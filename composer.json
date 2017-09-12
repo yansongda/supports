@@ -13,9 +13,7 @@
         }
     ],
     "require": {
-        "monolog/monolog": "^1.23",
-        "guzzlehttp/guzzle": "^6.3",
-        "symfony/http-foundation": "^3.3"
+        "monolog/monolog": "^1.23"
     },
     "autoload": {
         "psr-4": {
