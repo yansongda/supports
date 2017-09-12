@@ -1,19 +1,10 @@
 <?php
 
-/*
- * (c) overtrue <i@overtrue.me>
- *
- * modified by yansongda <me@yansongda.cn>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
 namespace Yansongda\Supports;
 
+use Monolog\Logger;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\NullHandler;
-use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
 class Log
@@ -88,7 +79,7 @@ class Log
      */
     private static function createDefaultLogger()
     {
-        $log = new Logger('GitNotify');
+        $log = new Logger('Yansongda');
 
         if (defined('PHPUNIT_RUNNING') || php_sapi_name() === 'cli') {
             $log->pushHandler(new NullHandler());
