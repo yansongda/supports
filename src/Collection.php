@@ -248,7 +248,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @see http://php.net/manual/en/iteratoraggregate.getiterator.php
      *
      * @return ArrayIterator An instance of an object implementing <b>Iterator</b> or
-     *                     <b>ArrayIterator</b>
+     *                       <b>ArrayIterator</b>
      */
     public function getIterator()
     {
