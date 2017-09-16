@@ -197,7 +197,7 @@ class Str
      */
     public static function length($value, $encoding = null)
     {
-        if ($encoding) {
+        if ($encoding !== null) {
             return mb_strlen($value, $encoding);
         }
 
@@ -261,18 +261,6 @@ class Str
     public static function parseCallback($callback, $default = null)
     {
         return static::contains($callback, '@') ? explode('@', $callback, 2) : [$callback, $default];
-    }
-
-    /**
-     * Get the plural form of an English word.
-     *
-     * @param  string  $value
-     * @param  int     $count
-     * @return string
-     */
-    public static function plural($value, $count = 2)
-    {
-        return Pluralizer::plural($value, $count);
     }
 
     /**
