@@ -1,14 +1,5 @@
 <?php
 
-/*
- * (c) overtrue <i@overtrue.me>
- *
- * Modified By yansongda <me@yansongda.cn>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
 namespace Yansongda\Supports\Traits;
 
 use GuzzleHttp\Client;
@@ -17,13 +8,15 @@ use Psr\Http\Message\ResponseInterface;
 trait HasHttpRequest
 {
     /**
-     * Make a get request.
+     * Send a GET request.
+     *
+     * @author yansongda <me@yansongda.cn>
      *
      * @param string $endpoint
-     * @param array  $query
-     * @param array  $headers
+     * @param array $query
+     * @param array $headers
      *
-     * @return array
+     * @return string
      */
     protected function get($endpoint, $query = [], $headers = [])
     {
@@ -34,35 +27,37 @@ trait HasHttpRequest
     }
 
     /**
-     * Make a post request.
+     * Send a POST request.
+     *
+     * @author yansongda <me@yansongda.cn>
      *
      * @param string $endpoint
-     * @param mixed  $params
-     * @param array  $options
+     * @param array $data
+     * @param array $options
      *
      * @return string
      */
-    protected function post($endpoint, $params = [], ...$options)
+    protected function post($endpoint, $data = [], $options = [])
     {
-        $options = isset($options[0]) ? $options[0] : [];
-
-        if (!is_array($params)) {
-            $options['body'] = $params;
+        if (! is_array($data)) {
+            $options['body'] = $data;
         } else {
-            $options['form_params'] = $params;
+            $options['form_params'] = $data;
         }
 
         return $this->request('post', $endpoint, $options);
     }
 
     /**
-     * Make a http request.
+     * Send request.
+     *
+     * @author yansongda <me@yansongda.cn>
      *
      * @param string $method
      * @param string $endpoint
-     * @param array  $options  http://docs.guzzlephp.org/en/latest/request-options.html
+     * @param array $options
      *
-     * @return array
+     * @return string
      */
     protected function request($method, $endpoint, $options = [])
     {
@@ -70,14 +65,16 @@ trait HasHttpRequest
     }
 
     /**
-     * Return base Guzzle options.
+     * Get base options.
      *
-     * @return array
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @return string
      */
     protected function getBaseOptions()
     {
         $options = [
-            'base_uri' => method_exists($this, 'getBaseUri') ? $this->getBaseUri() : '',
+            'base_uri' => property_exists($this, 'baseUri') ? $this->baseUri : '',
             'timeout'  => property_exists($this, 'timeout') ? $this->timeout : 5.0,
         ];
 
@@ -97,9 +94,11 @@ trait HasHttpRequest
     }
 
     /**
-     * Convert response contents to json.
+     * Convert response.
      *
-     * @param \Psr\Http\Message\ResponseInterface $response
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param ResponseInterface $response
      *
      * @return array
      */
