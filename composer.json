@@ -13,7 +13,6 @@
         }
     ],
     "require": {
-        "monolog/monolog": "^1.23",
         "guzzlehttp/guzzle": "^6.3"
     },
     "autoload": {
