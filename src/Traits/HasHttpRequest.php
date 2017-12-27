@@ -16,7 +16,7 @@ trait HasHttpRequest
      * @param array $query
      * @param array $headers
      *
-     * @return string
+     * @return array|string
      */
     protected function get($endpoint, $query = [], $headers = [])
     {
@@ -35,7 +35,7 @@ trait HasHttpRequest
      * @param array $data
      * @param array $options
      *
-     * @return string
+     * @return array|string
      */
     protected function post($endpoint, $data = [], $options = [])
     {
