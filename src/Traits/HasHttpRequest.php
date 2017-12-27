@@ -57,7 +57,7 @@ trait HasHttpRequest
      * @param string $endpoint
      * @param array $options
      *
-     * @return string
+     * @return array|string
      */
     protected function request($method, $endpoint, $options = [])
     {
@@ -69,7 +69,7 @@ trait HasHttpRequest
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @return string
+     * @return array
      */
     protected function getBaseOptions()
     {
@@ -100,7 +100,7 @@ trait HasHttpRequest
      *
      * @param ResponseInterface $response
      *
-     * @return array
+     * @return array|string
      */
     protected function unwrapResponse(ResponseInterface $response)
     {
