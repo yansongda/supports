@@ -494,6 +494,22 @@ class Str
     }
 
     /**
+     * Convert string's encoding.
+     *
+     * @author yansongda <me@yansonga.cn>
+     *
+     * @param string $string
+     * @param string $to
+     * @param string $from
+     *
+     * @return string
+     */
+    public static function encoding($string, $to = 'utf-8', $from = 'gb2312')
+    {
+        return mb_convert_encoding($string, $to, $from);
+    }
+
+    /**
      * Returns the replacements for the ascii method.
      *
      * Note: Adapted from Stringy\Stringy.
