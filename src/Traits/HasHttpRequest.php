@@ -31,13 +31,13 @@ trait HasHttpRequest
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string $endpoint
-     * @param array $data
-     * @param array $options
+     * @param string       $endpoint
+     * @param string|array $data
+     * @param array        $options
      *
      * @return array|string
      */
-    protected function post($endpoint, $data = [], $options = [])
+    protected function post($endpoint, $data, $options = [])
     {
         if (! is_array($data)) {
             $options['body'] = $data;
