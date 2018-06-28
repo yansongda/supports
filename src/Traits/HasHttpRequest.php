@@ -13,8 +13,8 @@ trait HasHttpRequest
      * @author yansongda <me@yansongda.cn>
      *
      * @param string $endpoint
-     * @param array $query
-     * @param array $headers
+     * @param array  $query
+     * @param array  $headers
      *
      * @return array|string
      */
@@ -39,7 +39,7 @@ trait HasHttpRequest
      */
     protected function post($endpoint, $data, $options = [])
     {
-        if (! is_array($data)) {
+        if (!is_array($data)) {
             $options['body'] = $data;
         } else {
             $options['form_params'] = $data;
@@ -55,7 +55,7 @@ trait HasHttpRequest
      *
      * @param string $method
      * @param string $endpoint
-     * @param array $options
+     * @param array  $options
      *
      * @return array|string
      */
@@ -74,8 +74,9 @@ trait HasHttpRequest
     protected function getBaseOptions()
     {
         $options = [
-            'base_uri' => property_exists($this, 'baseUri') ? $this->baseUri : '',
-            'timeout'  => property_exists($this, 'timeout') ? $this->timeout : 5.0,
+            'base_uri'         => property_exists($this, 'baseUri') ? $this->baseUri : '',
+            'timeout'          => property_exists($this, 'timeout') ? $this->timeout : 5.0,
+            'connect_timeout'  => property_exists($this, 'connect_timeout') ? $this->connect_timeout : 5.0,
         ];
 
         return $options;
