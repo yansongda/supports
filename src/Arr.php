@@ -367,7 +367,7 @@ class Arr
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param array $array
+     * @param array  $array
      * @param string $to_encoding
      * @param string $from_encoding
      *
