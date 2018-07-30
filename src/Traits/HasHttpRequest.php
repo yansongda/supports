@@ -76,7 +76,7 @@ trait HasHttpRequest
         $options = [
             'base_uri'         => property_exists($this, 'baseUri') ? $this->baseUri : '',
             'timeout'          => property_exists($this, 'timeout') ? $this->timeout : 5.0,
-            'connect_timeout'  => property_exists($this, 'connect_timeout') ? $this->connect_timeout : 5.0,
+            'connect_timeout'  => property_exists($this, 'connectTimeout') ? $this->connectTimeout : 5.0,
         ];
 
         return $options;
