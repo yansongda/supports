@@ -60,14 +60,15 @@ class Log
      * @param string $file
      * @param string $identify
      * @param int    $level
+     * @param int    $maxFiles
      *
      * @return \Monolog\Logger
      */
-    public static function createLogger($file = null, $identify = null, $level = Logger::DEBUG)
+    public static function createLogger($file = null, $identify = null, $level = Logger::DEBUG, $maxFiles = 30)
     {
         $handler = new RotatingFileHandler(
             is_null($file) ? sys_get_temp_dir().'/logs/yansongda.supports.log' : $file,
-            30,
+            $maxFiles,
             $level
         );
         $handler->setFormatter(
