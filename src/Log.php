@@ -25,7 +25,7 @@ class Log
      */
     public static function getLogger()
     {
-        return self::$logger ?: self::$logger = self::createDefaultLogger();
+        return self::$logger ?: self::$logger = self::createLogger();
     }
 
     /**
@@ -57,16 +57,24 @@ class Log
      *
      * @author yansongda <me@yansongda.cn>
      *
+     * @param string $file
+     * @param string $identify
+     * @param int    $level
+     *
      * @return \Monolog\Logger
      */
-    protected static function createDefaultLogger()
+    public static function createLogger($file = null, $identify = null, $level = Logger::DEBUG)
     {
-        $handler = new RotatingFileHandler(sys_get_temp_dir().'/logs/yansongda.supports.log', 30);
+        $handler = new RotatingFileHandler(
+            is_null($file) ? sys_get_temp_dir().'/logs/yansongda.supports.log' : $file,
+            30,
+            $level
+        );
         $handler->setFormatter(
             new LineFormatter("%datetime% > %level_name% > %message% %context% %extra%\n\n", null, false, true)
         );
 
-        $logger = new Logger('yansongda.supports');
+        $logger = new Logger(is_null($identify) ? 'yansongda.supports' : $identify);
         $logger->pushHandler($handler);
 
         return $logger;
