@@ -69,15 +69,15 @@ class Log
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string $type
      * @param string $file
      * @param string $identify
      * @param int    $level
+     * @param string $type
      * @param int    $max_files
      *
      * @return \Monolog\Logger
      */
-    public static function createLogger($type = 'daily', $file = null, $identify = null, $level = Logger::DEBUG, $max_files = 30)
+    public static function createLogger($file = null, $identify = null, $level = Logger::DEBUG, $type = 'daily', $max_files = 30)
     {
         $file = is_null($file) ? sys_get_temp_dir().'/logs/yansongda.supports.log' : $file;
 
