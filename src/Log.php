@@ -4,6 +4,7 @@ namespace Yansongda\Supports;
 
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\RotatingFileHandler;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Log\LoggerInterface;
 
@@ -68,20 +69,20 @@ class Log
      *
      * @author yansongda <me@yansongda.cn>
      *
+     * @param string $type
      * @param string $file
      * @param string $identify
      * @param int    $level
-     * @param int    $maxFiles
+     * @param int    $max_files
      *
      * @return \Monolog\Logger
      */
-    public static function createLogger($file = null, $identify = null, $level = Logger::DEBUG, $maxFiles = 30)
+    public static function createLogger($type = 'daily', $file = null, $identify = null, $level = Logger::DEBUG, $max_files = 30)
     {
-        $handler = new RotatingFileHandler(
-            is_null($file) ? sys_get_temp_dir().'/logs/yansongda.supports.log' : $file,
-            $maxFiles,
-            $level
-        );
+        $file = is_null($file) ? sys_get_temp_dir().'/logs/yansongda.supports.log' : $file;
+
+        $handler = $type === 'signle' ? new StreamHandler($file, $level) : new RotatingFileHandler($file, $max_files, $level);
+
         $handler->setFormatter(
             new LineFormatter("%datetime% > %level_name% > %message% %context% %extra%\n\n", null, false, true)
         );
