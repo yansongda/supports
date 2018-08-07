@@ -59,7 +59,7 @@ class Log
      *
      * @return bool
      */
-    public static function hasLogger(): bool
+    public static function hasLogger()
     {
         return self::$logger ? true : false;
     }
