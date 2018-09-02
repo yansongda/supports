@@ -265,7 +265,7 @@ class Str
     }
 
     /**
-     * Parse a Class@method style callback into class and method.
+     * Parse a Class
      *
      * @param string      $callback
      * @param string|null $default
@@ -281,6 +281,8 @@ class Str
      * Generate a more truly "random" alpha-numeric string.
      *
      * @param int $length
+     *
+     * @throws \Exception
      *
      * @return string
      */

@@ -33,6 +33,8 @@ class Log
      *
      * @author yansongda <me@yansongda.cn>
      *
+     * @throws \Exception
+     *
      * @return LoggerInterface
      */
     public static function getLogger()
@@ -75,6 +77,8 @@ class Log
      * @param string $type
      * @param int    $max_files
      *
+     * @throws \Exception
+     *
      * @return \Monolog\Logger
      */
     public static function createLogger($file = null, $identify = null, $level = Logger::DEBUG, $type = 'daily', $max_files = 30)
@@ -101,6 +105,8 @@ class Log
      * @param string $method
      * @param array  $args
      *
+     * @throws \Exception
+     *
      * @return mixed
      */
     public static function __callStatic($method, $args)
@@ -115,6 +121,8 @@ class Log
      *
      * @param string $method
      * @param array  $args
+     *
+     * @throws \Exception
      *
      * @return mixed
      */
