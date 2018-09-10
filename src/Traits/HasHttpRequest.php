@@ -7,6 +7,8 @@ use Psr\Http\Message\ResponseInterface;
 
 trait HasHttpRequest
 {
+    protected $httpClient = null;
+
     /**
      * Send a GET request.
      *
@@ -18,11 +20,11 @@ trait HasHttpRequest
      *
      * @return array|string
      */
-    protected function get($endpoint, $query = [], $headers = [])
+    public function get($endpoint, $query = [], $headers = [])
     {
         return $this->request('get', $endpoint, [
             'headers' => $headers,
-            'query'   => $query,
+            'query' => $query,
         ]);
     }
 
@@ -37,7 +39,7 @@ trait HasHttpRequest
      *
      * @return array|string
      */
-    protected function post($endpoint, $data, $options = [])
+    public function post($endpoint, $data, $options = [])
     {
         if (!is_array($data)) {
             $options['body'] = $data;
@@ -59,24 +61,40 @@ trait HasHttpRequest
      *
      * @return array|string
      */
-    protected function request($method, $endpoint, $options = [])
+    public function request($method, $endpoint, $options = [])
     {
-        return $this->unwrapResponse($this->getHttpClient($this->getBaseOptions())->{$method}($endpoint, $options));
+        return $this->unwrapResponse($this->getHttpClient()->{$method}($endpoint, $options));
     }
 
     /**
-     * Get base options.
+     * Set http client.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param Client $client
+     *
+     * @return $this
+     */
+    public function setHttpClient(Client $client)
+    {
+        $this->httpClient = $client;
+
+        return $this;
+    }
+
+    /**
+     * Get default options.
      *
      * @author yansongda <me@yansongda.cn>
      *
      * @return array
      */
-    protected function getBaseOptions()
+    protected function getDefaultOptions()
     {
         $options = [
-            'base_uri'         => property_exists($this, 'baseUri') ? $this->baseUri : '',
-            'timeout'          => property_exists($this, 'timeout') ? $this->timeout : 5.0,
-            'connect_timeout'  => property_exists($this, 'connectTimeout') ? $this->connectTimeout : 5.0,
+            'base_uri' => property_exists($this, 'baseUri') ? $this->baseUri : '',
+            'timeout' => property_exists($this, 'timeout') ? $this->timeout : 5.0,
+            'connect_timeout' => property_exists($this, 'connectTimeout') ? $this->connectTimeout : 5.0,
         ];
 
         return $options;
@@ -85,13 +103,27 @@ trait HasHttpRequest
     /**
      * Return http client.
      *
-     * @param array $options
-     *
      * @return \GuzzleHttp\Client
      */
-    protected function getHttpClient(array $options = [])
+    protected function getHttpClient()
     {
-        return new Client($options);
+        if (is_null($this->httpClient)) {
+            return $this->getDefaultHttpClient();
+        }
+
+        return $this->httpClient;
+    }
+
+    /**
+     * Get default http client.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @return Client
+     */
+    protected function getDefaultHttpClient()
+    {
+        return new Client($this->getDefaultOptions());
     }
 
     /**

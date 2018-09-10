@@ -40,6 +40,73 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     }
 
     /**
+     * To string.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->toJson();
+    }
+
+    /**
+     * Get a data by key.
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return $this->get($key);
+    }
+
+    /**
+     * Assigns a value to the specified data.
+     *
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function __set($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
+    /**
+     * Whether or not an data exists by key.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function __isset($key)
+    {
+        return $this->has($key);
+    }
+
+    /**
+     * Unsets an data by key.
+     *
+     * @param string $key
+     */
+    public function __unset($key)
+    {
+        $this->forget($key);
+    }
+
+    /**
+     * var_export.
+     *
+     * @param array $array
+     *
+     * @return array
+     */
+    public static function __set_state(array $array = [])
+    {
+        return (new static())->all();
+    }
+
+    /**
      * Return all items.
      *
      * @return array
@@ -205,16 +272,6 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     }
 
     /**
-     * To string.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->toJson();
-    }
-
-    /**
      * (PHP 5 &gt;= 5.4.0)<br/>
      * Specify data which should be serialized to JSON.
      *
@@ -286,63 +343,6 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     public function unserialize($serialized)
     {
         return $this->items = unserialize($serialized);
-    }
-
-    /**
-     * Get a data by key.
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function __get($key)
-    {
-        return $this->get($key);
-    }
-
-    /**
-     * Assigns a value to the specified data.
-     *
-     * @param string $key
-     * @param mixed  $value
-     */
-    public function __set($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    /**
-     * Whether or not an data exists by key.
-     *
-     * @param string $key
-     *
-     * @return bool
-     */
-    public function __isset($key)
-    {
-        return $this->has($key);
-    }
-
-    /**
-     * Unsets an data by key.
-     *
-     * @param string $key
-     */
-    public function __unset($key)
-    {
-        $this->forget($key);
-    }
-
-    /**
-     * var_export.
-     *
-     * @param array $array
-     *
-     * @return array
-     */
-    public static function __set_state(array $array = [])
-    {
-        return (new static())->all();
     }
 
     /**

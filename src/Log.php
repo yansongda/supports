@@ -29,6 +29,40 @@ class Log
     protected static $logger;
 
     /**
+     * Forward call.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param string $method
+     * @param array  $args
+     *
+     * @throws \Exception
+     *
+     * @return mixed
+     */
+    public static function __callStatic($method, $args)
+    {
+        return forward_static_call_array([self::getLogger(), $method], $args);
+    }
+
+    /**
+     * Forward call.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param string $method
+     * @param array  $args
+     *
+     * @throws \Exception
+     *
+     * @return mixed
+     */
+    public function __call($method, $args)
+    {
+        return call_user_func_array([self::getLogger(), $method], $args);
+    }
+
+    /**
      * Return the logger instance.
      *
      * @author yansongda <me@yansongda.cn>
@@ -95,39 +129,5 @@ class Log
         $logger->pushHandler($handler);
 
         return $logger;
-    }
-
-    /**
-     * Forward call.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @param string $method
-     * @param array  $args
-     *
-     * @throws \Exception
-     *
-     * @return mixed
-     */
-    public static function __callStatic($method, $args)
-    {
-        return forward_static_call_array([self::getLogger(), $method], $args);
-    }
-
-    /**
-     * Forward call.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @param string $method
-     * @param array  $args
-     *
-     * @throws \Exception
-     *
-     * @return mixed
-     */
-    public function __call($method, $args)
-    {
-        return call_user_func_array([self::getLogger(), $method], $args);
     }
 }
