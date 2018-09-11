@@ -119,7 +119,7 @@ class Log
     {
         $file = is_null($file) ? sys_get_temp_dir().'/logs/yansongda.supports.log' : $file;
 
-        $handler = $type === 'signle' ? new StreamHandler($file, $level) : new RotatingFileHandler($file, $max_files, $level);
+        $handler = $type === 'single' ? new StreamHandler($file, $level) : new RotatingFileHandler($file, $max_files, $level);
 
         $handler->setFormatter(
             new LineFormatter("%datetime% > %level_name% > %message% %context% %extra%\n\n", null, false, true)
