@@ -118,7 +118,7 @@ trait HasHttpRequest
     protected function getHttpClient()
     {
         if (is_null($this->httpClient)) {
-            return $this->getDefaultHttpClient();
+            $this->httpClient = $this->getDefaultHttpClient();
         }
 
         return $this->httpClient;
