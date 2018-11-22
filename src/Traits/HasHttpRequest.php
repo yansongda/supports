@@ -5,6 +5,13 @@ namespace Yansongda\Supports\Traits;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Trait HasHttpRequest
+ *
+ * @property string baseUri        base_uri
+ * @property string timeout        timeout
+ * @property string connectTimeout connect_timeout
+ */
 trait HasHttpRequest
 {
     /**

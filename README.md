@@ -4,7 +4,7 @@ handle with array/config/log/guzzle etc.
 
 ## About log
 
-### Registe
+### Register
 
 #### Method 1
 
@@ -43,7 +43,7 @@ Or, just init the log service with:
 ```PHP
 use Yansongda\Supports\Log;
 
-protected function registeLog()
+protected function registerLog()
 {
     $logger = Log::createLogger($file, $identify, $level);
 
@@ -53,7 +53,7 @@ protected function registeLog()
 
 ### Usage
 
-After registeLog, you can use Log service:
+After registerLog, you can use Log service:
 
 ```PHP
 use Yansongda\Supports\Log;
