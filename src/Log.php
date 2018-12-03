@@ -105,19 +105,19 @@ class Log
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string $file
-     * @param string $identify
-     * @param int    $level
-     * @param string $type
-     * @param int    $max_files
+     * @param string     $file
+     * @param string     $identify
+     * @param int|string $level
+     * @param string     $type
+     * @param int        $max_files
      *
      * @throws \Exception
      *
      * @return \Monolog\Logger
      */
-    public static function createLogger($file = null, $identify = null, $level = Logger::DEBUG, $type = 'daily', $max_files = 30)
+    public static function createLogger($file = null, $identify = 'yansongda.supports', $level = Logger::DEBUG, $type = 'daily', $max_files = 30)
     {
-        $file = is_null($file) ? sys_get_temp_dir().'/logs/yansongda.supports.log' : $file;
+        $file = is_null($file) ? sys_get_temp_dir().'/logs/'.$identify.'.log' : $file;
 
         $handler = $type === 'single' ? new StreamHandler($file, $level) : new RotatingFileHandler($file, $max_files, $level);
 
@@ -125,7 +125,7 @@ class Log
             new LineFormatter("%datetime% > %level_name% > %message% %context% %extra%\n\n", null, false, true)
         );
 
-        $logger = new Logger(is_null($identify) ? 'yansongda.supports' : $identify);
+        $logger = new Logger($identify);
         $logger->pushHandler($handler);
 
         return $logger;
