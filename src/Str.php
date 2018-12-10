@@ -265,7 +265,7 @@ class Str
     }
 
     /**
-     * Parse a Class
+     * Parse a Class.
      *
      * @param string      $callback
      * @param string|null $default
