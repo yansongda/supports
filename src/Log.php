@@ -122,7 +122,7 @@ class Log
         $handler = $type === 'single' ? new StreamHandler($file, $level) : new RotatingFileHandler($file, $max_files, $level);
 
         $handler->setFormatter(
-            new LineFormatter("%datetime% > %level_name% > %message% %context% %extra%\n\n", null, false, true)
+            new LineFormatter("%datetime% > %channel%.%level_name% > %message% %context% %extra%\n\n", null, false, true)
         );
 
         $logger = new Logger($identify);
