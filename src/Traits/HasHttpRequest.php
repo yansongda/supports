@@ -108,7 +108,7 @@ trait HasHttpRequest
      *
      * @return array
      */
-    protected function getOptions()
+    public function getOptions()
     {
         return array_merge([
             'base_uri'        => property_exists($this, 'baseUri') ? $this->baseUri : '',
@@ -122,7 +122,7 @@ trait HasHttpRequest
      *
      * @return \GuzzleHttp\Client
      */
-    protected function getHttpClient()
+    public function getHttpClient()
     {
         if (is_null($this->httpClient)) {
             $this->httpClient = $this->getDefaultHttpClient();
@@ -138,7 +138,7 @@ trait HasHttpRequest
      *
      * @return Client
      */
-    protected function getDefaultHttpClient()
+    public function getDefaultHttpClient()
     {
         return new Client($this->getOptions());
     }
@@ -152,7 +152,7 @@ trait HasHttpRequest
      *
      * @return array|string
      */
-    protected function unwrapResponse(ResponseInterface $response)
+    public function unwrapResponse(ResponseInterface $response)
     {
         $contentType = $response->getHeaderLine('Content-Type');
         $contents = $response->getBody()->getContents();
