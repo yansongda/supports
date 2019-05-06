@@ -30,8 +30,8 @@ class Arr
     /**
      * Build a new array using a callback.
      *
-     * @param array    $array
-     * @param \Closure $callback
+     * @param array   $array
+     * @param Closure $callback
      *
      * @return array
      */
@@ -125,9 +125,9 @@ class Arr
     /**
      * Return the first element in an array passing a given truth test.
      *
-     * @param array    $array
-     * @param \Closure $callback
-     * @param mixed    $default
+     * @param array   $array
+     * @param Closure $callback
+     * @param mixed   $default
      *
      * @return mixed
      */
@@ -145,9 +145,9 @@ class Arr
     /**
      * Return the last element in an array passing a given truth test.
      *
-     * @param array    $array
-     * @param \Closure $callback
-     * @param mixed    $default
+     * @param array   $array
+     * @param Closure $callback
+     * @param mixed   $default
      *
      * @return mixed
      */
@@ -325,8 +325,8 @@ class Arr
     /**
      * Sort the array using the given Closure.
      *
-     * @param array    $array
-     * @param \Closure $callback
+     * @param array   $array
+     * @param Closure $callback
      *
      * @return array
      */
@@ -344,8 +344,8 @@ class Arr
     /**
      * Filter the array using the given Closure.
      *
-     * @param array    $array
-     * @param \Closure $callback
+     * @param array   $array
+     * @param Closure $callback
      *
      * @return array
      */

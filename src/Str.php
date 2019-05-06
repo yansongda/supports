@@ -2,6 +2,8 @@
 
 namespace Yansongda\Supports;
 
+use Exception;
+
 /**
  * modify from Illuminate\Support;.
  */
@@ -282,7 +284,7 @@ class Str
      *
      * @param int $length
      *
-     * @throws \Exception
+     * @throws Exception
      *
      * @return string
      */

@@ -120,7 +120,7 @@ trait HasHttpRequest
     /**
      * Return http client.
      *
-     * @return \GuzzleHttp\Client
+     * @return Client
      */
     public function getHttpClient()
     {
