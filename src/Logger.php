@@ -27,7 +27,7 @@ class Logger
      *
      * @var LoggerInterface
      */
-    protected static $logger;
+    protected $logger;
 
     /**
      * Forward call.
@@ -43,7 +43,9 @@ class Logger
      */
     public static function __callStatic($method, $args)
     {
-        return forward_static_call_array([self::getLogger(), $method], $args);
+        $logger = new static();
+
+        return forward_static_call_array([$logger->getLogger(), $method], $args);
     }
 
     /**
@@ -60,7 +62,7 @@ class Logger
      */
     public function __call($method, $args)
     {
-        return call_user_func_array([self::getLogger(), $method], $args);
+        return call_user_func_array([$this->getLogger(), $method], $args);
     }
 
     /**
@@ -72,9 +74,13 @@ class Logger
      *
      * @return LoggerInterface
      */
-    public static function getLogger()
+    public function getLogger()
     {
-        return self::$logger ?: self::$logger = self::createLogger();
+        if (is_null($this->logger)) {
+            $this->logger = $this->createDefaultLogger();
+        }
+
+        return $this->logger;
     }
 
     /**
@@ -84,9 +90,9 @@ class Logger
      *
      * @param LoggerInterface $logger
      */
-    public static function setLogger(LoggerInterface $logger)
+    public function setLogger(LoggerInterface $logger)
     {
-        self::$logger = $logger;
+        $this->logger = $logger;
     }
 
     /**
@@ -96,9 +102,9 @@ class Logger
      *
      * @return bool
      */
-    public static function hasLogger()
+    public function hasLogger()
     {
-        return self::$logger ? true : false;
+        return $this->logger ? true : false;
     }
 
     /**
@@ -116,7 +122,7 @@ class Logger
      *
      * @return BaseLogger
      */
-    public static function createLogger($file = null, $identify = 'yansongda.supports', $level = BaseLogger::DEBUG, $type = 'daily', $max_files = 30)
+    public function createDefaultLogger($file = null, $identify = 'yansongda.supports', $level = BaseLogger::DEBUG, $type = 'daily', $max_files = 30)
     {
         $file = is_null($file) ? sys_get_temp_dir().'/logs/'.$identify.'.log' : $file;
 
