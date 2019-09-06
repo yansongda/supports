@@ -3,7 +3,9 @@
 namespace Yansongda\Supports;
 
 use Exception;
+use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\AbstractHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as BaseLogger;
@@ -30,23 +32,31 @@ class Logger
     protected $logger;
 
     /**
-     * Forward call.
+     * formatter.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @param string $method
-     * @param array  $args
-     *
-     * @throws Exception
-     *
-     * @return mixed
+     * @var \Monolog\Formatter\FormatterInterface
      */
-    public static function __callStatic($method, $args)
-    {
-        $logger = new static();
+    protected $formatter;
 
-        return forward_static_call_array([$logger->getLogger(), $method], $args);
-    }
+    /**
+     * handler.
+     *
+     * @var AbstractHandler
+     */
+    protected $handler;
+
+    /**
+     * config.
+     *
+     * @var array
+     */
+    protected $config = [
+        'file' => null,
+        'identify' => 'yansongda.supports',
+        'level' => BaseLogger::DEBUG,
+        'type' => 'daily',
+        'max_files' => 30
+    ];
 
     /**
      * Forward call.
@@ -66,6 +76,22 @@ class Logger
     }
 
     /**
+     * Set logger.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param LoggerInterface $logger
+     *
+     * @return Logger
+     */
+    public function setLogger(LoggerInterface $logger): Logger
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
      * Return the logger instance.
      *
      * @author yansongda <me@yansongda.cn>
@@ -74,37 +100,13 @@ class Logger
      *
      * @return LoggerInterface
      */
-    public function getLogger()
+    public function getLogger(): LoggerInterface
     {
         if (is_null($this->logger)) {
-            $this->logger = $this->createDefaultLogger();
+            $this->logger = $this->createLogger();
         }
 
         return $this->logger;
-    }
-
-    /**
-     * Set logger.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @param LoggerInterface $logger
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
-
-    /**
-     * Tests if logger exists.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @return bool
-     */
-    public function hasLogger()
-    {
-        return $this->logger ? true : false;
     }
 
     /**
@@ -112,29 +114,139 @@ class Logger
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string     $file
-     * @param string     $identify
-     * @param int|string $level
-     * @param string     $type
-     * @param int        $max_files
-     *
      * @throws Exception
      *
      * @return BaseLogger
      */
-    public function createDefaultLogger($file = null, $identify = 'yansongda.supports', $level = BaseLogger::DEBUG, $type = 'daily', $max_files = 30)
+    public function createLogger(): BaseLogger
     {
-        $file = is_null($file) ? sys_get_temp_dir().'/logs/'.$identify.'.log' : $file;
+        $handler = $this->getHandler();
 
-        $handler = $type === 'single' ? new StreamHandler($file, $level) : new RotatingFileHandler($file, $max_files, $level);
+        $handler->setFormatter($this->getFormatter());
 
-        $handler->setFormatter(
-            new LineFormatter("%datetime% > %channel%.%level_name% > %message% %context% %extra%\n\n", null, false, true)
-        );
+        $logger = new BaseLogger($this->config['identify']);
 
-        $logger = new BaseLogger($identify);
         $logger->pushHandler($handler);
 
         return $logger;
+    }
+
+    /**
+     * setFormatter.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param \Monolog\Formatter\FormatterInterface $formatter
+     *
+     * @return $this
+     */
+    public function setFormatter(FormatterInterface $formatter): self
+    {
+        $this->formatter = $formatter;
+
+        return $this;
+    }
+
+    /**
+     * getFormatter.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @return \Monolog\Formatter\FormatterInterface
+     */
+    public function getFormatter(): FormatterInterface
+    {
+        if (is_null($this->formatter)) {
+            $this->formatter = $this->createFormatter();
+        }
+
+        return $this->formatter;
+    }
+
+    /**
+     * createFormatter.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @return \Monolog\Formatter\LineFormatter
+     */
+    public function createFormatter(): LineFormatter
+    {
+        return new LineFormatter(
+            "%datetime% > %channel%.%level_name% > %message% %context% %extra%\n\n",
+            null,
+            false,
+            true
+        );
+    }
+
+    /**
+     * setHandler.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param \Monolog\Handler\AbstractHandler $handler
+     *
+     * @return $this
+     */
+    public function setHandler(AbstractHandler $handler): self
+    {
+        $this->handler = $handler;
+
+        return $this;
+    }
+
+    /**
+     * getHandler.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @throws \Exception
+     *
+     * @return AbstractHandler
+     */
+    public function getHandler(): AbstractHandler
+    {
+        if (is_null($this->handler)) {
+            $this->handler = $this->createHandler();
+        }
+
+        return $this->handler;
+    }
+
+    /**
+     * createHandler.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @throws \Exception
+     *
+     * @return \Monolog\Handler\RotatingFileHandler|\Monolog\Handler\StreamHandler
+     */
+    public function createHandler(): AbstractHandler
+    {
+        $file = $this->config['file'] ?? sys_get_temp_dir().'/logs/'.$this->config['identify'].'.log';
+
+        if ($this->config['type'] === 'single') {
+            return new StreamHandler($file, $this->config['level']);
+        }
+
+        return new RotatingFileHandler($file, $this->config['max_files'], $this->config['level']);
+    }
+
+    /**
+     * setConfig.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param array $config
+     *
+     * @return $this
+     */
+    public function setConfig(array $config): self
+    {
+        $this->config = array_merge($this->config, $config);
+
+        return $this;
     }
 }
