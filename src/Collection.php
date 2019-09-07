@@ -1,14 +1,5 @@
 <?php
 
-/*
- * (c) overtrue <i@overtrue.me>
- *
- * modified by yansongda <me@yansongda.cn>
- *
- * This source file is subject to the MIT license that is bundled
- * with this source code in the file LICENSE.
- */
-
 namespace Yansongda\Supports;
 
 use ArrayAccess;
@@ -92,18 +83,6 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     public function __unset($key)
     {
         $this->forget($key);
-    }
-
-    /**
-     * var_export.
-     *
-     * @param array $array
-     *
-     * @return array
-     */
-    public static function __set_state(array $array = [])
-    {
-        return (new static())->all();
     }
 
     /**
