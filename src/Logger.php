@@ -12,15 +12,15 @@ use Monolog\Logger as BaseLogger;
 use Psr\Log\LoggerInterface;
 
 /**
- * @method void emergency($message, array $context = array())
- * @method void alert($message, array $context = array())
- * @method void critical($message, array $context = array())
- * @method void error($message, array $context = array())
- * @method void warning($message, array $context = array())
- * @method void notice($message, array $context = array())
- * @method void info($message, array $context = array())
- * @method void debug($message, array $context = array())
- * @method void log($message, array $context = array())
+ * @method bool emergency($message, array $context = array())
+ * @method bool alert($message, array $context = array())
+ * @method bool critical($message, array $context = array())
+ * @method bool error($message, array $context = array())
+ * @method bool warning($message, array $context = array())
+ * @method bool notice($message, array $context = array())
+ * @method bool info($message, array $context = array())
+ * @method bool debug($message, array $context = array())
+ * @method bool log($message, array $context = array())
  */
 class Logger
 {
