@@ -112,8 +112,8 @@ trait ShouldThrottle
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param null $key
-     * @param null $default
+     * @param null|string $key
+     * @param null|mixed  $default
      *
      * @return array|null
      */
@@ -135,8 +135,8 @@ trait ShouldThrottle
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param     $key
-     * @param int $period
+     * @param string $key
+     * @param int    $period
      *
      * @return string
      */
