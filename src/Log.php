@@ -72,7 +72,7 @@ class Log extends Logger
      *
      * @return \Psr\Log\LoggerInterface
      */
-    public function getInstance()
+    public static function getInstance()
     {
         if (is_null(self::$instance)) {
             self::$instance = (new Logger())->getLogger();
