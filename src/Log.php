@@ -2,7 +2,7 @@
 
 namespace Yansongda\Supports;
 
-use Monolog\Logger as BaseLogger;
+use Psr\Log\LoggerInterface;
 
 /**
  * @method static bool emergency($message, array $context = array())
@@ -41,16 +41,11 @@ class Log extends Logger
      *
      * @throws \Exception
      *
-     * @return mixed
+     * @return bool
      */
-    public function __call($method, $args)
+    public function __call($method, $args): bool
     {
         $ret = call_user_func_array([self::getInstance(), $method], $args);
-
-        // Monolog v2 always returns null
-        if (BaseLogger::API >= 2 && null === $ret) {
-            return true;
-        }
 
         return $ret;
     }
@@ -65,16 +60,11 @@ class Log extends Logger
      *
      * @throws \Exception
      *
-     * @return mixed
+     * @return bool
      */
-    public static function __callStatic($method, $args)
+    public static function __callStatic($method, $args): bool
     {
         $ret = forward_static_call_array([self::getInstance(), $method], $args);
-
-        // Monolog v2 always returns null
-        if (BaseLogger::API >= 2 && null === $ret) {
-            return true;
-        }
 
         return $ret;
     }
@@ -88,12 +78,28 @@ class Log extends Logger
      *
      * @return \Psr\Log\LoggerInterface
      */
-    public static function getInstance()
+    public static function getInstance(): LoggerInterface
     {
         if (is_null(self::$instance)) {
             self::$instance = (new Logger())->getLogger();
         }
 
         return self::$instance;
+    }
+
+    /**
+     * setInstance.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param \Yansongda\Supports\Logger $logger
+     *
+     * @throws \Exception
+     *
+     * @return void
+     */
+    public static function setInstance(Logger $logger): void
+    {
+        self::$instance = $logger->getLogger();
     }
 }

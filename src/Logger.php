@@ -68,9 +68,9 @@ class Logger
      *
      * @throws Exception
      *
-     * @return mixed
+     * @return bool
      */
-    public function __call($method, $args)
+    public function __call($method, $args): bool
     {
         $ret = call_user_func_array([$this->getLogger(), $method], $args);
 
