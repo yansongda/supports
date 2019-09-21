@@ -55,7 +55,7 @@ class Logger
         'identify' => 'yansongda.supports',
         'level' => BaseLogger::DEBUG,
         'type' => 'daily',
-        'max_files' => 30
+        'max_files' => 30,
     ];
 
     /**
@@ -227,7 +227,7 @@ class Logger
     {
         $file = $this->config['file'] ?? sys_get_temp_dir().'/logs/'.$this->config['identify'].'.log';
 
-        if ($this->config['type'] === 'single') {
+        if ('single' === $this->config['type']) {
             return new StreamHandler($file, $this->config['level']);
         }
 

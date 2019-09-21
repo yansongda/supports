@@ -17,7 +17,7 @@ trait HasHttpRequest
     /**
      * Http client.
      *
-     * @var null|Client
+     * @var Client|null
      */
     protected $httpClient = null;
 
@@ -43,7 +43,7 @@ trait HasHttpRequest
     {
         return $this->request('get', $endpoint, [
             'headers' => $headers,
-            'query'   => $query,
+            'query' => $query,
         ]);
     }
 
@@ -111,8 +111,8 @@ trait HasHttpRequest
     public function getOptions()
     {
         return array_merge([
-            'base_uri'        => property_exists($this, 'baseUri') ? $this->baseUri : '',
-            'timeout'         => property_exists($this, 'timeout') ? $this->timeout : 5.0,
+            'base_uri' => property_exists($this, 'baseUri') ? $this->baseUri : '',
+            'timeout' => property_exists($this, 'timeout') ? $this->timeout : 5.0,
             'connect_timeout' => property_exists($this, 'connectTimeout') ? $this->connectTimeout : 5.0,
         ], $this->httpOptions);
     }
