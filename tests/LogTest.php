@@ -8,8 +8,9 @@ class LogTest extends TestCase
 {
     public function testDebug()
     {
-        $result = Log::debug('test debug', ['foo' => 'bar']);
+        $this->assertTrue(Log::debug('test debug', ['foo' => 'bar']));
 
-        $this->assertTrue($result);
+        $log = Log::getInstance();
+        $this->assertTrue($log->debug('test debug', ['foo' => 'bar']));
     }
 }

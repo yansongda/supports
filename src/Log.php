@@ -2,8 +2,6 @@
 
 namespace Yansongda\Supports;
 
-use Psr\Log\LoggerInterface;
-
 /**
  * @method static bool emergency($message, array $context = array())
  * @method static bool alert($message, array $context = array())
@@ -74,14 +72,12 @@ class Log extends Logger
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @throws \Exception
-     *
-     * @return \Psr\Log\LoggerInterface
+     * @return \Yansongda\Supports\Logger
      */
-    public static function getInstance(): LoggerInterface
+    public static function getInstance(): Logger
     {
         if (is_null(self::$instance)) {
-            self::$instance = (new Logger())->getLogger();
+            self::$instance = new Logger();
         }
 
         return self::$instance;
@@ -98,6 +94,6 @@ class Log extends Logger
      */
     public static function setInstance(Logger $logger): void
     {
-        self::$instance = $logger->getLogger();
+        self::$instance = $logger;
     }
 }
