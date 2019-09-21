@@ -43,9 +43,7 @@ class Log extends Logger
      */
     public function __call($method, $args): bool
     {
-        $ret = call_user_func_array([self::getInstance(), $method], $args);
-
-        return $ret;
+        return call_user_func_array([self::getInstance(), $method], $args);
     }
 
     /**
@@ -62,9 +60,7 @@ class Log extends Logger
      */
     public static function __callStatic($method, $args): bool
     {
-        $ret = forward_static_call_array([self::getInstance(), $method], $args);
-
-        return $ret;
+        return forward_static_call_array([self::getInstance(), $method], $args);
     }
 
     /**
