@@ -95,8 +95,6 @@ class Log extends Logger
      * @param \Yansongda\Supports\Logger $logger
      *
      * @throws \Exception
-     *
-     * @return void
      */
     public static function setInstance(Logger $logger): void
     {
