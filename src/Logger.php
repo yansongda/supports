@@ -256,4 +256,16 @@ class Logger
 
         return $this;
     }
+
+    /**
+     * getConfig.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @return array
+     */
+    public function getConfig(): array
+    {
+        return $this->config;
+    }
 }
