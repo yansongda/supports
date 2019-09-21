@@ -29,8 +29,8 @@ class CollectionTest extends TestCase
             'language' => [
                 'php',
                 'java',
-                'python'
-            ]
+                'python',
+            ],
         ];
         $this->collection = new Collection($this->data);
     }
@@ -79,7 +79,7 @@ class CollectionTest extends TestCase
     public function testOnly()
     {
         $this->assertEquals([
-            'name' => 'yansongda'
+            'name' => 'yansongda',
         ], $this->collection->only(['name']));
     }
 
