@@ -75,7 +75,7 @@ class Logger
         $ret = call_user_func_array([$this->getLogger(), $method], $args);
 
         // Monolog v2 always returns null
-        if (BaseLogger::API >= 2 && $ret === null) {
+        if (BaseLogger::API >= 2 && null === $ret) {
             return true;
         }
 

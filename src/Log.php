@@ -48,7 +48,7 @@ class Log extends Logger
         $ret = call_user_func_array([self::getInstance(), $method], $args);
 
         // Monolog v2 always returns null
-        if (BaseLogger::API >= 2 && $ret === null) {
+        if (BaseLogger::API >= 2 && null === $ret) {
             return true;
         }
 
@@ -72,7 +72,7 @@ class Log extends Logger
         $ret = forward_static_call_array([self::getInstance(), $method], $args);
 
         // Monolog v2 always returns null
-        if (BaseLogger::API >= 2 && $ret === null) {
+        if (BaseLogger::API >= 2 && null === $ret) {
             return true;
         }
 
