@@ -5,7 +5,7 @@ namespace Yansongda\Supports;
 use Exception;
 
 /**
- * modify from Illuminate\Support;.
+ * modify from Illuminate\Support.
  */
 class Str
 {
