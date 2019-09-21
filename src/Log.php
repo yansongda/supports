@@ -2,6 +2,8 @@
 
 namespace Yansongda\Supports;
 
+use Monolog\Logger as BaseLogger;
+
 /**
  * @method static bool emergency($message, array $context = array())
  * @method static bool alert($message, array $context = array())
@@ -43,7 +45,14 @@ class Log extends Logger
      */
     public function __call($method, $args)
     {
-        return call_user_func_array([self::getInstance(), $method], $args);
+        $ret = call_user_func_array([self::getInstance(), $method], $args);
+
+        // Monolog v2 always returns null
+        if (BaseLogger::API >= 2 && $ret === null) {
+            return true;
+        }
+
+        return $ret;
     }
 
     /**
@@ -60,7 +69,14 @@ class Log extends Logger
      */
     public static function __callStatic($method, $args)
     {
-        return forward_static_call_array([self::getInstance(), $method], $args);
+        $ret = forward_static_call_array([self::getInstance(), $method], $args);
+
+        // Monolog v2 always returns null
+        if (BaseLogger::API >= 2 && $ret === null) {
+            return true;
+        }
+
+        return $ret;
     }
 
     /**

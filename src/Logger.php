@@ -72,7 +72,14 @@ class Logger
      */
     public function __call($method, $args)
     {
-        return call_user_func_array([$this->getLogger(), $method], $args);
+        $ret = call_user_func_array([$this->getLogger(), $method], $args);
+
+        // Monolog v2 always returns null
+        if (BaseLogger::API >= 2 && $ret === null) {
+            return true;
+        }
+
+        return $ret;
     }
 
     /**
