@@ -307,7 +307,6 @@ class Str
      * Replace a given value in the string sequentially with an array.
      *
      * @param string $search
-     * @param array  $replace
      * @param string $subject
      *
      * @return string

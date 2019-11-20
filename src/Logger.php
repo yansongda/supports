@@ -67,8 +67,6 @@ class Logger
      * @param array  $args
      *
      * @throws Exception
-     *
-     * @return bool
      */
     public function __call($method, $args): bool
     {
@@ -86,10 +84,6 @@ class Logger
      * Set logger.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @param LoggerInterface $logger
-     *
-     * @return Logger
      */
     public function setLogger(LoggerInterface $logger): Logger
     {
@@ -104,8 +98,6 @@ class Logger
      * @author yansongda <me@yansongda.cn>
      *
      * @throws Exception
-     *
-     * @return LoggerInterface
      */
     public function getLogger(): LoggerInterface
     {
@@ -122,8 +114,6 @@ class Logger
      * @author yansongda <me@yansongda.cn>
      *
      * @throws Exception
-     *
-     * @return BaseLogger
      */
     public function createLogger(): BaseLogger
     {
@@ -143,8 +133,6 @@ class Logger
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param \Monolog\Formatter\FormatterInterface $formatter
-     *
      * @return $this
      */
     public function setFormatter(FormatterInterface $formatter): self
@@ -158,8 +146,6 @@ class Logger
      * getFormatter.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @return \Monolog\Formatter\FormatterInterface
      */
     public function getFormatter(): FormatterInterface
     {
@@ -174,8 +160,6 @@ class Logger
      * createFormatter.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @return \Monolog\Formatter\LineFormatter
      */
     public function createFormatter(): LineFormatter
     {
@@ -192,8 +176,6 @@ class Logger
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param \Monolog\Handler\AbstractHandler $handler
-     *
      * @return $this
      */
     public function setHandler(AbstractHandler $handler): self
@@ -209,8 +191,6 @@ class Logger
      * @author yansongda <me@yansongda.cn>
      *
      * @throws \Exception
-     *
-     * @return AbstractHandler
      */
     public function getHandler(): AbstractHandler
     {
@@ -246,8 +226,6 @@ class Logger
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param array $config
-     *
      * @return $this
      */
     public function setConfig(array $config): self
@@ -261,8 +239,6 @@ class Logger
      * getConfig.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @return array
      */
     public function getConfig(): array
     {

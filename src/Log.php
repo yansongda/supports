@@ -38,8 +38,6 @@ class Log extends Logger
      * @param array  $args
      *
      * @throws \Exception
-     *
-     * @return bool
      */
     public function __call($method, $args): bool
     {
@@ -55,8 +53,6 @@ class Log extends Logger
      * @param array  $args
      *
      * @throws \Exception
-     *
-     * @return bool
      */
     public static function __callStatic($method, $args): bool
     {

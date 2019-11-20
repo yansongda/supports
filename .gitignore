@@ -1,5 +1,4 @@
-/vendor
-tests/*.log
+vendor/
 *.log
 composer.lock
 .DS_Store

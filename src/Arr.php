@@ -30,8 +30,7 @@ class Arr
     /**
      * Build a new array using a callback.
      *
-     * @param array   $array
-     * @param Closure $callback
+     * @param array $array
      *
      * @return array
      */
@@ -325,8 +324,7 @@ class Arr
     /**
      * Sort the array using the given Closure.
      *
-     * @param array   $array
-     * @param Closure $callback
+     * @param array $array
      *
      * @return array
      */
@@ -344,8 +342,7 @@ class Arr
     /**
      * Filter the array using the given Closure.
      *
-     * @param array   $array
-     * @param Closure $callback
+     * @param array $array
      *
      * @return array
      */

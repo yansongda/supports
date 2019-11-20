@@ -90,8 +90,6 @@ trait HasHttpRequest
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param Client $client
-     *
      * @return $this
      */
     public function setHttpClient(Client $client)
@@ -147,8 +145,6 @@ trait HasHttpRequest
      * Convert response.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @param ResponseInterface $response
      *
      * @return array|string
      */
