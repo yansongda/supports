@@ -39,9 +39,9 @@ class Log extends Logger
      *
      * @throws \Exception
      */
-    public function __call($method, $args): bool
+    public function __call($method, $args): void
     {
-        return call_user_func_array([self::getInstance(), $method], $args);
+        call_user_func_array([self::getInstance(), $method], $args);
     }
 
     /**
@@ -54,9 +54,9 @@ class Log extends Logger
      *
      * @throws \Exception
      */
-    public static function __callStatic($method, $args): bool
+    public static function __callStatic($method, $args): void
     {
-        return forward_static_call_array([self::getInstance(), $method], $args);
+        forward_static_call_array([self::getInstance(), $method], $args);
     }
 
     /**

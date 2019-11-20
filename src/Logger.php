@@ -68,16 +68,9 @@ class Logger
      *
      * @throws Exception
      */
-    public function __call($method, $args): bool
+    public function __call($method, $args): void
     {
-        $ret = call_user_func_array([$this->getLogger(), $method], $args);
-
-        // Monolog v2 always returns null
-        if (BaseLogger::API >= 2 && null === $ret) {
-            return true;
-        }
-
-        return $ret;
+        call_user_func_array([$this->getLogger(), $method], $args);
     }
 
     /**

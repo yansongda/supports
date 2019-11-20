@@ -35,12 +35,12 @@ class LoggerTest extends TestCase
     public function testDebug()
     {
         $result = $this->logger->debug('test debug', ['foo' => 'bar']);
-        $this->assertTrue($result);
+        $this->assertNull($result);
     }
 
     public function testInfo()
     {
         $result = $this->logger->info('test info', ['foo' => 'bar']);
-        $this->assertTrue($result);
+        $this->assertNull($result);
     }
 }
