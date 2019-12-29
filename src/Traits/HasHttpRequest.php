@@ -100,7 +100,7 @@ trait HasHttpRequest
      *
      * @return $this
      */
-    public function setHttpClient(Client $client)
+    public function setHttpClient(Client $client): self
     {
         $this->httpClient = $client;
 
@@ -109,10 +109,8 @@ trait HasHttpRequest
 
     /**
      * Return http client.
-     *
-     * @return Client
      */
-    public function getHttpClient()
+    public function getHttpClient(): Client
     {
         if (is_null($this->httpClient)) {
             $this->httpClient = $this->getDefaultHttpClient();
@@ -125,10 +123,8 @@ trait HasHttpRequest
      * Get default http client.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @return Client
      */
-    public function getDefaultHttpClient()
+    public function getDefaultHttpClient(): Client
     {
         return new Client($this->getOptions());
     }
@@ -137,10 +133,8 @@ trait HasHttpRequest
      * Get default options.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @return array
      */
-    public function getOptions()
+    public function getOptions(): array
     {
         return array_merge([
             'base_uri' => $this->baseUri,
@@ -156,9 +150,71 @@ trait HasHttpRequest
      *
      * @return $this
      */
-    public function setOptions(array $options)
+    public function setOptions(array $options): self
     {
         $this->httpOptions = $options;
+
+        return $this;
+    }
+
+    /**
+     * setBaseUri.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @return $this
+     */
+    public function setBaseUri(string $url): self
+    {
+        $parsedUrl = parse_url($url);
+
+        $this->baseUri = $parsedUrl['scheme'].'://'.$parsedUrl['host'].(isset($parsedUrl['port']) ? (':'.$parsedUrl['port']) : '');
+
+        return $this;
+    }
+
+    /**
+     * getBaseUri.
+     *
+     * @author yansongda <me@yansongda.cn>
+     */
+    public function getBaseUri(): string
+    {
+        return $this->baseUri;
+    }
+
+    public function getTimeout(): float
+    {
+        return $this->timeout;
+    }
+
+    public function setTimeout(float $timeout): self
+    {
+        $this->timeout = $timeout;
+
+        return $this;
+    }
+
+    public function getConnectTimeout(): float
+    {
+        return $this->connectTimeout;
+    }
+
+    public function setConnectTimeout(float $connectTimeout): self
+    {
+        $this->connectTimeout = $connectTimeout;
+
+        return $this;
+    }
+
+    public function getHttpOptions(): array
+    {
+        return $this->httpOptions;
+    }
+
+    public function setHttpOptions(array $httpOptions): self
+    {
+        $this->httpOptions = $httpOptions;
 
         return $this;
     }
