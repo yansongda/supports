@@ -5,15 +5,23 @@ namespace Yansongda\Supports\Traits;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 
-/**
- * Trait HasHttpRequest.
- *
- * @property string baseUri        base_uri
- * @property string timeout        timeout
- * @property string connectTimeout connect_timeout
- */
 trait HasHttpRequest
 {
+    /**
+     * @var string
+     */
+    protected $baseUri;
+
+    /**
+     * @var float
+     */
+    protected $timeout = 5.0;
+
+    /**
+     * @var float
+     */
+    protected $connectTimeout = 3.0;
+
     /**
      * Http client.
      *
@@ -100,22 +108,6 @@ trait HasHttpRequest
     }
 
     /**
-     * Get default options.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @return array
-     */
-    public function getOptions()
-    {
-        return array_merge([
-            'base_uri' => property_exists($this, 'baseUri') ? $this->baseUri : '',
-            'timeout' => property_exists($this, 'timeout') ? $this->timeout : 5.0,
-            'connect_timeout' => property_exists($this, 'connectTimeout') ? $this->connectTimeout : 5.0,
-        ], $this->httpOptions);
-    }
-
-    /**
      * Return http client.
      *
      * @return Client
@@ -139,6 +131,38 @@ trait HasHttpRequest
     public function getDefaultHttpClient()
     {
         return new Client($this->getOptions());
+    }
+
+    /**
+     * Get default options.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @return array
+     */
+    public function getOptions()
+    {
+        return array_merge([
+            'base_uri' => $this->baseUri,
+            'timeout' => $this->timeout,
+            'connect_timeout' => $this->connectTimeout,
+        ], $this->httpOptions);
+    }
+
+    /**
+     * setOptions.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param array $options
+     *
+     * @return $this
+     */
+    public function setOptions(array $options)
+    {
+        $this->httpOptions = $options;
+
+        return $this;
     }
 
     /**
