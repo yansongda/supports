@@ -18,4 +18,4 @@ jobs:
       - name: Install Dependencies
         run: composer update --prefer-dist --no-interaction --no-suggest
       - name: Run PHPUnit
-        run: ./vendor/bin/phpunit
+        run: ./vendor/bin/phpunit -c phpunit.xml
