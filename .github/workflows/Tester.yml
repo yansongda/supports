@@ -16,6 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@master
       - name: Install Dependencies
-        run: composer update --prefer-dist --no-interaction --no-suggest
+        run: pwd && composer update --prefer-dist --no-interaction --no-suggest
       - name: Run PHPUnit
-        run: ./vendor/bin/phpunit -c phpunit.xml
+        run: pwd && ./vendor/bin/phpunit -c phpunit.xml
