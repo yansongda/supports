@@ -154,8 +154,6 @@ trait HasHttpRequest
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param array $options
-     *
      * @return $this
      */
     public function setOptions(array $options)
