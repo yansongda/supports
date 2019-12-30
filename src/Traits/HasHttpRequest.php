@@ -6,13 +6,11 @@ use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Trait HasHttpRequest
- *
- * @package Yansongda\Supports\Traits
+ * Trait HasHttpRequest.
  *
  * @property string $baseUri
- * @property float $timeout
- * @property float $connectTimeout
+ * @property float  $timeout
+ * @property float  $connectTimeout
  */
 trait HasHttpRequest
 {
