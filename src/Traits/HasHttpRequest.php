@@ -5,23 +5,17 @@ namespace Yansongda\Supports\Traits;
 use GuzzleHttp\Client;
 use Psr\Http\Message\ResponseInterface;
 
+/**
+ * Trait HasHttpRequest
+ *
+ * @package Yansongda\Supports\Traits
+ *
+ * @property string $baseUri
+ * @property float $timeout
+ * @property float $connectTimeout
+ */
 trait HasHttpRequest
 {
-    /**
-     * @var string
-     */
-    protected $baseUri;
-
-    /**
-     * @var float
-     */
-    protected $timeout = 5.0;
-
-    /**
-     * @var float
-     */
-    protected $connectTimeout = 3.0;
-
     /**
      * Http client.
      *
@@ -130,34 +124,6 @@ trait HasHttpRequest
     }
 
     /**
-     * Get default options.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
-    public function getOptions(): array
-    {
-        return array_merge([
-            'base_uri' => $this->baseUri,
-            'timeout' => $this->timeout,
-            'connect_timeout' => $this->connectTimeout,
-        ], $this->httpOptions);
-    }
-
-    /**
-     * setOptions.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @return $this
-     */
-    public function setOptions(array $options): self
-    {
-        $this->httpOptions = $options;
-
-        return $this;
-    }
-
-    /**
      * setBaseUri.
      *
      * @author yansongda <me@yansongda.cn>
@@ -166,9 +132,12 @@ trait HasHttpRequest
      */
     public function setBaseUri(string $url): self
     {
-        $parsedUrl = parse_url($url);
+        if (property_exists($this, 'baseUri')) {
+            $parsedUrl = parse_url($url);
 
-        $this->baseUri = $parsedUrl['scheme'].'://'.$parsedUrl['host'].(isset($parsedUrl['port']) ? (':'.$parsedUrl['port']) : '');
+            $this->baseUri = $parsedUrl['scheme'].'://'.
+                $parsedUrl['host'].(isset($parsedUrl['port']) ? (':'.$parsedUrl['port']) : '');
+        }
 
         return $this;
     }
@@ -180,31 +149,61 @@ trait HasHttpRequest
      */
     public function getBaseUri(): string
     {
-        return $this->baseUri;
+        return property_exists($this, 'baseUri') ? $this->baseUri : '';
     }
 
     public function getTimeout(): float
     {
-        return $this->timeout;
+        return property_exists($this, 'timeout') ? $this->timeout : 5.0;
     }
 
     public function setTimeout(float $timeout): self
     {
-        $this->timeout = $timeout;
+        if (property_exists($this, 'timeout')) {
+            $this->timeout = $timeout;
+        }
 
         return $this;
     }
 
     public function getConnectTimeout(): float
     {
-        return $this->connectTimeout;
+        return property_exists($this, 'connectTimeout') ? $this->connectTimeout : 3.0;
     }
 
     public function setConnectTimeout(float $connectTimeout): self
     {
-        $this->connectTimeout = $connectTimeout;
+        if (property_exists($this, 'connectTimeout')) {
+            $this->connectTimeout = $connectTimeout;
+        }
 
         return $this;
+    }
+
+    /**
+     * Get default options.
+     *
+     * @author yansongda <me@yansongda.cn>
+     */
+    public function getOptions(): array
+    {
+        return array_merge([
+            'base_uri' => $this->getBaseUri(),
+            'timeout' => $this->getTimeout(),
+            'connect_timeout' => $this->getConnectTimeout(),
+        ], $this->getHttpOptions());
+    }
+
+    /**
+     * setOptions.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @return $this
+     */
+    public function setOptions(array $options): self
+    {
+        return $this->setHttpOptions($options);
     }
 
     public function getHttpOptions(): array
