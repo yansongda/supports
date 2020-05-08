@@ -12,13 +12,9 @@ class Arr
     /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
-     * @param array  $array
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return array
+     * @param mixed $value
      */
-    public static function add($array, $key, $value)
+    public static function add(array $array, string $key, $value): array
     {
         if (is_null(static::get($array, $key))) {
             static::set($array, $key, $value);
@@ -29,12 +25,8 @@ class Arr
 
     /**
      * Build a new array using a callback.
-     *
-     * @param array $array
-     *
-     * @return array
      */
-    public static function build($array, Closure $callback)
+    public static function build(array $array, Closure $callback): array
     {
         $results = [];
 
@@ -48,12 +40,8 @@ class Arr
 
     /**
      * Divide an array into two arrays. One with keys and the other with values.
-     *
-     * @param array $array
-     *
-     * @return array
      */
-    public static function divide($array)
+    public static function divide(array $array): array
     {
         return [
                 array_keys($array),
@@ -63,13 +51,8 @@ class Arr
 
     /**
      * Flatten a multi-dimensional associative array with dots.
-     *
-     * @param array  $array
-     * @param string $prepend
-     *
-     * @return array
      */
-    public static function dot($array, $prepend = '')
+    public static function dot(array $array, string $prepend = ''): array
     {
         $results = [];
 
@@ -87,25 +70,17 @@ class Arr
     /**
      * Get all of the given array except for a specified array of items.
      *
-     * @param array        $array
      * @param array|string $keys
-     *
-     * @return array
      */
-    public static function except($array, $keys)
+    public static function except(array $array, $keys): array
     {
         return array_diff_key($array, array_flip((array) $keys));
     }
 
     /**
      * Fetch a flattened array of a nested array element.
-     *
-     * @param array  $array
-     * @param string $key
-     *
-     * @return array
      */
-    public static function fetch($array, $key)
+    public static function fetch(array $array, string $key): array
     {
         $results = [];
 
@@ -124,13 +99,11 @@ class Arr
     /**
      * Return the first element in an array passing a given truth test.
      *
-     * @param array   $array
-     * @param Closure $callback
-     * @param mixed   $default
+     * @param mixed $default
      *
      * @return mixed
      */
-    public static function first($array, $callback, $default = null)
+    public static function first(array $array, Closure $callback, $default = null)
     {
         foreach ($array as $key => $value) {
             if (call_user_func($callback, $key, $value)) {
@@ -144,25 +117,19 @@ class Arr
     /**
      * Return the last element in an array passing a given truth test.
      *
-     * @param array   $array
-     * @param Closure $callback
-     * @param mixed   $default
+     * @param mixed $default
      *
      * @return mixed
      */
-    public static function last($array, $callback, $default = null)
+    public static function last(array $array, Closure $callback, $default = null)
     {
         return static::first(array_reverse($array), $callback, $default);
     }
 
     /**
      * Flatten a multi-dimensional array into a single level.
-     *
-     * @param array $array
-     *
-     * @return array
      */
-    public static function flatten($array)
+    public static function flatten(array $array): array
     {
         $return = [];
         array_walk_recursive(
@@ -202,13 +169,11 @@ class Arr
     /**
      * Get an item from an array using "dot" notation.
      *
-     * @param array  $array
-     * @param string $key
-     * @param mixed  $default
+     * @param mixed $default
      *
      * @return mixed
      */
-    public static function get($array, $key, $default = null)
+    public static function get(array $array, string $key, $default = null)
     {
         if (is_null($key)) {
             return $array;
@@ -231,12 +196,9 @@ class Arr
     /**
      * Get a subset of the items from the given array.
      *
-     * @param array        $array
      * @param array|string $keys
-     *
-     * @return array
      */
-    public static function only($array, $keys)
+    public static function only(array $array, $keys): array
     {
         return array_intersect_key($array, array_flip((array) $keys));
     }
@@ -244,13 +206,9 @@ class Arr
     /**
      * Pluck an array of values from an array.
      *
-     * @param array  $array
-     * @param string $value
      * @param string $key
-     *
-     * @return array
      */
-    public static function pluck($array, $value, $key = null)
+    public static function pluck(array $array, string $value, string $key = null): array
     {
         $results = [];
 
@@ -273,13 +231,11 @@ class Arr
     /**
      * Get a value from the array, and remove it.
      *
-     * @param array  $array
-     * @param string $key
-     * @param mixed  $default
+     * @param mixed $default
      *
      * @return mixed
      */
-    public static function pull(&$array, $key, $default = null)
+    public static function pull(array &$array, string $key, $default = null)
     {
         $value = static::get($array, $key, $default);
         static::forget($array, $key);
@@ -292,13 +248,9 @@ class Arr
      *
      * If no key is given to the method, the entire array will be replaced.
      *
-     * @param array  $array
-     * @param string $key
-     * @param mixed  $value
-     *
-     * @return array
+     * @param mixed $value
      */
-    public static function set(&$array, $key, $value)
+    public static function set(array &$array, string $key, $value): array
     {
         if (is_null($key)) {
             return $array = $value;
@@ -323,12 +275,8 @@ class Arr
 
     /**
      * Sort the array using the given Closure.
-     *
-     * @param array $array
-     *
-     * @return array
      */
-    public static function sort($array, Closure $callback)
+    public static function sort(array $array, Closure $callback): array
     {
         $results = [];
 
@@ -341,12 +289,8 @@ class Arr
 
     /**
      * Filter the array using the given Closure.
-     *
-     * @param array $array
-     *
-     * @return array
      */
-    public static function where($array, Closure $callback)
+    public static function where(array $array, Closure $callback): array
     {
         $filtered = [];
 
@@ -364,13 +308,9 @@ class Arr
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param array  $array
-     * @param string $to_encoding
      * @param string $from_encoding
-     *
-     * @return array
      */
-    public static function encoding($array, $to_encoding, $from_encoding = 'gb2312')
+    public static function encoding(array $array, string $to_encoding, $from_encoding = 'gb2312'): array
     {
         $encoded = [];
 

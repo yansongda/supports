@@ -32,10 +32,8 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     /**
      * To string.
-     *
-     * @return string
      */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->toJson();
     }
@@ -43,11 +41,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     /**
      * Get a data by key.
      *
-     * @param string $key
-     *
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         return $this->get($key);
     }
@@ -55,52 +51,41 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     /**
      * Assigns a value to the specified data.
      *
-     * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      */
-    public function __set($key, $value)
+    public function __set(string $key, $value)
     {
         $this->set($key, $value);
     }
 
     /**
      * Whether or not an data exists by key.
-     *
-     * @param string $key
-     *
-     * @return bool
      */
-    public function __isset($key)
+    public function __isset(string $key): bool
     {
         return $this->has($key);
     }
 
     /**
      * Unsets an data by key.
-     *
-     * @param string $key
      */
-    public function __unset($key)
+    public function __unset(string $key)
     {
         $this->forget($key);
     }
 
     /**
      * Return all items.
-     *
-     * @return array
      */
-    public function all()
+    public function all(): array
     {
         return $this->items;
     }
 
     /**
      * Return specific items.
-     *
-     * @return array
      */
-    public function only(array $keys)
+    public function only(array $keys): array
     {
         $return = [];
 
@@ -133,10 +118,8 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * Merge data.
      *
      * @param Collection|array $items
-     *
-     * @return array
      */
-    public function merge($items)
+    public function merge($items): array
     {
         foreach ($items as $key => $value) {
             $this->set($key, $value);
@@ -147,12 +130,8 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     /**
      * To determine Whether the specified element exists.
-     *
-     * @param string $key
-     *
-     * @return bool
      */
-    public function has($key)
+    public function has(string $key): bool
     {
         return !is_null(Arr::get($this->items, $key));
     }
@@ -170,7 +149,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     /**
      * Retrieve the last item.
      *
-     * @return bool
+     * @return mixed
      */
     public function last()
     {
@@ -184,10 +163,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     /**
      * add the item value.
      *
-     * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      */
-    public function add($key, $value)
+    public function add(string $key, $value)
     {
         Arr::set($this->items, $key, $value);
     }
@@ -195,10 +173,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     /**
      * Set the item value.
      *
-     * @param string $key
-     * @param mixed  $value
+     * @param mixed $value
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         Arr::set($this->items, $key, $value);
     }
@@ -211,39 +188,31 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @return mixed
      */
-    public function get($key = null, $default = null)
+    public function get(?string $key = null, $default = null)
     {
         return Arr::get($this->items, $key, $default);
     }
 
     /**
      * Remove item form Collection.
-     *
-     * @param string $key
      */
-    public function forget($key)
+    public function forget(string $key)
     {
         Arr::forget($this->items, $key);
     }
 
     /**
      * Build to array.
-     *
-     * @return array
      */
-    public function toArray()
+    public function toArray(): array
     {
         return $this->all();
     }
 
     /**
      * Build to json.
-     *
-     * @param int $option
-     *
-     * @return string
      */
-    public function toJson($option = JSON_UNESCAPED_UNICODE)
+    public function toJson(int $option = JSON_UNESCAPED_UNICODE): string
     {
         return json_encode($this->all(), $option);
     }
