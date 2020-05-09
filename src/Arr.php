@@ -526,7 +526,7 @@ class Arr
      *
      * @author yansongda <me@yansongda.cn>
      */
-    public function filter(array $array): array
+    public static function filter(array $array): array
     {
         return array_filter($array, function ($v) {
             if (is_array($v)) {
