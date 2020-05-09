@@ -12,7 +12,8 @@ class Arr
     /**
      * Determine whether the given value is array accessible.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return bool
      */
     public static function accessible($value)
@@ -91,8 +92,9 @@ class Arr
     /**
      * Determine if the given key exists in the provided array.
      *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|int  $key
+     * @param \ArrayAccess|array $array
+     * @param string|int         $key
+     *
      * @return bool
      */
     public static function exists($array, $key)
@@ -107,15 +109,16 @@ class Arr
     /**
      * Check if an item or items exist in an array using "dot" notation.
      *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param \ArrayAccess|array $array
+     * @param string|array       $keys
+     *
      * @return bool
      */
     public static function has($array, $keys)
     {
         $keys = (array) $keys;
 
-        if (! $array || $keys === []) {
+        if (!$array || $keys === []) {
             return false;
         }
 
@@ -141,8 +144,9 @@ class Arr
     /**
      * Determine if any of the keys exist in an array using "dot" notation.
      *
-     * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param \ArrayAccess|array $array
+     * @param string|array       $keys
+     *
      * @return bool
      */
     public static function hasAny($array, $keys)
@@ -153,7 +157,7 @@ class Arr
 
         $keys = (array) $keys;
 
-        if (! $array) {
+        if (!$array) {
             return false;
         }
 
@@ -247,7 +251,7 @@ class Arr
 
         $keys = (array) $keys;
 
-        if (count($keys) === 0) {
+        if (0 === count($keys)) {
             return;
         }
 
@@ -343,9 +347,10 @@ class Arr
     /**
      * Push an item onto the beginning of an array.
      *
-     * @param  array  $array
-     * @param  mixed  $value
-     * @param  mixed  $key
+     * @param array $array
+     * @param mixed $value
+     * @param mixed $key
+     *
      * @return array
      */
     public static function prepend($array, $value, $key = null)
@@ -378,8 +383,9 @@ class Arr
     /**
      * Get one or a specified number of random values from an array.
      *
-     * @param  array  $array
-     * @param  int|null  $number
+     * @param array    $array
+     * @param int|null $number
+     *
      * @return mixed
      *
      * @throws \InvalidArgumentException
@@ -396,7 +402,7 @@ class Arr
             return $array[array_rand($array)];
         }
 
-        if ((int) $number === 0) {
+        if (0 === (int) $number) {
             return [];
         }
 
@@ -458,8 +464,9 @@ class Arr
     /**
      * Shuffle the given array and return the result.
      *
-     * @param  array  $array
-     * @param  int|null  $seed
+     * @param array    $array
+     * @param int|null $seed
+     *
      * @return array
      */
     public static function shuffle($array, $seed = null)
@@ -478,7 +485,8 @@ class Arr
     /**
      * Convert the array into a query string.
      *
-     * @param  array  $array
+     * @param array $array
+     *
      * @return string
      */
     public static function query($array)
