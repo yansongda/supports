@@ -13,10 +13,8 @@ class Arr
      * Determine whether the given value is array accessible.
      *
      * @param mixed $value
-     *
-     * @return bool
      */
-    public static function accessible($value)
+    public static function accessible($value): bool
     {
         return is_array($value) || $value instanceof ArrayAccess;
     }
@@ -485,29 +483,25 @@ class Arr
     /**
      * Convert the array into a query string.
      *
-     * @param array $array
-     *
      * @return string
      */
-    public static function query($array)
+    public static function query(array $array)
     {
         return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
     }
 
     /**
-     * Filter the array using the given Closure.
+     * Filter the array using the given callback.
      */
-    public static function where(array $array, callable $callback): array
+    public static function where(array $array, ?callable $callback = null): array
     {
-        $filtered = [];
-
-        foreach ($array as $key => $value) {
-            if (call_user_func($callback, $key, $value)) {
-                $filtered[$key] = $value;
+        return array_filter($array, $callback ?? function ($value) use ($callback) {
+            if (static::accessible($value)) {
+                $value = static::where($value, $callback);
             }
-        }
 
-        return $filtered;
+            return '' !== $value && !is_null($value);
+        }, ARRAY_FILTER_USE_BOTH);
     }
 
     /**
@@ -527,21 +521,5 @@ class Arr
         }
 
         return $encoded;
-    }
-
-    /**
-     * 过滤 null and 空值.
-     *
-     * @author yansongda <me@yansongda.cn>
-     */
-    public static function filter(array $array): array
-    {
-        return array_filter($array, function ($v) {
-            if (is_array($v)) {
-                $v = $this->filter($v);
-            }
-
-            return '' !== $v && !is_null($v);
-        });
     }
 }
