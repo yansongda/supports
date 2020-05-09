@@ -11,11 +11,9 @@ trait Accessable
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param $key
-     *
      * @return mixed
      */
-    public function __get($key)
+    public function __get(string $key)
     {
         return $this->get($key);
     }
@@ -25,12 +23,11 @@ trait Accessable
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param $key
-     * @param $value
+     * @param mixed $value
      *
      * @return mixed
      */
-    public function __set($key, $value)
+    public function __set(string $key, $value)
     {
         return $this->set($key, $value);
     }
@@ -40,12 +37,11 @@ trait Accessable
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param null $key
-     * @param null $default
+     * @param mixed $default
      *
-     * @return mixed|null
+     * @return mixed
      */
-    public function get($key = null, $default = null)
+    public function get(?string $key = null, $default = null)
     {
         if (is_null($key)) {
             return method_exists($this, 'toArray') ? $this->toArray() : $default;
@@ -68,12 +64,11 @@ trait Accessable
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param $key
-     * @param $value
+     * @param mixed $value
      *
      * @return $this
      */
-    public function set($key, $value)
+    public function set(string $key, $value)
     {
         $method = 'set';
         foreach (explode('_', $key) as $item) {
@@ -88,7 +83,15 @@ trait Accessable
     }
 
     /**
-     * {@inheritdoc}
+     * Whether a offset exists.
+     *
+     * @see https://php.net/manual/en/arrayaccess.offsetexists.php
+     *
+     * @param mixed $offset an offset to check for
+     *
+     * @return bool true on success or false on failure.
+     *
+     * The return value will be casted to boolean if non-boolean was returned.
      */
     public function offsetExists($offset)
     {
@@ -96,7 +99,13 @@ trait Accessable
     }
 
     /**
-     * {@inheritdoc}
+     * Offset to retrieve.
+     *
+     * @see https://php.net/manual/en/arrayaccess.offsetget.php
+     *
+     * @param mixed $offset the offset to retrieve
+     *
+     * @return mixed can return all value types
      */
     public function offsetGet($offset)
     {
@@ -104,7 +113,14 @@ trait Accessable
     }
 
     /**
-     * {@inheritdoc}
+     * Offset to set.
+     *
+     * @see https://php.net/manual/en/arrayaccess.offsetset.php
+     *
+     * @param mixed $offset the offset to assign the value to
+     * @param mixed $value  the value to set
+     *
+     * @return void
      */
     public function offsetSet($offset, $value)
     {
@@ -112,7 +128,13 @@ trait Accessable
     }
 
     /**
-     * {@inheritdoc}
+     * Offset to unset.
+     *
+     * @see https://php.net/manual/en/arrayaccess.offsetunset.php
+     *
+     * @param mixed $offset the offset to unset
+     *
+     * @return void
      */
     public function offsetUnset($offset)
     {

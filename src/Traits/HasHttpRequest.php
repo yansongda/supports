@@ -33,13 +33,9 @@ trait HasHttpRequest
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string $endpoint
-     * @param array  $query
-     * @param array  $headers
-     *
      * @return array|string
      */
-    public function get($endpoint, $query = [], $headers = [])
+    public function get(string $endpoint, array $query = [], array $headers = [])
     {
         return $this->request('get', $endpoint, [
             'headers' => $headers,
@@ -52,13 +48,11 @@ trait HasHttpRequest
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string       $endpoint
      * @param string|array $data
-     * @param array        $options
      *
      * @return array|string
      */
-    public function post($endpoint, $data, $options = [])
+    public function post(string $endpoint, $data, array $options = [])
     {
         if (!is_array($data)) {
             $options['body'] = $data;
@@ -74,13 +68,9 @@ trait HasHttpRequest
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string $method
-     * @param string $endpoint
-     * @param array  $options
-     *
      * @return array|string
      */
-    public function request($method, $endpoint, $options = [])
+    public function request(string $method, string $endpoint, array $options = [])
     {
         return $this->unwrapResponse($this->getHttpClient()->{$method}($endpoint, $options));
     }
