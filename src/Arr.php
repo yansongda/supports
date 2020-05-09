@@ -2,13 +2,24 @@
 
 namespace Yansongda\Supports;
 
-use Closure;
+use ArrayAccess;
 
 /**
  * Array helper from Illuminate\Support\Arr.
  */
 class Arr
 {
+    /**
+     * Determine whether the given value is array accessible.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    public static function accessible($value)
+    {
+        return is_array($value) || $value instanceof ArrayAccess;
+    }
+
     /**
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
@@ -26,12 +37,12 @@ class Arr
     /**
      * Build a new array using a callback.
      */
-    public static function build(array $array, Closure $callback): array
+    public static function build(array $array, callable $callback): array
     {
         $results = [];
 
         foreach ($array as $key => $value) {
-            list($innerKey, $innerValue) = call_user_func($callback, $key, $value);
+            [$innerKey, $innerValue] = call_user_func($callback, $key, $value);
             $results[$innerKey] = $innerValue;
         }
 
@@ -78,6 +89,88 @@ class Arr
     }
 
     /**
+     * Determine if the given key exists in the provided array.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|int  $key
+     * @return bool
+     */
+    public static function exists($array, $key)
+    {
+        if ($array instanceof ArrayAccess) {
+            return $array->offsetExists($key);
+        }
+
+        return array_key_exists($key, $array);
+    }
+
+    /**
+     * Check if an item or items exist in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function has($array, $keys)
+    {
+        $keys = (array) $keys;
+
+        if (! $array || $keys === []) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            $subKeyArray = $array;
+
+            if (static::exists($array, $key)) {
+                continue;
+            }
+
+            foreach (explode('.', $key) as $segment) {
+                if (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
+                    $subKeyArray = $subKeyArray[$segment];
+                } else {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if any of the keys exist in an array using "dot" notation.
+     *
+     * @param  \ArrayAccess|array  $array
+     * @param  string|array  $keys
+     * @return bool
+     */
+    public static function hasAny($array, $keys)
+    {
+        if (is_null($keys)) {
+            return false;
+        }
+
+        $keys = (array) $keys;
+
+        if (! $array) {
+            return false;
+        }
+
+        if ($keys === []) {
+            return false;
+        }
+
+        foreach ($keys as $key) {
+            if (static::has($array, $key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Fetch a flattened array of a nested array element.
      */
     public static function fetch(array $array, string $key): array
@@ -103,7 +196,7 @@ class Arr
      *
      * @return mixed
      */
-    public static function first(array $array, Closure $callback, $default = null)
+    public static function first(array $array, callable $callback, $default = null)
     {
         foreach ($array as $key => $value) {
             if (call_user_func($callback, $key, $value)) {
@@ -121,7 +214,7 @@ class Arr
      *
      * @return mixed
      */
-    public static function last(array $array, Closure $callback, $default = null)
+    public static function last(array $array, callable $callback, $default = null)
     {
         return static::first(array_reverse($array), $callback, $default);
     }
@@ -152,17 +245,36 @@ class Arr
     {
         $original = &$array;
 
-        foreach ((array) $keys as $key) {
+        $keys = (array) $keys;
+
+        if (count($keys) === 0) {
+            return;
+        }
+
+        foreach ($keys as $key) {
+            // if the exact key exists in the top-level, remove it
+            if (static::exists($array, $key)) {
+                unset($array[$key]);
+
+                continue;
+            }
+
             $parts = explode('.', $key);
+
+            // clean up before each pass
+            $array = &$original;
+
             while (count($parts) > 1) {
                 $part = array_shift($parts);
+
                 if (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
+                } else {
+                    continue 2;
                 }
             }
+
             unset($array[array_shift($parts)]);
-            // clean up after each pass
-            $array = &$original;
         }
     }
 
@@ -229,6 +341,25 @@ class Arr
     }
 
     /**
+     * Push an item onto the beginning of an array.
+     *
+     * @param  array  $array
+     * @param  mixed  $value
+     * @param  mixed  $key
+     * @return array
+     */
+    public static function prepend($array, $value, $key = null)
+    {
+        if (is_null($key)) {
+            array_unshift($array, $value);
+        } else {
+            $array = [$key => $value] + $array;
+        }
+
+        return $array;
+    }
+
+    /**
      * Get a value from the array, and remove it.
      *
      * @param mixed $default
@@ -238,9 +369,46 @@ class Arr
     public static function pull(array &$array, string $key, $default = null)
     {
         $value = static::get($array, $key, $default);
+
         static::forget($array, $key);
 
         return $value;
+    }
+
+    /**
+     * Get one or a specified number of random values from an array.
+     *
+     * @param  array  $array
+     * @param  int|null  $number
+     * @return mixed
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function random($array, $number = null)
+    {
+        $requested = is_null($number) ? 1 : $number;
+
+        $count = count($array);
+
+        $number = $requested > $count ? $count : $requested;
+
+        if (is_null($number)) {
+            return $array[array_rand($array)];
+        }
+
+        if ((int) $number === 0) {
+            return [];
+        }
+
+        $keys = array_rand($array, $number);
+
+        $results = [];
+
+        foreach ((array) $keys as $key) {
+            $results[] = $array[$key];
+        }
+
+        return $results;
     }
 
     /**
@@ -276,7 +444,7 @@ class Arr
     /**
      * Sort the array using the given Closure.
      */
-    public static function sort(array $array, Closure $callback): array
+    public static function sort(array $array, callable $callback): array
     {
         $results = [];
 
@@ -288,9 +456,40 @@ class Arr
     }
 
     /**
+     * Shuffle the given array and return the result.
+     *
+     * @param  array  $array
+     * @param  int|null  $seed
+     * @return array
+     */
+    public static function shuffle($array, $seed = null)
+    {
+        if (is_null($seed)) {
+            shuffle($array);
+        } else {
+            mt_srand($seed);
+            shuffle($array);
+            mt_srand();
+        }
+
+        return $array;
+    }
+
+    /**
+     * Convert the array into a query string.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    public static function query($array)
+    {
+        return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
+    }
+
+    /**
      * Filter the array using the given Closure.
      */
-    public static function where(array $array, Closure $callback): array
+    public static function where(array $array, callable $callback): array
     {
         $filtered = [];
 
@@ -320,5 +519,21 @@ class Arr
         }
 
         return $encoded;
+    }
+
+    /**
+     * 过滤 null and 空值.
+     *
+     * @author yansongda <me@yansongda.cn>
+     */
+    public function filter(array $array): array
+    {
+        return array_filter($array, function ($v) {
+            if (is_array($v)) {
+                $v = $this->filter($v);
+            }
+
+            return '' !== $v && !is_null($v);
+        });
     }
 }
