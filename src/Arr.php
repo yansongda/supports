@@ -500,6 +500,10 @@ class Arr
                 $value = static::where($value, $callback);
             }
 
+            if (is_array($value) && 0 === count($value)) {
+                $value = null;
+            }
+
             return '' !== $value && !is_null($value);
         }, ARRAY_FILTER_USE_BOTH);
     }
