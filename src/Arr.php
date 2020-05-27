@@ -88,6 +88,27 @@ class Arr
     }
 
     /**
+     * access array.
+     *
+     * if not array access, return original.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param mixed $data
+     *
+     * @return mixed
+     */
+    public static function access($data)
+    {
+        if (!self::accessible($data) &&
+            !(is_object($data) && method_exists($data, 'toArray'))) {
+            return $data;
+        }
+
+        return is_object($data) ? $data->toArray() : $data;
+    }
+
+    /**
      * Determine if the given key exists in the provided array.
      *
      * @param \ArrayAccess|array $array
@@ -97,6 +118,8 @@ class Arr
      */
     public static function exists($array, $key)
     {
+        $array = self::access($array);
+
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
         }
@@ -114,6 +137,8 @@ class Arr
      */
     public static function has($array, $keys)
     {
+        $array = self::access($array);
+
         $keys = (array) $keys;
 
         if (!$array || $keys === []) {
@@ -149,6 +174,8 @@ class Arr
      */
     public static function hasAny($array, $keys)
     {
+        $array = self::access($array);
+
         if (is_null($keys)) {
             return false;
         }
@@ -345,13 +372,12 @@ class Arr
     /**
      * Push an item onto the beginning of an array.
      *
-     * @param array $array
      * @param mixed $value
      * @param mixed $key
      *
      * @return array
      */
-    public static function prepend($array, $value, $key = null)
+    public static function prepend(array $array, $value, $key = null)
     {
         if (is_null($key)) {
             array_unshift($array, $value);
@@ -388,7 +414,7 @@ class Arr
      *
      * @throws \InvalidArgumentException
      */
-    public static function random($array, $number = null)
+    public static function random(array $array, $number = null)
     {
         $requested = is_null($number) ? 1 : $number;
 
@@ -467,7 +493,7 @@ class Arr
      *
      * @return array
      */
-    public static function shuffle($array, $seed = null)
+    public static function shuffle(array $array, $seed = null): array
     {
         if (is_null($seed)) {
             shuffle($array);
@@ -482,10 +508,8 @@ class Arr
 
     /**
      * Convert the array into a query string.
-     *
-     * @return string
      */
-    public static function query(array $array)
+    public static function query(array $array): string
     {
         return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
     }
@@ -538,11 +562,13 @@ class Arr
      */
     public static function camelCaseKey($data)
     {
-        if (!self::accessible($data)) {
+        if (!self::accessible($data) &&
+            !(is_object($data) && method_exists($data, 'toArray'))) {
             return $data;
         }
 
         $result = [];
+        $data = self::access($data);
 
         foreach ($data as $key => $value) {
             $result[is_string($key) ? Str::camel($key) : $key] = self::camelCaseKey($value);
@@ -562,10 +588,12 @@ class Arr
      */
     public static function snakeCaseKey($data)
     {
-        if (!self::accessible($data)) {
+        if (!self::accessible($data) &&
+            !(is_object($data) && method_exists($data, 'toArray'))) {
             return $data;
         }
 
+        $data = self::access($data);
         $result = [];
 
         foreach ($data as $key => $value) {
