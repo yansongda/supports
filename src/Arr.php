@@ -526,4 +526,28 @@ class Arr
 
         return $encoded;
     }
+
+    /**
+     * camelCaseKey.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param mixed $data
+     *
+     * @return mixed
+     */
+    public static function camelCaseKey($data)
+    {
+        if (!is_array($data)) {
+            return $data;
+        }
+
+        $result = [];
+
+        foreach ($data as $key => $value) {
+            $result[is_string($key) ? Str::camel($key) : $key] = self::camelCaseKey($value);
+        }
+
+        return $result;
+    }
 }
