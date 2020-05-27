@@ -550,4 +550,28 @@ class Arr
 
         return $result;
     }
+
+    /**
+     * snakeCaseKey.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @param mixed $data
+     *
+     * @return mixed
+     */
+    public static function snakeCaseKey($data)
+    {
+        if (!is_array($data)) {
+            return $data;
+        }
+
+        $result = [];
+
+        foreach ($data as $key => $value) {
+            $result[is_string($key) ? Str::snake($key) : $key] = self::snakeCaseKey($value);
+        }
+
+        return $result;
+    }
 }
