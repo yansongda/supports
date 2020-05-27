@@ -538,7 +538,7 @@ class Arr
      */
     public static function camelCaseKey($data)
     {
-        if (!is_array($data)) {
+        if (!self::accessible($data)) {
             return $data;
         }
 
@@ -562,7 +562,7 @@ class Arr
      */
     public static function snakeCaseKey($data)
     {
-        if (!is_array($data)) {
+        if (!self::accessible($data)) {
             return $data;
         }
 
