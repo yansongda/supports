@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yansongda\Supports;
 
 use ArrayAccess;
@@ -141,7 +143,7 @@ class Arr
 
         $keys = (array) $keys;
 
-        if (!$array || $keys === []) {
+        if (!$array || [] === $keys) {
             return false;
         }
 
@@ -186,7 +188,7 @@ class Arr
             return false;
         }
 
-        if ($keys === []) {
+        if ([] === $keys) {
             return false;
         }
 
@@ -267,10 +269,9 @@ class Arr
     /**
      * Remove one or many array items from a given array using "dot" notation.
      *
-     * @param array        $array
      * @param array|string $keys
      */
-    public static function forget(&$array, $keys)
+    public static function forget(array &$array, $keys)
     {
         $original = &$array;
 
@@ -346,10 +347,8 @@ class Arr
 
     /**
      * Pluck an array of values from an array.
-     *
-     * @param string $key
      */
-    public static function pluck(array $array, string $value, string $key = null): array
+    public static function pluck(array $array, string $value, ?string $key = null): array
     {
         $results = [];
 
@@ -407,7 +406,6 @@ class Arr
     /**
      * Get one or a specified number of random values from an array.
      *
-     * @param array    $array
      * @param int|null $number
      *
      * @return mixed
@@ -488,10 +486,7 @@ class Arr
     /**
      * Shuffle the given array and return the result.
      *
-     * @param array    $array
      * @param int|null $seed
-     *
-     * @return array
      */
     public static function shuffle(array $array, $seed = null): array
     {

@@ -24,10 +24,8 @@ trait Accessable
      * @author yansongda <me@yansongda.cn>
      *
      * @param mixed $value
-     *
-     * @return mixed
      */
-    public function __set(string $key, $value)
+    public function __set(string $key, $value): self
     {
         return $this->set($key, $value);
     }
@@ -65,10 +63,8 @@ trait Accessable
      * @author yansongda <me@yansongda.cn>
      *
      * @param mixed $value
-     *
-     * @return $this
      */
-    public function set(string $key, $value)
+    public function set(string $key, $value): self
     {
         $method = 'set';
         foreach (explode('_', $key) as $item) {

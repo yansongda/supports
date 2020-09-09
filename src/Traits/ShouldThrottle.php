@@ -1,22 +1,20 @@
 <?php
 
-namespace Yansongda\Supports\Traits;
+declare(strict_types=1);
 
-use Predis\Client;
+namespace Yansongda\Supports\Traits;
 
 /**
  * Trait ShouldThrottle.
  *
- * @property Client $redis
+ * @property \Redis $redis
  */
 trait ShouldThrottle
 {
     /**
-     * _throttle.
-     *
      * @var array
      */
-    protected $_throttle = [
+    protected $throttle = [
         'limit' => 60,
         'period' => 60,
         'count' => 0,
@@ -27,15 +25,8 @@ trait ShouldThrottle
      * isThrottled.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @param string $key
-     * @param int    $limit
-     * @param int    $period
-     * @param bool   $auto_add
-     *
-     * @return bool
      */
-    public function isThrottled($key, $limit = 60, $period = 60, $auto_add = false)
+    public function isThrottled(string $key, int $limit = 60, int $period = 60, bool $autoAdd = false): bool
     {
         if (-1 === $limit) {
             return false;
@@ -43,17 +34,17 @@ trait ShouldThrottle
 
         $now = microtime(true) * 1000;
 
-        $this->redis->zremrangebyscore($key, 0, $now - $period * 1000);
+        $this->redis->zRemRangeByScore($key, 0, $now - $period * 1000);
 
-        $this->_throttle = [
+        $this->throttle = [
             'limit' => $limit,
             'period' => $period,
             'count' => $this->getThrottleCounts($key, $period),
             'reset_time' => $this->getThrottleResetTime($key, $now),
         ];
 
-        if ($this->_throttle['count'] < $limit) {
-            if ($auto_add) {
+        if ($this->throttle['count'] < $limit) {
+            if ($autoAdd) {
                 $this->throttleAdd($key, $period);
             }
 
@@ -67,42 +58,36 @@ trait ShouldThrottle
      * 限流 + 1.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @param string $key
-     * @param int    $period
      */
-    public function throttleAdd($key, $period = 60)
+    public function throttleAdd(string $key, int $period = 60): void
     {
         $now = microtime(true) * 1000;
 
-        $this->redis->zadd($key, [$now => $now]);
+        $this->redis->zAdd($key, $now, $now);
         $this->redis->expire($key, $period * 2);
     }
 
     /**
-     * getResetTime.
+     * 获取下次重置时间.
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param $key
-     * @param $now
-     *
-     * @return int
+     * @param float $now 现在的毫秒时间
      */
-    public function getThrottleResetTime($key, $now)
+    public function getThrottleResetTime(string $key, float $now): int
     {
-        $data = $this->redis->zrangebyscore(
+        $data = $this->redis->zRangeByScore(
             $key,
-            $now - $this->_throttle['period'] * 1000,
+            $now - $this->throttle['period'] * 1000,
             $now,
             ['limit' => [0, 1]]
         );
 
         if (0 === count($data)) {
-            return $this->_throttle['reset_time'] = time() + $this->_throttle['period'];
+            return $this->throttle['reset_time'] = time() + $this->throttle['period'];
         }
 
-        return intval($data[0] / 1000) + $this->_throttle['period'];
+        return intval(reset($data) / 1000) + $this->throttle['period'];
     }
 
     /**
@@ -110,19 +95,18 @@ trait ShouldThrottle
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string|null $key
-     * @param mixed|null  $default
+     * @param mixed $default
      *
-     * @return array|null
+     * @return mixed
      */
-    public function getThrottleInfo($key = null, $default = null)
+    public function getThrottleInfo(?string $key = null, $default = null)
     {
         if (is_null($key)) {
-            return $this->_throttle;
+            return $this->throttle;
         }
 
-        if (isset($this->_throttle[$key])) {
-            return $this->_throttle[$key];
+        if (isset($this->throttle[$key])) {
+            return $this->throttle[$key];
         }
 
         return $default;
@@ -132,16 +116,11 @@ trait ShouldThrottle
      * 获取已使用次数.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @param string $key
-     * @param int    $period
-     *
-     * @return string
      */
-    public function getThrottleCounts($key, $period = 60)
+    public function getThrottleCounts(string $key, int $period = 60): int
     {
         $now = microtime(true) * 1000;
 
-        return $this->redis->zcount($key, $now - $period * 1000, $now);
+        return $this->redis->zCount($key, $now - $period * 1000, $now);
     }
 }

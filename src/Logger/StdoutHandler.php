@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yansongda\Supports\Logger;
 
 use Monolog\Handler\AbstractProcessingHandler;
@@ -17,12 +19,12 @@ class StdoutHandler extends AbstractProcessingHandler
     /**
      * Bootstrap.
      *
-     * @param int  $level
-     * @param bool $bubble
+     * @param int|string $level
      */
-    public function __construct($level = Logger::DEBUG, $bubble = true, ?OutputInterface $output = null)
+    public function __construct($level = Logger::DEBUG, bool $bubble = true, ?OutputInterface $output = null)
     {
         $this->output = $output ?? new ConsoleOutput();
+
         parent::__construct($level, $bubble);
     }
 

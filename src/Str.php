@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yansongda\Supports;
 
 use Exception;
@@ -164,8 +166,6 @@ class Str
 
     /**
      * Return the length of the given string.
-     *
-     * @param string $encoding
      */
     public static function length(string $value, ?string $encoding = null): int
     {

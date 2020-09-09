@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yansongda\Supports;
 
 use Exception;
@@ -12,15 +14,15 @@ use Monolog\Logger as BaseLogger;
 use Psr\Log\LoggerInterface;
 
 /**
- * @method void emergency($message, array $context = array())
- * @method void alert($message, array $context = array())
- * @method void critical($message, array $context = array())
- * @method void error($message, array $context = array())
- * @method void warning($message, array $context = array())
- * @method void notice($message, array $context = array())
- * @method void info($message, array $context = array())
- * @method void debug($message, array $context = array())
- * @method void log($message, array $context = array())
+ * @method static void emergency($message, array $context = [])
+ * @method static void alert($message, array $context = [])
+ * @method static void critical($message, array $context = [])
+ * @method static void error($message, array $context = [])
+ * @method static void warning($message, array $context = [])
+ * @method static void notice($message, array $context = [])
+ * @method static void info($message, array $context = [])
+ * @method static void debug($message, array $context = [])
+ * @method static void log($message, array $context = [])
  */
 class Logger
 {
@@ -63,12 +65,9 @@ class Logger
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string $method
-     * @param array  $args
-     *
      * @throws Exception
      */
-    public function __call($method, $args): void
+    public function __call(string $method, array $args): void
     {
         call_user_func_array([$this->getLogger(), $method], $args);
     }

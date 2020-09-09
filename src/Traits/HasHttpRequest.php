@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yansongda\Supports\Traits;
 
 use GuzzleHttp\Client;
@@ -79,8 +81,6 @@ trait HasHttpRequest
      * Set http client.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @return $this
      */
     public function setHttpClient(Client $client): self
     {
@@ -115,8 +115,6 @@ trait HasHttpRequest
      * setBaseUri.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @return $this
      */
     public function setBaseUri(string $url): self
     {

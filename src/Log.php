@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Yansongda\Supports;
 
 /**
- * @method static void emergency($message, array $context = array())
- * @method static void alert($message, array $context = array())
- * @method static void critical($message, array $context = array())
- * @method static void error($message, array $context = array())
- * @method static void warning($message, array $context = array())
- * @method static void notice($message, array $context = array())
- * @method static void info($message, array $context = array())
- * @method static void debug($message, array $context = array())
- * @method static void log($message, array $context = array())
+ * @method static void emergency($message, array $context = [])
+ * @method static void alert($message, array $context = [])
+ * @method static void critical($message, array $context = [])
+ * @method static void error($message, array $context = [])
+ * @method static void warning($message, array $context = [])
+ * @method static void notice($message, array $context = [])
+ * @method static void info($message, array $context = [])
+ * @method static void debug($message, array $context = [])
+ * @method static void log($message, array $context = [])
  */
 class Log extends Logger
 {
@@ -34,12 +36,9 @@ class Log extends Logger
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string $method
-     * @param array  $args
-     *
      * @throws \Exception
      */
-    public function __call($method, $args): void
+    public function __call(string $method, array $args): void
     {
         call_user_func_array([self::getInstance(), $method], $args);
     }
@@ -49,12 +48,9 @@ class Log extends Logger
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @param string $method
-     * @param array  $args
-     *
      * @throws \Exception
      */
-    public static function __callStatic($method, $args): void
+    public static function __callStatic(string $method, array $args): void
     {
         forward_static_call_array([self::getInstance(), $method], $args);
     }

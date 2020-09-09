@@ -68,7 +68,7 @@ trait Serializable
      *
      * @since 5.1.0
      */
-    public function unserialize($serialized)
+    public function unserialize(string $serialized)
     {
         $data = json_decode($serialized, true);
 
