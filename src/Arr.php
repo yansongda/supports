@@ -312,7 +312,7 @@ class Arr
      * Get an item from an array using "dot" notation.
      *
      * @param string|int|null $key
-     * @param mixed $default
+     * @param mixed           $default
      *
      * @return mixed
      */
@@ -446,7 +446,7 @@ class Arr
      * If no key is given to the method, the entire array will be replaced.
      *
      * @param string|int|null $key
-     * @param mixed $value
+     * @param mixed           $value
      */
     public static function set(array &$array, $key, $value): array
     {

@@ -168,7 +168,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * add the item value.
      *
      * @param string|int|null $key
-     * @param mixed $value
+     * @param mixed           $value
      */
     public function add($key, $value)
     {
@@ -179,7 +179,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * Set the item value.
      *
      * @param string|int|null $key
-     * @param mixed $value
+     * @param mixed           $value
      */
     public function set($key, $value)
     {
@@ -190,7 +190,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * Retrieve item from Collection.
      *
      * @param string|int|null $key
-     * @param mixed $default
+     * @param mixed           $default
      *
      * @return mixed
      */
