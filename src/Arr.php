@@ -311,11 +311,12 @@ class Arr
     /**
      * Get an item from an array using "dot" notation.
      *
+     * @param string|int|null $key
      * @param mixed $default
      *
      * @return mixed
      */
-    public static function get(array $array, string $key, $default = null)
+    public static function get(array $array, $key, $default = null)
     {
         if (is_null($key)) {
             return $array;
@@ -444,9 +445,10 @@ class Arr
      *
      * If no key is given to the method, the entire array will be replaced.
      *
+     * @param string|int|null $key
      * @param mixed $value
      */
-    public static function set(array &$array, string $key, $value): array
+    public static function set(array &$array, $key, $value): array
     {
         if (is_null($key)) {
             return $array = $value;

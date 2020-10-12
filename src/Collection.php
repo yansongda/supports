@@ -132,8 +132,10 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     /**
      * To determine Whether the specified element exists.
+     *
+     * @param string|int $key
      */
-    public function has(string $key): bool
+    public function has($key): bool
     {
         return !is_null(Arr::get($this->items, $key));
     }
@@ -165,9 +167,10 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     /**
      * add the item value.
      *
+     * @param string|int|null $key
      * @param mixed $value
      */
-    public function add(string $key, $value)
+    public function add($key, $value)
     {
         Arr::set($this->items, $key, $value);
     }
@@ -175,9 +178,10 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     /**
      * Set the item value.
      *
+     * @param string|int|null $key
      * @param mixed $value
      */
-    public function set(string $key, $value)
+    public function set($key, $value)
     {
         Arr::set($this->items, $key, $value);
     }
@@ -185,19 +189,22 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     /**
      * Retrieve item from Collection.
      *
+     * @param string|int|null $key
      * @param mixed $default
      *
      * @return mixed
      */
-    public function get(?string $key = null, $default = null)
+    public function get($key = null, $default = null)
     {
         return Arr::get($this->items, $key, $default);
     }
 
     /**
      * Remove item form Collection.
+     *
+     * @param string|int $key
      */
-    public function forget(string $key)
+    public function forget($key)
     {
         Arr::forget($this->items, $key);
     }
