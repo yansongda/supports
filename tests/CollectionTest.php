@@ -20,7 +20,7 @@ class CollectionTest extends TestCase
      */
     protected $collection;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->data = [
             'name' => 'yansongda',
@@ -39,14 +39,14 @@ class CollectionTest extends TestCase
     {
         $json = json_encode($this->data);
 
-        $this->assertEquals($json, $this->collection->toJson());
-        $this->assertEquals($json, $this->collection->__toString());
+        self::assertEquals($json, $this->collection->toJson());
+        self::assertEquals($json, $this->collection->__toString());
     }
 
     public function testMagicGet()
     {
-        $this->assertEquals('yansongda', $this->collection->name);
-        $this->assertEquals(['php', 'java', 'python'], $this->collection->language);
+        self::assertEquals('yansongda', $this->collection->name);
+        self::assertEquals(['php', 'java', 'python'], $this->collection->language);
     }
 
     public function testMagicSet()
@@ -54,38 +54,38 @@ class CollectionTest extends TestCase
         $this->collection->fuck = 'ok';
         $this->collection->foo = ['bar', 'fuck'];
 
-        $this->assertEquals('ok', $this->collection->get('fuck'));
-        $this->assertEquals(['bar', 'fuck'], $this->collection->get('foo'));
+        self::assertEquals('ok', $this->collection->get('fuck'));
+        self::assertEquals(['bar', 'fuck'], $this->collection->get('foo'));
     }
 
     public function testIsset()
     {
-        $this->assertTrue(isset($this->collection['name']));
-        $this->assertFalse(isset($this->collection['notExistKey']));
+        self::assertTrue(isset($this->collection['name']));
+        self::assertFalse(isset($this->collection['notExistKey']));
     }
 
     public function testUnset()
     {
         unset($this->collection['name']);
 
-        $this->assertFalse(isset($this->collection['name']));
+        self::assertFalse(isset($this->collection['name']));
     }
 
     public function testAll()
     {
-        $this->assertEquals($this->data, $this->collection->all());
+        self::assertEquals($this->data, $this->collection->all());
     }
 
     public function testOnly()
     {
-        $this->assertEquals([
+        self::assertEquals([
             'name' => 'yansongda',
         ], $this->collection->only(['name']));
     }
 
     public function testExcept()
     {
-        $this->assertEquals([
+        self::assertEquals([
             'name' => 'yansongda',
             'age' => 26,
             'sex' => 1,
@@ -96,6 +96,6 @@ class CollectionTest extends TestCase
     {
         $merge = ['haha' => 'enen'];
 
-        $this->assertEquals(array_merge($this->data, $merge), $this->collection->merge($merge));
+        self::assertEquals(array_merge($this->data, $merge), $this->collection->merge($merge));
     }
 }

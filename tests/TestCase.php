@@ -6,11 +6,11 @@ use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 
 class TestCase extends PHPUnitTestCase
 {
-    public function setUp()
+    protected function setUp()
     {
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
     }
 }

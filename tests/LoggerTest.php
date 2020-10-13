@@ -11,7 +11,7 @@ class LoggerTest extends TestCase
 {
     protected $logger;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->logger = new Logger();
         $this->logger->setConfig(['file' => './test.log']);
@@ -19,28 +19,26 @@ class LoggerTest extends TestCase
 
     public function testGetFormatter()
     {
-        $this->assertInstanceOf(FormatterInterface::class, $this->logger->getFormatter());
+        self::assertInstanceOf(FormatterInterface::class, $this->logger->getFormatter());
     }
 
     public function testGetHandler()
     {
-        $this->assertInstanceOf(AbstractHandler::class, $this->logger->getHandler());
+        self::assertInstanceOf(AbstractHandler::class, $this->logger->getHandler());
     }
 
     public function testGetLogger()
     {
-        $this->assertInstanceOf(LoggerInterface::class, $this->logger->getLogger());
+        self::assertInstanceOf(LoggerInterface::class, $this->logger->getLogger());
     }
 
     public function testDebug()
     {
-        $result = $this->logger->debug('test debug', ['foo' => 'bar']);
-        $this->assertNull($result);
+        self::assertNull($this->logger->debug('test debug', ['foo' => 'bar']));
     }
 
     public function testInfo()
     {
-        $result = $this->logger->info('test info', ['foo' => 'bar']);
-        $this->assertNull($result);
+        self::assertNull($this->logger->info('test info', ['foo' => 'bar']));
     }
 }

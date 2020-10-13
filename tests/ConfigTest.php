@@ -11,6 +11,6 @@ class ConfigTest extends TestCase
     {
         $config = [];
 
-        $this->assertInstanceOf(Collection::class, new Config($config));
+        self::assertInstanceOf(Collection::class, new Config($config));
     }
 }
