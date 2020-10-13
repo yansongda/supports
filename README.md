@@ -12,50 +12,53 @@ handle with array/config/log/guzzle etc.
 
 ## About log
 
-### Register
-
-#### Method 1
-
-A application logger can extends `Yansongda\Supports\Log` and modify `createLogger` method, the method must return instance of `Monolog\Logger`.
-
 ```PHP
-use Yansongda\Supports\Log;
+use Yansongda\Supports\Logger as Log;
 use Monolog\Logger;
 
-class APPLICATIONLOG extends Log
+class ApplicationLogger
 {
+    private static $logger;
+
+    /**
+     * Forward call.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @return mixed
+     */
+    public static function __callStatic(string $method, array $args)
+    {
+        return call_user_func_array([self::getLogger(), $method], $args);
+    }
+
+    /**
+     * Forward call.
+     *
+     * @author yansongda <me@yansongda.cn>
+     *
+     * @return mixed
+     */
+    public function __call(string $method, array $args)
+    {
+        return call_user_func_array([self::getLogger(), $method], $args);
+    }
+
     /**
      * Make a default log instance.
      *
      * @author yansongda <me@yansongda.cn>
      *
-     * @return Logger
+     * @return Log
      */
-    public static function createLogger()
+    public static function getLogger()
     {
-        $handler = new StreamHandler('./log.log');
-        $handler->setFormatter(new LineFormatter("%datetime% > %level_name% > %message% %context% %extra%\n\n"));
+        if (! self::$logger instanceof Logger) {
+            self::$logger = new Log();
+        }   
 
-        $logger = new Logger('yansongda.private_number');
-        $logger->pushHandler($handler);
-
-        return $logger;
+        return self::$logger;
     }
-}
-```
-
-#### Method 2
-
-Or, just init the log service with:
-
-```PHP
-use Yansongda\Supports\Log;
-
-protected function registerLog()
-{
-    $logger = Log::createLogger($file, $identify, $level);
-
-    Log::setLogger($logger);
 }
 ```
 
@@ -64,7 +67,6 @@ protected function registerLog()
 After registerLog, you can use Log service:
 
 ```PHP
-use Yansongda\Supports\Log;
 
-Log::debug('test', ['test log']);
+ApplicationLogger::debug('test', ['test log']);
 ```

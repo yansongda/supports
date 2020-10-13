@@ -61,6 +61,16 @@ class Logger
     ];
 
     /**
+     * Bootstrap.
+     *
+     * @param array $config
+     */
+    public function __construct(array $config = [])
+    {
+        $this->setConfig($config);
+    }
+
+    /**
      * Forward call.
      *
      * @author yansongda <me@yansongda.cn>
