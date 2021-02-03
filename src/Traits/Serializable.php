@@ -12,10 +12,8 @@ trait Serializable
      * toJson.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @return string
      */
-    public function toJson()
+    public function toJson(): string
     {
         return $this->serialize();
     }
@@ -68,7 +66,7 @@ trait Serializable
      *
      * @since 5.1.0
      */
-    public function unserialize(string $serialized)
+    public function unserialize($serialized)
     {
         $data = json_decode($serialized, true);
 
