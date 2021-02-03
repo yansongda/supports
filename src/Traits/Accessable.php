@@ -72,7 +72,7 @@ trait Accessable
         }
 
         if (method_exists($this, $method)) {
-            return $this->{$method}($value);
+            $this->{$method}($value);
         }
 
         return $this;
