@@ -16,7 +16,7 @@ jobs:
       image: yansongda/php-fpm:${{ matrix.php }}
     steps:
       - name: Install Git
-        run: apt update && apt install -y git
+        run: apt-get update && apt-get install -y git
       - name: Checkout Code
         uses: actions/checkout@master
       - name: Install Dependencies
