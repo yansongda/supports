@@ -24,6 +24,9 @@
         "symfony/console": "^5.1"
     },
     "autoload": {
+        "files": [
+            "src/Functions.php"
+        ],
         "psr-4": {
             "Yansongda\\Supports\\": "src/"
         }
