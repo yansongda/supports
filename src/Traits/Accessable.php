@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Yansongda\Supports\Traits;
 
+use Yansongda\Supports\Str;
+
 trait Accessable
 {
     /**
@@ -45,10 +47,7 @@ trait Accessable
             return method_exists($this, 'toArray') ? $this->toArray() : $default;
         }
 
-        $method = 'get';
-        foreach (explode('_', $key) as $item) {
-            $method .= ucfirst($item);
-        }
+        $method = 'get'.Str::studly($key);
 
         if (method_exists($this, $method)) {
             return $this->{$method}();
@@ -66,10 +65,7 @@ trait Accessable
      */
     public function set(string $key, $value): self
     {
-        $method = 'set';
-        foreach (explode('_', $key) as $item) {
-            $method .= ucfirst($item);
-        }
+        $method = 'set'.Str::studly($key);
 
         if (method_exists($this, $method)) {
             $this->{$method}($value);

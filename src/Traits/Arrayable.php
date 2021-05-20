@@ -13,8 +13,6 @@ trait Arrayable
      * toArray.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @throws \ReflectionException
      */
     public function toArray(): array
     {
