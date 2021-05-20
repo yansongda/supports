@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace Yansongda\Supports;
 
 use ArrayAccess;
+use InvalidArgumentException;
 
 /**
  * Most of the methods in this file come from illuminate/support and hyperf/support,
- * thanks Laravel Team provide such a useful class.
+ * thanks provide such a useful class.
  */
 class Arr
 {
@@ -78,12 +79,8 @@ class Arr
 
     /**
      * Divide an array into two arrays. One with keys and the other with values.
-     *
-     * @param array $array
-     *
-     * @return array
      */
-    public static function divide($array)
+    public static function divide(array $array): array
     {
         return [array_keys($array), array_values($array)];
     }
@@ -324,14 +321,17 @@ class Arr
         $results = [];
 
         foreach ($array as $item) {
-            $itemValue = is_object($item) ? $item->{$value} : $item[$value];
+            $itemValue = data_get($item, $value);
             // If the key is "null", we will just append the value to the array and keep
             // looping. Otherwise we will key the array using the value of the key we
             // received from the developer. Then we'll return the final array form.
             if (is_null($key)) {
                 $results[] = $itemValue;
             } else {
-                $itemKey = is_object($item) ? $item->{$key} : $item[$key];
+                $itemKey = data_get($item, $key);
+                if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
+                    $itemKey = (string) $itemKey;
+                }
                 $results[$itemKey] = $itemValue;
             }
         }
@@ -374,22 +374,19 @@ class Arr
      *
      * @throws \InvalidArgumentException
      */
-    public static function random(array $array, int $number = 1)
+    public static function random(array $array, int $number = 1): array
     {
         $count = count($array);
-        $requested = $number > $count ? $count : $number;
-
-        if (is_null($number)) {
-            return $array[array_rand($array)];
+        if ($number > $count) {
+            throw new InvalidArgumentException("You requested $number items, but there are only $count items available.");
         }
 
-        if (0 === (int) $number) {
+        if ($number === 0) {
             return [];
         }
 
         $keys = array_rand($array, $number);
         $results = [];
-
         foreach ((array) $keys as $key) {
             $results[] = $array[$key];
         }
@@ -543,7 +540,7 @@ class Arr
                 }
             }
         } else {
-            foreach ($array2 as $key => $value) {
+            foreach ($array2 as $value) {
                 if ($unique && in_array($value, $array1, true)) {
                     continue;
                 }
@@ -581,10 +578,8 @@ class Arr
      * Convert encoding.
      *
      * @author yansongda <me@yansongda.cn>
-     *
-     * @param string $from_encoding
      */
-    public static function encoding(array $array, string $to_encoding, $from_encoding = 'gb2312'): array
+    public static function encoding(array $array, string $to_encoding, string $from_encoding = 'gb2312'): array
     {
         $encoded = [];
 

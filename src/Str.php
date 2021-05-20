@@ -7,7 +7,8 @@ namespace Yansongda\Supports;
 use Exception;
 
 /**
- * modify from Illuminate\Support.
+ * Most of the methods in this file come from illuminate/support.
+ * thanks provide such a useful class.
  */
 class Str
 {
@@ -127,7 +128,7 @@ class Str
      */
     public static function is($pattern, string $value): bool
     {
-        $patterns = is_array($pattern) ? $pattern : (array) $pattern;
+        $patterns = Arr::wrap($pattern);
 
         if (empty($patterns)) {
             return false;
@@ -201,7 +202,7 @@ class Str
      */
     public static function words(string $value, int $words = 100, string $end = '...'): string
     {
-        preg_match('/^\s*+(?:\S++\s*+){1,'.$words.'}/u', $value, $matches);
+        preg_match('/^\s*+\S++\s*+{1,'.$words.'}/u', $value, $matches);
 
         if (!isset($matches[0]) || static::length($value) === static::length($matches[0])) {
             return $value;
@@ -230,7 +231,7 @@ class Str
         while (($len = strlen($string)) < $length) {
             $size = $length - $len;
 
-            $bytes = function_exists('random_bytes') ? random_bytes($size) : mt_rand();
+            $bytes = random_bytes($size);
 
             $string .= substr(str_replace(['/', '+', '='], '', base64_encode($bytes)), 0, $size);
         }
@@ -565,6 +566,6 @@ class Str
             ];
         }
 
-        return isset($languageSpecific[$language]) ? $languageSpecific[$language] : null;
+        return $languageSpecific[$language] ?? null;
     }
 }

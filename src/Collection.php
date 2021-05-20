@@ -109,7 +109,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @return static
      */
-    public function except($keys)
+    public function except($keys): Collection
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
@@ -234,7 +234,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * @return mixed data which can be serialized by <b>json_encode</b>,
      *               which is a value of any type other than a resource
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return $this->items;
     }
@@ -247,7 +247,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @return string the string representation of the object or null
      */
-    public function serialize()
+    public function serialize(): string
     {
         return serialize($this->items);
     }
