@@ -20,7 +20,7 @@ class CollectionTest extends TestCase
      */
     protected $collection;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->data = [
             'name' => 'yansongda',
@@ -29,7 +29,7 @@ class CollectionTest extends TestCase
             'language' => [
                 'php',
                 'java',
-                'python',
+                'rust',
             ],
         ];
         $this->collection = new Collection($this->data);

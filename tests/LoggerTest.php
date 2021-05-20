@@ -11,7 +11,7 @@ class LoggerTest extends TestCase
 {
     protected $logger;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->logger = new Logger();
         $this->logger->setConfig(['file' => './test.log']);
