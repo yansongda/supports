@@ -2,10 +2,8 @@
 
 namespace Yansongda\Supports\Tests\Traits;
 
-use Yansongda\Supports\Collection;
-use Yansongda\Supports\Config;
+use PHPUnit\Framework\TestCase;
 use Yansongda\Supports\Tests\Stubs\TraitStub;
-use Yansongda\Supports\Tests\TestCase;
 
 class ArrayAccessTest extends TestCase
 {

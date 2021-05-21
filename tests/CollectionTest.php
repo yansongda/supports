@@ -2,6 +2,7 @@
 
 namespace Yansongda\Supports\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Yansongda\Supports\Collection;
 
 class CollectionTest extends TestCase

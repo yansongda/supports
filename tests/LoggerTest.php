@@ -4,6 +4,7 @@ namespace Yansongda\Supports\Tests;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractHandler;
+use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use Yansongda\Supports\Logger;
 
