@@ -5,7 +5,7 @@ declare(strict_types=1);
 use Yansongda\Supports\Arr;
 use Yansongda\Supports\Collection;
 
-if (! function_exists('collect')) {
+if (!function_exists('collect')) {
     /**
      * Create a collection from the given value.
      */
@@ -15,7 +15,7 @@ if (! function_exists('collect')) {
     }
 }
 
-if (! function_exists('value')) {
+if (!function_exists('value')) {
     /**
      * Return the default value of the given value.
      *
@@ -29,13 +29,13 @@ if (! function_exists('value')) {
     }
 }
 
-if (! function_exists('data_get')) {
+if (!function_exists('data_get')) {
     /**
      * Get an item from an array or object using "dot" notation.
      *
-     * @param null|array|int|string $key
-     * @param null|mixed $default
-     * @param mixed $target
+     * @param array|int|string|null $key
+     * @param mixed|null            $default
+     * @param mixed                 $target
      */
     function data_get($target, $key, $default = null)
     {
@@ -44,17 +44,18 @@ if (! function_exists('data_get')) {
         }
 
         $key = is_array($key) ? $key : explode('.', is_int($key) ? (string) $key : $key);
-        while (! is_null($segment = array_shift($key))) {
-            if ($segment === '*') {
+        while (!is_null($segment = array_shift($key))) {
+            if ('*' === $segment) {
                 if ($target instanceof Collection) {
                     $target = $target->all();
-                } elseif (! is_array($target)) {
+                } elseif (!is_array($target)) {
                     return value($default);
                 }
                 $result = [];
                 foreach ($target as $item) {
                     $result[] = data_get($item, $key);
                 }
+
                 return in_array('*', $key) ? Arr::collapse($result) : $result;
             }
             if (Arr::accessible($target) && Arr::exists($target, $segment)) {
@@ -65,6 +66,7 @@ if (! function_exists('data_get')) {
                 return value($default);
             }
         }
+
         return $target;
     }
 }

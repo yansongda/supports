@@ -46,7 +46,7 @@ class CollectionTest extends TestCase
     public function testMagicGet()
     {
         self::assertEquals('yansongda', $this->collection->name);
-        self::assertEquals(['php', 'java', 'python'], $this->collection->language);
+        self::assertEqualsCanonicalizing(['php', 'java', 'rust'], $this->collection->language);
     }
 
     public function testMagicSet()
