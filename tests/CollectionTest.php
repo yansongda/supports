@@ -2,6 +2,7 @@
 
 namespace Yansongda\Supports\Tests;
 
+use PHPUnit\Framework\TestCase;
 use Yansongda\Supports\Collection;
 
 class CollectionTest extends TestCase
@@ -46,7 +47,7 @@ class CollectionTest extends TestCase
     public function testMagicGet()
     {
         self::assertEquals('yansongda', $this->collection->name);
-        self::assertEquals(['php', 'java', 'python'], $this->collection->language);
+        self::assertEqualsCanonicalizing(['php', 'java', 'rust'], $this->collection->language);
     }
 
     public function testMagicSet()

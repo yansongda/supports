@@ -381,7 +381,7 @@ class Arr
             throw new InvalidArgumentException("You requested $number items, but there are only $count items available.");
         }
 
-        if ($number === 0) {
+        if (0 === $number) {
             return [];
         }
 
