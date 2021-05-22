@@ -149,17 +149,13 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     }
 
     /**
-     * Merge data.
+     * Merge the collection with the given items.
      *
-     * @param Collection|array $items
+     * @param mixed $items
      */
-    public function merge($items): array
+    public function merge($items): self
     {
-        foreach ($items as $key => $value) {
-            $this->set($key, $value);
-        }
-
-        return $this->all();
+        return new static(array_merge($this->items, $this->getArrayableItems($items)));
     }
 
     /**
@@ -623,5 +619,24 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     public function offsetSet($offset, $value)
     {
         $this->set($offset, $value);
+    }
+
+    /**
+     * Results array of items from Collection or Arrayable.
+     * @param mixed $items
+     */
+    protected function getArrayableItems($items): array
+    {
+        if (is_array($items)) {
+            return $items;
+        }
+        if ($items instanceof self) {
+            return $items->all();
+        }
+        if ($items instanceof JsonSerializable) {
+            return $items->jsonSerialize();
+        }
+
+        return (array) $items;
     }
 }
