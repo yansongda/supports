@@ -77,6 +77,26 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     }
 
     /**
+     * Wrap the given value in a collection if applicable.
+     *
+     * @param mixed $value
+     */
+    public static function wrap($value): self
+    {
+        return $value instanceof self ? new static($value) : new static(Arr::wrap($value));
+    }
+
+    /**
+     * Get the underlying items from the given collection if applicable.
+     *
+     * @param array|static $value
+     */
+    public static function unwrap($value): array
+    {
+        return $value instanceof self ? $value->all() : $value;
+    }
+
+    /**
      * Return all items.
      */
     public function all(): array
@@ -114,6 +134,18 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         $keys = is_array($keys) ? $keys : func_get_args();
 
         return new static(Arr::except($this->items, $keys));
+    }
+
+    /**
+     * Run a filter over each of the items.
+     */
+    public function filter(callable $callback = null): self
+    {
+        if ($callback) {
+            return new static(Arr::where($this->items, $callback));
+        }
+
+        return new static(array_filter($this->items));
     }
 
     /**
@@ -207,6 +239,151 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     public function forget($key)
     {
         Arr::forget($this->items, $key);
+    }
+
+    /**
+     * Get a flattened array of the items in the collection.
+     * @param float|int $depth
+     */
+    public function flatten($depth = INF): self
+    {
+        return new static(Arr::flatten($this->items, $depth));
+    }
+
+    /**
+     * Run a map over each of the items.
+     */
+    public function map(callable $callback): self
+    {
+        $keys = array_keys($this->items);
+        $items = array_map($callback, $this->items, $keys);
+
+        return new static(array_combine($keys, $items));
+    }
+
+    /**
+     * Get and remove the last item from the collection.
+     */
+    public function pop()
+    {
+        return array_pop($this->items);
+    }
+
+    /**
+     * Push an item onto the beginning of the collection.
+     *
+     * @param null|mixed $key
+     * @param mixed $value
+     */
+    public function prepend($value, $key = null): self
+    {
+        $this->items = Arr::prepend($this->items, $value, $key);
+        return $this;
+    }
+
+    /**
+     * Push an item onto the end of the collection.
+     * @param mixed $value
+     */
+    public function push($value): self
+    {
+        $this->offsetSet(null, $value);
+        return $this;
+    }
+
+    /**
+     * Get and remove an item from the collection.
+     *
+     * @param null|mixed $default
+     * @param mixed $key
+     */
+    public function pull($key, $default = null)
+    {
+        return Arr::pull($this->items, $key, $default);
+    }
+
+    /**
+     * Put an item in the collection by key.
+     * @param mixed $key
+     * @param mixed $value
+     */
+    public function put($key, $value): self
+    {
+        $this->offsetSet($key, $value);
+        return $this;
+    }
+
+    /**
+     * Get one or a specified number of items randomly from the collection.
+     *
+     * @throws \InvalidArgumentException
+     * @return mixed|self
+     */
+    public function random(int $number = null)
+    {
+        if (is_null($number)) {
+            return Arr::random($this->items);
+        }
+        return new static(Arr::random($this->items, $number));
+    }
+
+    /**
+     * Reduce the collection to a single value.
+     *
+     * @param null|mixed $initial
+     */
+    public function reduce(callable $callback, $initial = null)
+    {
+        return array_reduce($this->items, $callback, $initial);
+    }
+
+    /**
+     * Reset the keys on the underlying array.
+     */
+    public function values(): self
+    {
+        return new static(array_values($this->items));
+    }
+
+    /**
+     * Determine if all items in the collection pass the given test.
+     *
+     * @param callable|string $key
+     */
+    public function every($key): bool
+    {
+        $callback = $this->valueRetriever($key);
+
+        foreach ($this->items as $k => $v) {
+            if (! $callback($v, $k)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Determine if the given value is callable, but not a string.
+     * @param mixed $value
+     */
+    protected function useAsCallable($value): bool
+    {
+        return ! is_string($value) && is_callable($value);
+    }
+
+    /**
+     * Get a value retrieving callback.
+     * @param mixed $value
+     */
+    protected function valueRetriever($value): callable
+    {
+        if ($this->useAsCallable($value)) {
+            return $value;
+        }
+        return function ($item) use ($value) {
+            return data_get($item, $value);
+        };
     }
 
     /**
