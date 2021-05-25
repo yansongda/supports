@@ -97,6 +97,6 @@ class CollectionTest extends TestCase
     {
         $merge = ['haha' => 'enen'];
 
-        self::assertEquals(array_merge($this->data, $merge), $this->collection->merge($merge));
+        self::assertEqualsCanonicalizing(array_merge($this->data, $merge), $this->collection->merge($merge)->all());
     }
 }
