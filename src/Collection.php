@@ -239,6 +239,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     /**
      * Get a flattened array of the items in the collection.
+     *
      * @param float|int $depth
      */
     public function flatten($depth = INF): self
@@ -268,30 +269,33 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     /**
      * Push an item onto the beginning of the collection.
      *
-     * @param null|mixed $key
-     * @param mixed $value
+     * @param mixed|null $key
+     * @param mixed      $value
      */
     public function prepend($value, $key = null): self
     {
         $this->items = Arr::prepend($this->items, $value, $key);
+
         return $this;
     }
 
     /**
      * Push an item onto the end of the collection.
+     *
      * @param mixed $value
      */
     public function push($value): self
     {
         $this->offsetSet(null, $value);
+
         return $this;
     }
 
     /**
      * Get and remove an item from the collection.
      *
-     * @param null|mixed $default
-     * @param mixed $key
+     * @param mixed|null $default
+     * @param mixed      $key
      */
     public function pull($key, $default = null)
     {
@@ -300,12 +304,14 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     /**
      * Put an item in the collection by key.
+     *
      * @param mixed $key
      * @param mixed $value
      */
     public function put($key, $value): self
     {
         $this->offsetSet($key, $value);
+
         return $this;
     }
 
@@ -313,6 +319,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * Get one or a specified number of items randomly from the collection.
      *
      * @throws \InvalidArgumentException
+     *
      * @return mixed|self
      */
     public function random(int $number = null)
@@ -320,13 +327,14 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         if (is_null($number)) {
             return Arr::random($this->items);
         }
+
         return new static(Arr::random($this->items, $number));
     }
 
     /**
      * Reduce the collection to a single value.
      *
-     * @param null|mixed $initial
+     * @param mixed|null $initial
      */
     public function reduce(callable $callback, $initial = null)
     {
@@ -351,7 +359,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         $callback = $this->valueRetriever($key);
 
         foreach ($this->items as $k => $v) {
-            if (! $callback($v, $k)) {
+            if (!$callback($v, $k)) {
                 return false;
             }
         }
@@ -371,6 +379,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         foreach (array_chunk($this->items, $size, true) as $chunk) {
             $chunks[] = new static($chunk);
         }
+
         return new static($chunks);
     }
 
@@ -381,6 +390,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     {
         $items = $this->items;
         $callback ? uasort($items, $callback) : asort($items);
+
         return new static($items);
     }
 
@@ -406,6 +416,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         foreach (array_keys($results) as $key) {
             $results[$key] = $this->items[$key];
         }
+
         return new static($results);
     }
 
@@ -426,6 +437,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     {
         $items = $this->items;
         $descending ? krsort($items, $options) : ksort($items, $options);
+
         return new static($items);
     }
 
@@ -435,30 +447,6 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     public function sortKeysDesc(int $options = SORT_REGULAR): self
     {
         return $this->sortKeys($options, true);
-    }
-
-
-    /**
-     * Determine if the given value is callable, but not a string.
-     * @param mixed $value
-     */
-    protected function useAsCallable($value): bool
-    {
-        return ! is_string($value) && is_callable($value);
-    }
-
-    /**
-     * Get a value retrieving callback.
-     * @param mixed $value
-     */
-    protected function valueRetriever($value): callable
-    {
-        if ($this->useAsCallable($value)) {
-            return $value;
-        }
-        return function ($item) use ($value) {
-            return data_get($item, $value);
-        };
     }
 
     /**
@@ -622,7 +610,34 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     }
 
     /**
+     * Determine if the given value is callable, but not a string.
+     *
+     * @param mixed $value
+     */
+    protected function useAsCallable($value): bool
+    {
+        return !is_string($value) && is_callable($value);
+    }
+
+    /**
+     * Get a value retrieving callback.
+     *
+     * @param mixed $value
+     */
+    protected function valueRetriever($value): callable
+    {
+        if ($this->useAsCallable($value)) {
+            return $value;
+        }
+
+        return function ($item) use ($value) {
+            return data_get($item, $value);
+        };
+    }
+
+    /**
      * Results array of items from Collection or Arrayable.
+     *
      * @param mixed $items
      */
     protected function getArrayableItems($items): array
