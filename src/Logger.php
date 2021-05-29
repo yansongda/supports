@@ -29,7 +29,7 @@ class Logger
     /**
      * Logger instance.
      *
-     * @var LoggerInterface
+     * @var \Psr\Log\LoggerInterface
      */
     protected $logger;
 
@@ -43,7 +43,7 @@ class Logger
     /**
      * handler.
      *
-     * @var AbstractHandler
+     * @var \Monolog\Handler\AbstractHandler
      */
     protected $handler;
 
