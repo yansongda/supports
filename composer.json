@@ -14,15 +14,15 @@
     ],
     "require": {
         "php": ">=7.3",
-        "monolog/monolog": "^2.0",
-        "guzzlehttp/guzzle": "^7.0"
+        "monolog/monolog": "^2.0"
     },
     "require-dev": {
         "predis/predis": "^1.1",
         "phpunit/phpunit": "^9.0",
         "mockery/mockery": "^1.4",
         "friendsofphp/php-cs-fixer": "^2.15",
-        "symfony/console": "^5.1"
+        "symfony/console": "^5.1",
+        "guzzlehttp/guzzle": "^7.0"
     },
     "autoload": {
         "files": [
@@ -39,7 +39,8 @@
     },
     "suggest": {
         "predis/predis": "Allows to use throttle feature",
-        "symfony/console": "Use stdout logger"
+        "symfony/console": "Use stdout logger",
+        "guzzlehttp/guzzle": "Use http trait"
     },
     "license": "MIT"
 }
