@@ -490,7 +490,7 @@ class Arr
             $result .= $key.'='.$value.$separator;
         }
 
-        return substr($result, 0, 0 - strlen($separator));
+        return substr($result, 0, 0 - Str::length($separator));
     }
 
     /**
