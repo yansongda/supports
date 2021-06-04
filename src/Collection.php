@@ -443,9 +443,14 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return $this->sortKeys($options, true);
     }
 
-    public function query(int $encodingType = PHP_QUERY_RFC3986): string
+    public function query(int $encodingType = PHP_QUERY_RFC1738): string
     {
         return Arr::query($this->all(), $encodingType);
+    }
+
+    public function toString(string $separator = '&'): string
+    {
+        return Arr::toString($this->all(), $separator);
     }
 
     /**

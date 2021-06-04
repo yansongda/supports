@@ -46,4 +46,14 @@ class ArrTest extends TestCase
 
         self::assertEqualsCanonicalizing($expect, Arr::camelCaseKey($a));
     }
+
+    public function testToString()
+    {
+        $a = [
+            'my_name' => 'yansongda',
+            'my_age' => 27,
+        ];
+
+        self::assertEquals('my_name=yansongda&my_age=27', Arr::toString($a));
+    }
 }

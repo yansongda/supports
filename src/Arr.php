@@ -477,12 +477,20 @@ class Arr
         return $array;
     }
 
-    /**
-     * Convert the array into a query string.
-     */
-    public static function query(array $array, int $encodingType = PHP_QUERY_RFC3986): string
+    public static function query(array $array, int $encodingType = PHP_QUERY_RFC1738): string
     {
         return http_build_query($array, '', '&', $encodingType);
+    }
+
+    public static function toString(array $array, string $separator = '&'): string
+    {
+        $result = '';
+
+        foreach ($array as $key => $value) {
+            $result .= $key.'='.$value.$separator;
+        }
+
+        return substr($result, 0, 0 - strlen($separator));
     }
 
     /**
