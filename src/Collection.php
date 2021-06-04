@@ -319,16 +319,10 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      * Get one or a specified number of items randomly from the collection.
      *
      * @throws \InvalidArgumentException
-     *
-     * @return mixed|self
      */
-    public function random(int $number = null)
+    public function random(?int $number = null): self
     {
-        if (is_null($number)) {
-            return Arr::random($this->items);
-        }
-
-        return new static(Arr::random($this->items, $number));
+        return new static(Arr::random($this->items, $number ?? 1));
     }
 
     /**
@@ -447,6 +441,11 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     public function sortKeysDesc(int $options = SORT_REGULAR): self
     {
         return $this->sortKeys($options, true);
+    }
+
+    public function query(int $encodingType = PHP_QUERY_RFC3986): string
+    {
+        return Arr::query($this->all(), $encodingType);
     }
 
     /**
