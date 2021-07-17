@@ -25,9 +25,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      *
      * @param mixed $items
      */
-    public function __construct(array $items = [])
+    public function __construct($items = [])
     {
-        foreach ($items as $key => $value) {
+        foreach ($this->getArrayableItems($items) as $key => $value) {
             $this->set($key, $value);
         }
     }
@@ -649,9 +649,11 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         if (is_array($items)) {
             return $items;
         }
+
         if ($items instanceof self) {
             return $items->all();
         }
+
         if ($items instanceof JsonSerializable) {
             return $items->jsonSerialize();
         }

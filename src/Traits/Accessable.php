@@ -27,9 +27,9 @@ trait Accessable
      *
      * @param mixed $value
      */
-    public function __set(string $key, $value): self
+    public function __set(string $key, $value): void
     {
-        return $this->set($key, $value);
+        $this->set($key, $value);
     }
 
     /**

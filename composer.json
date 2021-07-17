@@ -19,7 +19,8 @@
         "predis/predis": "^1.1",
         "phpunit/phpunit": "^9.0",
         "mockery/mockery": "^1.4",
-        "friendsofphp/php-cs-fixer": "^2.15",
+        "friendsofphp/php-cs-fixer": "^3.0",
+        "phpstan/phpstan": "^0.12.91",
         "symfony/console": "^5.1",
         "guzzlehttp/guzzle": "^7.0",
         "monolog/monolog": "^2.0"
@@ -42,6 +43,11 @@
         "symfony/console": "Use stdout logger",
         "guzzlehttp/guzzle": "Use http trait",
         "monolog/monolog": "Use logger"
+    },
+    "scripts": {
+        "test": "./vendor/bin/phpunit -c phpunit.xml --colors=always",
+        "cs-fix": "php-cs-fixer fix --dry-run --diff 1>&2",
+        "analyse": "phpstan analyse --memory-limit 300M -l 5 -c phpstan.neon ./src"
     },
     "license": "MIT"
 }

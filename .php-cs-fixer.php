@@ -1,10 +1,11 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->in(__DIR__)
     ->exclude('tests')
-    ->exclude('vendor');
-return PhpCsFixer\Config::create()
+    ->exclude('vendor')
+    ->in(__DIR__);
+
+return (new PhpCsFixer\Config())
     ->setUsingCache(false)
     ->setRules([
         '@Symfony' => true,
@@ -14,5 +15,10 @@ return PhpCsFixer\Config::create()
         'line_ending' => true,
         'single_quote' => true,
         'array_syntax' => ['syntax' => 'short'],
+        'general_phpdoc_annotation_remove' => [
+            'annotations' => [
+                'author'
+            ],
+        ],
     ])
     ->setFinder($finder);
