@@ -403,8 +403,6 @@ class Str
 
     /**
      * Convert string's encoding.
-     *
-     * @author yansongda <me@yansonga.cn>
      */
     public static function encoding(string $string, string $to = 'utf-8', string $from = 'gb2312'): string
     {

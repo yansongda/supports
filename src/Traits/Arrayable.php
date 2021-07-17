@@ -11,8 +11,6 @@ trait Arrayable
 {
     /**
      * toArray.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function toArray(): array
     {

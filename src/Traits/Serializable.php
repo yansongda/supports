@@ -10,8 +10,6 @@ trait Serializable
 {
     /**
      * toJson.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function toJson(): string
     {

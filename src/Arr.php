@@ -566,8 +566,6 @@ class Arr
      *
      * if not array access, return original.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
      * @param mixed $data
      *
      * @return mixed
@@ -584,8 +582,6 @@ class Arr
 
     /**
      * Convert encoding.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public static function encoding(array $array, string $to_encoding, string $from_encoding = 'gb2312'): array
     {
@@ -601,8 +597,6 @@ class Arr
 
     /**
      * camelCaseKey.
-     *
-     * @author yansongda <me@yansongda.cn>
      *
      * @param mixed $data
      *
@@ -627,8 +621,6 @@ class Arr
 
     /**
      * snakeCaseKey.
-     *
-     * @author yansongda <me@yansongda.cn>
      *
      * @param mixed $data
      *

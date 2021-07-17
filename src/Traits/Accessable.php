@@ -11,8 +11,6 @@ trait Accessable
     /**
      * __get.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
      * @return mixed
      */
     public function __get(string $key)
@@ -23,8 +21,6 @@ trait Accessable
     /**
      * __set.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
      * @param mixed $value
      */
     public function __set(string $key, $value): void
@@ -34,8 +30,6 @@ trait Accessable
 
     /**
      * get.
-     *
-     * @author yansongda <me@yansongda.cn>
      *
      * @param mixed $default
      *
@@ -58,8 +52,6 @@ trait Accessable
 
     /**
      * set.
-     *
-     * @author yansongda <me@yansongda.cn>
      *
      * @param mixed $value
      */

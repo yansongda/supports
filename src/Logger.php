@@ -7,7 +7,7 @@ namespace Yansongda\Supports;
 use Exception;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\AbstractHandler;
+use Monolog\Handler\AbstractProcessingHandler;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger as BaseLogger;
@@ -29,21 +29,21 @@ class Logger
     /**
      * Logger instance.
      *
-     * @var \Psr\Log\LoggerInterface
+     * @var \Psr\Log\LoggerInterface|null
      */
     protected $logger;
 
     /**
      * formatter.
      *
-     * @var \Monolog\Formatter\FormatterInterface
+     * @var \Monolog\Formatter\FormatterInterface|null
      */
     protected $formatter;
 
     /**
      * handler.
      *
-     * @var \Monolog\Handler\AbstractHandler
+     * @var \Monolog\Handler\AbstractProcessingHandler|null
      */
     protected $handler;
 
@@ -71,8 +71,6 @@ class Logger
     /**
      * Forward call.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
      * @throws Exception
      */
     public function __call(string $method, array $args): void
@@ -82,8 +80,6 @@ class Logger
 
     /**
      * Set logger.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function setLogger(LoggerInterface $logger): Logger
     {
@@ -94,8 +90,6 @@ class Logger
 
     /**
      * Return the logger instance.
-     *
-     * @author yansongda <me@yansongda.cn>
      *
      * @throws Exception
      */
@@ -108,13 +102,6 @@ class Logger
         return $this->logger;
     }
 
-    /**
-     * Make a default log instance.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @throws Exception
-     */
     public function createLogger(): BaseLogger
     {
         $handler = $this->getHandler();
@@ -131,8 +118,6 @@ class Logger
     /**
      * setFormatter.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
      * @return $this
      */
     public function setFormatter(FormatterInterface $formatter): self
@@ -144,8 +129,6 @@ class Logger
 
     /**
      * getFormatter.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function getFormatter(): FormatterInterface
     {
@@ -158,8 +141,6 @@ class Logger
 
     /**
      * createFormatter.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function createFormatter(): LineFormatter
     {
@@ -174,25 +155,16 @@ class Logger
     /**
      * setHandler.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
      * @return $this
      */
-    public function setHandler(AbstractHandler $handler): self
+    public function setHandler(AbstractProcessingHandler $handler): self
     {
         $this->handler = $handler;
 
         return $this;
     }
 
-    /**
-     * getHandler.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @throws \Exception
-     */
-    public function getHandler(): AbstractHandler
+    public function getHandler(): AbstractProcessingHandler
     {
         if (is_null($this->handler)) {
             $this->handler = $this->createHandler();
@@ -201,16 +173,7 @@ class Logger
         return $this->handler;
     }
 
-    /**
-     * createHandler.
-     *
-     * @author yansongda <me@yansongda.cn>
-     *
-     * @throws \Exception
-     *
-     * @return \Monolog\Handler\RotatingFileHandler|\Monolog\Handler\StreamHandler
-     */
-    public function createHandler(): AbstractHandler
+    public function createHandler(): AbstractProcessingHandler
     {
         $file = $this->config['file'] ?? sys_get_temp_dir().'/logs/'.$this->config['identify'].'.log';
 
@@ -224,8 +187,6 @@ class Logger
     /**
      * setConfig.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
      * @return $this
      */
     public function setConfig(array $config): self
@@ -237,8 +198,6 @@ class Logger
 
     /**
      * getConfig.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function getConfig(): array
     {

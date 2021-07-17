@@ -23,8 +23,6 @@ trait ShouldThrottle
 
     /**
      * isThrottled.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function isThrottled(string $key, int $limit = 60, int $period = 60, bool $autoAdd = false): bool
     {
@@ -56,8 +54,6 @@ trait ShouldThrottle
 
     /**
      * 限流 + 1.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function throttleAdd(string $key, int $period = 60): void
     {
@@ -69,8 +65,6 @@ trait ShouldThrottle
 
     /**
      * 获取下次重置时间.
-     *
-     * @author yansongda <me@yansongda.cn>
      *
      * @param float $now 现在的毫秒时间
      */
@@ -93,8 +87,6 @@ trait ShouldThrottle
     /**
      * 获取限流相关信息.
      *
-     * @author yansongda <me@yansongda.cn>
-     *
      * @param mixed $default
      *
      * @return mixed
@@ -114,8 +106,6 @@ trait ShouldThrottle
 
     /**
      * 获取已使用次数.
-     *
-     * @author yansongda <me@yansongda.cn>
      */
     public function getThrottleCounts(string $key, int $period = 60): int
     {
