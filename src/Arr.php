@@ -521,7 +521,7 @@ class Arr
     public static function unique(array $array): array
     {
         $result = [];
-        foreach ($array ?? [] as $key => $item) {
+        foreach ($array as $key => $item) {
             if (is_array($item)) {
                 $result[$key] = self::unique($item);
             } else {

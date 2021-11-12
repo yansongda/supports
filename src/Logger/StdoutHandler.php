@@ -12,15 +12,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 class StdoutHandler extends AbstractProcessingHandler
 {
     /**
-     * @var OutputInterface
+     * @var \Symfony\Component\Console\Output\OutputInterface
      */
     private $output;
 
-    /**
-     * Bootstrap.
-     *
-     * @param int|string $level
-     */
     public function __construct($level = Logger::DEBUG, bool $bubble = true, ?OutputInterface $output = null)
     {
         $this->output = $output ?? new ConsoleOutput();
