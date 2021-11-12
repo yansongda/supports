@@ -3,6 +3,7 @@
 namespace Yansongda\Supports\Tests;
 
 use PHPUnit\Framework\TestCase;
+use stdClass;
 use Yansongda\Supports\Arr;
 
 class ArrTest extends TestCase
@@ -23,7 +24,23 @@ class ArrTest extends TestCase
                 'has_children' => false,
             ]
         ];
+        self::assertEqualsCanonicalizing($expect, Arr::snakeCaseKey($a));
 
+        $obj =  new stdClass();
+        $a = [
+            'myName' => 'yansongda',
+            'myAge' => 27,
+            'family' => [
+                'hasChildren' => $obj,
+            ]
+        ];
+        $expect = [
+            'my_name' => 'yansongda',
+            'my_age' => 27,
+            'family' => [
+                'has_children' => $obj,
+            ]
+        ];
         self::assertEqualsCanonicalizing($expect, Arr::snakeCaseKey($a));
     }
 
@@ -43,7 +60,6 @@ class ArrTest extends TestCase
                 'hasChildren' => false,
             ]
         ];
-
         self::assertEqualsCanonicalizing($expect, Arr::camelCaseKey($a));
     }
 

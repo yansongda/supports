@@ -3,14 +3,13 @@ on: [push, pull_request]
 
 jobs:
   php_cs_fixer:
-    name: php_cs_fixer
+    name: php_cs_fixer-${{ matrix.os }}-php-${{ matrix.php-version }}
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: true
       matrix:
         os: [ubuntu-latest]
         php-version:
-          - 7.4
           - 8.0
     steps:
       - name: Checkout Code
@@ -24,7 +23,7 @@ jobs:
       - name: Run PHP-CS-Fixer
         run: composer cs-fix
   php_stan:
-    name: php_stan
+    name: php_stan-${{ matrix.os }}-php-${{ matrix.php-version }}
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: true

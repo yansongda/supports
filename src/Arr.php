@@ -562,25 +562,6 @@ class Arr
     }
 
     /**
-     * access array.
-     *
-     * if not array access, return original.
-     *
-     * @param mixed $data
-     *
-     * @return mixed
-     */
-    public static function access($data)
-    {
-        if (!self::accessible($data) &&
-            !(is_object($data) && method_exists($data, 'toArray'))) {
-            return $data;
-        }
-
-        return is_object($data) ? $data->toArray() : $data;
-    }
-
-    /**
      * Convert encoding.
      */
     public static function encoding(array $array, string $to_encoding, string $from_encoding = 'gb2312'): array
@@ -604,13 +585,11 @@ class Arr
      */
     public static function camelCaseKey($data)
     {
-        if (!self::accessible($data) &&
-            !(is_object($data) && method_exists($data, 'toArray'))) {
+        if (!self::accessible($data)) {
             return $data;
         }
 
         $result = [];
-        $data = self::access($data);
 
         foreach ($data as $key => $value) {
             $result[is_string($key) ? Str::camel($key) : $key] = self::camelCaseKey($value);
@@ -628,12 +607,10 @@ class Arr
      */
     public static function snakeCaseKey($data)
     {
-        if (!self::accessible($data) &&
-            !(is_object($data) && method_exists($data, 'toArray'))) {
+        if (!self::accessible($data)) {
             return $data;
         }
 
-        $data = self::access($data);
         $result = [];
 
         foreach ($data as $key => $value) {
