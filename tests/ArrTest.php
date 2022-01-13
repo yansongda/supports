@@ -63,6 +63,38 @@ class ArrTest extends TestCase
         self::assertEqualsCanonicalizing($expect, Arr::camelCaseKey($a));
     }
 
+    public function testCamelCaseKeyWithObject()
+    {
+        $obj = new Class {
+            public function toArray(): array
+            {
+                return ['name' => 'yansongda'];
+            }
+        };
+
+        $a = [
+            'my_name' => 'yansongda',
+            'my_age' => 27,
+            'family' => [
+                'has_children' => false,
+            ],
+            'objs' => [
+                $obj,
+            ]
+        ];
+        $expect = [
+            'myName' => 'yansongda',
+            'myAge' => 27,
+            'family' => [
+                'hasChildren' => false,
+            ],
+            'objs' => [
+                ['name' => 'yansongda'],
+            ]
+        ];
+        self::assertEqualsCanonicalizing($expect, Arr::camelCaseKey($a));
+    }
+
     public function testToString()
     {
         $a = [

@@ -585,13 +585,14 @@ class Arr
      */
     public static function camelCaseKey($data)
     {
-        if (!self::accessible($data)) {
+        if (!self::accessible($data) &&
+            !(is_object($data) && method_exists($data, 'toArray'))) {
             return $data;
         }
 
         $result = [];
 
-        foreach ($data as $key => $value) {
+        foreach ((is_object($data) ? $data->toArray() : $data) as $key => $value) {
             $result[is_string($key) ? Str::camel($key) : $key] = self::camelCaseKey($value);
         }
 
@@ -607,13 +608,14 @@ class Arr
      */
     public static function snakeCaseKey($data)
     {
-        if (!self::accessible($data)) {
+        if (!self::accessible($data) &&
+            !(is_object($data) && method_exists($data, 'toArray'))) {
             return $data;
         }
 
         $result = [];
 
-        foreach ($data as $key => $value) {
+        foreach ((is_object($data) ? $data->toArray() : $data) as $key => $value) {
             $result[is_string($key) ? Str::snake($key) : $key] = self::snakeCaseKey($value);
         }
 
