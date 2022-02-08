@@ -8,6 +8,20 @@ use RuntimeException;
 
 trait Serializable
 {
+    public function __serialize(): array
+    {
+        if (method_exists($this, 'toArray')) {
+            return $this->toArray();
+        }
+
+        return [];
+    }
+
+    public function __unserialize(array $data): void
+    {
+        $this->unserializeArray($data);
+    }
+
     /**
      * toJson.
      */

@@ -77,6 +77,7 @@ trait Accessable
      *
      * The return value will be casted to boolean if non-boolean was returned.
      */
+    #[\ReturnTypeWillChange]
     public function offsetExists($offset)
     {
         return !is_null($this->get($offset));
@@ -91,6 +92,7 @@ trait Accessable
      *
      * @return mixed can return all value types
      */
+    #[\ReturnTypeWillChange]
     public function offsetGet($offset)
     {
         return $this->get($offset);
@@ -106,6 +108,7 @@ trait Accessable
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetSet($offset, $value)
     {
         $this->set($offset, $value);
@@ -120,6 +123,7 @@ trait Accessable
      *
      * @return void
      */
+    #[\ReturnTypeWillChange]
     public function offsetUnset($offset)
     {
     }
