@@ -19,6 +19,22 @@ trait Accessable
     }
 
     /**
+     * Whether or not an data exists by key.
+     */
+    public function __isset(string $key): bool
+    {
+        return !is_null($this->get($key));
+    }
+
+    /**
+     * Unsets an data by key.
+     */
+    public function __unset(string $key)
+    {
+        $this->offsetUnset($key);
+    }
+
+    /**
      * __set.
      *
      * @param mixed $value
