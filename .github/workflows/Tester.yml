@@ -3,14 +3,16 @@ on: [push, pull_request]
 
 jobs:
   PHPUnit:
-    name: phpunit-${{ matrix.os }}-php-${{ matrix.php-version }}
+    name: phpunit-${{ matrix.os }}-php${{ matrix.php-version }}
     runs-on: "${{ matrix.os }}"
     strategy:
       fail-fast: true
       matrix:
         os: [ ubuntu-latest ]
         php-version:
+          - 7.4
           - 8.0
+          - 8.1
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
