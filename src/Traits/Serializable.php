@@ -25,6 +25,16 @@ trait Serializable
         return $this->toJson();
     }
 
+    public function serialize(): ?string
+    {
+        return serialize($this);
+    }
+
+    public function unserialize(string $data): void
+    {
+        unserialize($data);
+    }
+
     /**
      * toJson.
      */
