@@ -16,9 +16,7 @@ class SerializableTest extends TestCase
 
     public function test()
     {
-        $s = 'O:4:"Test":1:{s:4:"name";s:9:"yansongda";}';
-
-        self::assertEquals($s, serialize($this->class));
-        self::assertEquals('yansongda', unserialize($s)->getName());
+        self::assertStringContainsString('yansongda', serialize($this->class));
+        self::assertEquals('yansongda', unserialize(serialize($this->class))->getName());
     }
 }
