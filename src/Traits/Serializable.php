@@ -52,12 +52,14 @@ trait Serializable
         return $this->__serialize();
     }
 
-    public function unserializeArray(array $data): void
+    public function unserializeArray(array $data): self
     {
         foreach ($data as $key => $item) {
             if (method_exists($this, 'set')) {
                 $this->set($key, $item);
             }
         }
+
+        return $this;
     }
 }
