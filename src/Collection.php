@@ -119,8 +119,6 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     /**
      * Retrieve the first item.
-     *
-     * @return mixed
      */
     public function first(): mixed
     {
@@ -129,8 +127,6 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     /**
      * Retrieve the last item.
-     *
-     * @return mixed
      */
     public function last(): mixed
     {
@@ -143,9 +139,6 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     /**
      * add the item value.
-     *
-     * @param int|string|null $key
-     * @param mixed           $value
      */
     public function add(int|string|null $key, mixed $value): void
     {

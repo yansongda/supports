@@ -136,10 +136,6 @@ class Pipeline
 
     /**
      * Handle the value returned from each pipe before passing it to the next.
-     *
-     * @param mixed $carry
-     *
-     * @return mixed
      */
     protected function handleCarry(mixed $carry): mixed
     {

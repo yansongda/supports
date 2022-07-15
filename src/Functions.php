@@ -19,10 +19,6 @@ if (!function_exists('collect')) {
 if (!function_exists('value')) {
     /**
      * Return the default value of the given value.
-     *
-     * @param mixed $value
-     *
-     * @return mixed
      */
     function value(mixed $value): mixed
     {
