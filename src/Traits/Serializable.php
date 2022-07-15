@@ -43,11 +43,7 @@ trait Serializable
         return json_encode($this->__serialize(), $option);
     }
 
-    /**
-     * @return mixed
-     */
-    #[\ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return $this->__serialize();
     }
