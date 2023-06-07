@@ -8,28 +8,17 @@ use Yansongda\Supports\Str;
 
 trait Accessable
 {
-    /**
-     * __get.
-     *
-     * @return mixed
-     */
-    public function __get(string $key)
+    public function __get(string $key): mixed
     {
         return $this->get($key);
     }
 
-    /**
-     * Whether or not an data exists by key.
-     */
     public function __isset(string $key): bool
     {
         return !is_null($this->get($key));
     }
 
-    /**
-     * Unsets an data by key.
-     */
-    public function __unset(string $key)
+    public function __unset(string $key): void
     {
         $this->offsetUnset($key);
     }
@@ -70,15 +59,6 @@ trait Accessable
         return !is_null($this->get($offset));
     }
 
-    /**
-     * Offset to retrieve.
-     *
-     * @see https://php.net/manual/en/arrayaccess.offsetget.php
-     *
-     * @param mixed $offset the offset to retrieve
-     *
-     * @return mixed can return all value types
-     */
     public function offsetGet(mixed $offset): mixed
     {
         return $this->get($offset);

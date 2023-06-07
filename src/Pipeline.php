@@ -13,26 +13,12 @@ use Psr\Container\ContainerInterface;
  */
 class Pipeline
 {
-    /**
-     * The container implementation.
-     */
     protected ContainerInterface $container;
 
-    /**
-     * The object being passed through the pipeline.
-     *
-     * @var mixed
-     */
-    protected $passable;
+    protected mixed $passable;
 
-    /**
-     * The array of class pipes.
-     */
     protected array $pipes = [];
 
-    /**
-     * The method to call on each pipe.
-     */
     protected string $method = 'handle';
 
     public function __construct(ContainerInterface $container)
@@ -64,9 +50,6 @@ class Pipeline
         return $this;
     }
 
-    /**
-     * Run the pipeline with a final destination callback.
-     */
     public function then(Closure $destination)
     {
         $pipeline = array_reduce(array_reverse($this->pipes), $this->carry(), $this->prepareDestination($destination));
@@ -74,9 +57,6 @@ class Pipeline
         return $pipeline($this->passable);
     }
 
-    /**
-     * Get the final piece of the Closure onion.
-     */
     protected function prepareDestination(Closure $destination): Closure
     {
         return static function ($passable) use ($destination) {
@@ -84,9 +64,6 @@ class Pipeline
         };
     }
 
-    /**
-     * Get a Closure that represents a slice of the application onion.
-     */
     protected function carry(): Closure
     {
         return function ($stack, $pipe) {
@@ -120,9 +97,6 @@ class Pipeline
         };
     }
 
-    /**
-     * Parse full pipe string to get name and parameters.
-     */
     protected function parsePipeString(string $pipe): array
     {
         [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, []);
@@ -134,9 +108,6 @@ class Pipeline
         return [$name, $parameters];
     }
 
-    /**
-     * Handle the value returned from each pipe before passing it to the next.
-     */
     protected function handleCarry(mixed $carry): mixed
     {
         return $carry;

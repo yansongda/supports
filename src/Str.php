@@ -12,19 +12,10 @@ use Exception;
  */
 class Str
 {
-    /**
-     * The cache of snake-cased words.
-     */
     protected static array $snakeCache = [];
 
-    /**
-     * The cache of camel-cased words.
-     */
     protected static array $camelCache = [];
 
-    /**
-     * The cache of studly-cased words.
-     */
     protected static array $studlyCache = [];
 
     public static function after(string $subject, string $search): string
@@ -32,9 +23,6 @@ class Str
         return '' === $search ? $subject : array_reverse(explode($search, $subject, 2))[0];
     }
 
-    /**
-     * Transliterate a UTF-8 value to ASCII.
-     */
     public static function ascii(string $value, string $language = 'en'): string
     {
         $languageSpecific = static::languageSpecificCharsArray($language);
@@ -86,9 +74,6 @@ class Str
         return false;
     }
 
-    /**
-     * Cap a string with a single instance of a given value.
-     */
     public static function finish(string $value, string $cap): string
     {
         $quoted = preg_quote($cap, '/');
@@ -127,17 +112,11 @@ class Str
         return false;
     }
 
-    /**
-     * Convert a string to kebab case.
-     */
     public static function kebab(string $value): string
     {
         return static::snake($value, '-');
     }
 
-    /**
-     * Return the length of the given string.
-     */
     public static function length(string $value, ?string $encoding = null): int
     {
         if (null !== $encoding) {
@@ -147,9 +126,6 @@ class Str
         return mb_strlen($value);
     }
 
-    /**
-     * Limit the number of characters in a string.
-     */
     public static function limit(string $value, int $limit = 100, string $end = '...'): string
     {
         if (mb_strwidth($value, 'UTF-8') <= $limit) {
@@ -159,17 +135,11 @@ class Str
         return rtrim(mb_strimwidth($value, 0, $limit, '', 'UTF-8')).$end;
     }
 
-    /**
-     * Convert the given string to lower-case.
-     */
     public static function lower(string $value): string
     {
         return mb_strtolower($value, 'UTF-8');
     }
 
-    /**
-     * Limit the number of words in a string.
-     */
     public static function words(string $value, int $words = 100, string $end = '...'): string
     {
         preg_match('/^\s*+\S++\s*+{1,'.$words.'}/u', $value, $matches);
@@ -227,9 +197,6 @@ class Str
         );
     }
 
-    /**
-     * Replace a given value in the string sequentially with an array.
-     */
     public static function replaceArray(string $search, array $replace, string $subject): string
     {
         foreach ($replace as $value) {
@@ -239,9 +206,6 @@ class Str
         return $subject;
     }
 
-    /**
-     * Replace the first occurrence of a given value in the string.
-     */
     public static function replaceFirst(string $search, string $replace, string $subject): string
     {
         if ('' == $search) {
@@ -257,9 +221,6 @@ class Str
         return $subject;
     }
 
-    /**
-     * Replace the last occurrence of a given value in the string.
-     */
     public static function replaceLast(string $search, string $replace, string $subject): string
     {
         $position = strrpos($subject, $search);
@@ -271,9 +232,6 @@ class Str
         return $subject;
     }
 
-    /**
-     * Begin a string with a single instance of a given value.
-     */
     public static function start(string $value, string $prefix): string
     {
         $quoted = preg_quote($prefix, '/');
@@ -281,25 +239,16 @@ class Str
         return $prefix.preg_replace('/^(?:'.$quoted.')+/u', '', $value);
     }
 
-    /**
-     * Convert the given string to upper-case.
-     */
     public static function upper(string $value): string
     {
         return mb_strtoupper($value, 'UTF-8');
     }
 
-    /**
-     * Convert the given string to title case.
-     */
     public static function title(string $value): string
     {
         return mb_convert_case($value, MB_CASE_TITLE, 'UTF-8');
     }
 
-    /**
-     * Generate a URL friendly "slug" from a given string.
-     */
     public static function slug(string $title, string $separator = '-', string $language = 'en'): string
     {
         $title = static::ascii($title, $language);
@@ -321,9 +270,6 @@ class Str
         return trim($title, $separator);
     }
 
-    /**
-     * Convert a string to snake case.
-     */
     public static function snake(string $value, string $delimiter = '_'): string
     {
         $key = $value;
@@ -352,9 +298,6 @@ class Str
         return false;
     }
 
-    /**
-     * Convert a value to studly caps case.
-     */
     public static function studly(string $value): string
     {
         $key = $value;
@@ -368,35 +311,22 @@ class Str
         return static::$studlyCache[$key] = str_replace(' ', '', $value);
     }
 
-    /**
-     * Returns the portion of string specified by the start and length parameters.
-     */
     public static function substr(string $string, int $start, ?int $length = null): string
     {
         return mb_substr($string, $start, $length, 'UTF-8');
     }
 
-    /**
-     * Make a string's first character uppercase.
-     */
     public static function ucfirst(string $string): string
     {
         return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
     }
 
-    /**
-     * Convert string's encoding.
-     */
     public static function encoding(string $string, string $to = 'utf-8', string $from = 'gb2312'): string
     {
         return mb_convert_encoding($string, $to, $from);
     }
 
     /**
-     * Returns the replacements for the ascii method.
-     *
-     * Note: Adapted from Stringy\Stringy.
-     *
      * @see https://github.com/danielstjules/Stringy/blob/3.1.0/LICENSE.txt
      */
     protected static function charsArray(): array
@@ -525,10 +455,6 @@ class Str
     }
 
     /**
-     * Returns the language specific replacements for the ascii method.
-     *
-     * Note: Adapted from Stringy\Stringy.
-     *
      * @see https://github.com/danielstjules/Stringy/blob/3.1.0/LICENSE.txt
      */
     protected static function languageSpecificCharsArray(string $language): ?array

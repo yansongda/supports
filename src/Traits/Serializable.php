@@ -35,15 +35,12 @@ trait Serializable
         unserialize($data);
     }
 
-    /**
-     * toJson.
-     */
     public function toJson(int $option = JSON_UNESCAPED_UNICODE): string
     {
         return json_encode($this->__serialize(), $option);
     }
 
-    public function jsonSerialize(): mixed
+    public function jsonSerialize(): array
     {
         return $this->__serialize();
     }

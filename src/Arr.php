@@ -13,17 +13,11 @@ use InvalidArgumentException;
  */
 class Arr
 {
-    /**
-     * Determine whether the given value is array accessible.
-     */
     public static function accessible(mixed $value): bool
     {
         return is_array($value) || $value instanceof ArrayAccess;
     }
 
-    /**
-     * Add an element to an array using "dot" notation if it doesn't exist.
-     */
     public static function add(array $array, string $key, mixed $value): array
     {
         if (is_null(static::get($array, $key))) {
@@ -33,9 +27,6 @@ class Arr
         return $array;
     }
 
-    /**
-     * Collapse an array of arrays into a single array.
-     */
     public static function collapse(array $array): array
     {
         $results = [];
@@ -51,11 +42,6 @@ class Arr
         return array_merge([], ...$results);
     }
 
-    /**
-     * Cross join the given arrays, returning all possible permutations.
-     *
-     * @param array ...$arrays
-     */
     public static function crossJoin(...$arrays): array
     {
         $results = [[]];
@@ -73,17 +59,11 @@ class Arr
         return $results;
     }
 
-    /**
-     * Divide an array into two arrays. One with keys and the other with values.
-     */
     public static function divide(array $array): array
     {
         return [array_keys($array), array_values($array)];
     }
 
-    /**
-     * Flatten a multi-dimensional associative array with dots.
-     */
     public static function dot(array $array, string $prepend = ''): array
     {
         $results = [];
@@ -98,9 +78,6 @@ class Arr
         return $results;
     }
 
-    /**
-     * Get all of the given array except for a specified array of keys.
-     */
     public static function except(array $array, array|string $keys): array
     {
         static::forget($array, $keys);
@@ -108,9 +85,6 @@ class Arr
         return $array;
     }
 
-    /**
-     * Determine if the given key exists in the provided array.
-     */
     public static function exists(ArrayAccess|array $array, int|string $key): bool
     {
         if ($array instanceof ArrayAccess) {
@@ -120,9 +94,6 @@ class Arr
         return array_key_exists($key, $array);
     }
 
-    /**
-     * Return the first element in an array passing a given truth test.
-     */
     public static function first(array $array, callable $callback = null, mixed $default = null)
     {
         if (is_null($callback)) {
@@ -142,9 +113,6 @@ class Arr
         return $default;
     }
 
-    /**
-     * Return the last element in an array passing a given truth test.
-     */
     public static function last(array $array, callable $callback = null, mixed $default = null)
     {
         if (is_null($callback)) {
@@ -154,9 +122,6 @@ class Arr
         return static::first(array_reverse($array, true), $callback, $default);
     }
 
-    /**
-     * Flatten a multi-dimensional array into a single level.
-     */
     public static function flatten(array $array, float|int $depth = INF): array
     {
         $result = [];
@@ -174,9 +139,6 @@ class Arr
         return $result;
     }
 
-    /**
-     * Remove one or many array items from a given array using "dot" notation.
-     */
     public static function forget(array &$array, array|string $keys): void
     {
         $original = &$array;
@@ -205,9 +167,6 @@ class Arr
         }
     }
 
-    /**
-     * Get an item from an array using "dot" notation.
-     */
     public static function get(ArrayAccess|array $array, int|string $key = null, mixed $default = null): mixed
     {
         if (!static::accessible($array)) {
@@ -233,9 +192,6 @@ class Arr
         return $array;
     }
 
-    /**
-     * Check if an item or items exist in an array using "dot" notation.
-     */
     public static function has(ArrayAccess|array $array, array|string|null $keys): bool
     {
         if (is_null($keys)) {
@@ -265,10 +221,6 @@ class Arr
         return true;
     }
 
-    /**
-     * Determines if an array is associative.
-     * An array is "associative" if it doesn't have sequential numerical keys beginning with zero.
-     */
     public static function isAssoc(array $array): bool
     {
         $keys = array_keys($array);
@@ -276,17 +228,11 @@ class Arr
         return array_keys($keys) !== $keys;
     }
 
-    /**
-     * Get a subset of the items from the given array.
-     */
     public static function only(array $array, array|string $keys): array
     {
         return array_intersect_key($array, array_flip((array) $keys));
     }
 
-    /**
-     * Pluck an array of values from an array.
-     */
     public static function pluck(array $array, array|string $value, array|string|null $key = null): array
     {
         $results = [];
@@ -294,7 +240,7 @@ class Arr
         foreach ($array as $item) {
             $itemValue = data_get($item, $value);
             // If the key is "null", we will just append the value to the array and keep
-            // looping. Otherwise we will key the array using the value of the key we
+            // looping, Otherwise we will key the array using the value of the key we
             // received from the developer. Then we'll return the final array form.
             if (is_null($key)) {
                 $results[] = $itemValue;
@@ -310,9 +256,6 @@ class Arr
         return $results;
     }
 
-    /**
-     * Push an item onto the beginning of an array.
-     */
     public static function prepend(array $array, mixed $value, mixed $key = null): array
     {
         if (is_null($key)) {
@@ -324,9 +267,6 @@ class Arr
         return $array;
     }
 
-    /**
-     * Get a value from the array, and remove it.
-     */
     public static function pull(array &$array, string $key, mixed $default = null): mixed
     {
         $value = static::get($array, $key, $default);
@@ -336,9 +276,7 @@ class Arr
     }
 
     /**
-     * Get one or a specified number of random values from an array.
-     *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public static function random(array $array, int $number = 1): array
     {
@@ -390,9 +328,6 @@ class Arr
         return $array;
     }
 
-    /**
-     * Shuffle the given array and return the result.
-     */
     public static function shuffle(array $array, int $seed = null): array
     {
         if (is_null($seed)) {
@@ -407,9 +342,6 @@ class Arr
         return $array;
     }
 
-    /**
-     * Sort the array using the given Closure.
-     */
     public static function sort(array $array, callable $callback): array
     {
         $results = [];
@@ -421,9 +353,6 @@ class Arr
         return $results;
     }
 
-    /**
-     * Recursively sort an array by keys and values.
-     */
     public static function sortRecursive(array $array): array
     {
         foreach ($array as &$value) {
@@ -456,17 +385,11 @@ class Arr
         return substr($result, 0, 0 - Str::length($separator));
     }
 
-    /**
-     * Filter the array using the given callback.
-     */
     public static function where(array $array, callable $callback): array
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
     }
 
-    /**
-     * If the given value is not an array and not null, wrap it in one.
-     */
     public static function wrap(mixed $value): array
     {
         if (is_null($value)) {
@@ -476,9 +399,6 @@ class Arr
         return !is_array($value) ? [$value] : $value;
     }
 
-    /**
-     * Make array elements unique.
-     */
     public static function unique(array $array): array
     {
         $result = [];
@@ -522,9 +442,6 @@ class Arr
         return $array1;
     }
 
-    /**
-     * Convert encoding.
-     */
     public static function encoding(array $array, string $to_encoding, string $from_encoding = 'gb2312'): array
     {
         $encoded = [];
