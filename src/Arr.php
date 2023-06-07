@@ -150,6 +150,7 @@ class Arr
             // if the exact key exists in the top-level, remove it
             if (static::exists($array, $key)) {
                 unset($array[$key]);
+
                 continue;
             }
             $parts = explode('.', $key);
@@ -282,7 +283,7 @@ class Arr
     {
         $count = count($array);
         if ($number > $count) {
-            throw new InvalidArgumentException("You requested $number items, but there are only $count items available.");
+            throw new InvalidArgumentException("You requested {$number} items, but there are only {$count} items available.");
         }
 
         if (0 === $number) {
@@ -456,8 +457,8 @@ class Arr
 
     public static function camelCaseKey(mixed $data): mixed
     {
-        if (!self::accessible($data) &&
-            !(is_object($data) && method_exists($data, 'toArray'))) {
+        if (!self::accessible($data)
+            && !(is_object($data) && method_exists($data, 'toArray'))) {
             return $data;
         }
 
@@ -472,8 +473,8 @@ class Arr
 
     public static function snakeCaseKey(mixed $data): mixed
     {
-        if (!self::accessible($data) &&
-            !(is_object($data) && method_exists($data, 'toArray'))) {
+        if (!self::accessible($data)
+            && !(is_object($data) && method_exists($data, 'toArray'))) {
             return $data;
         }
 

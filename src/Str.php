@@ -176,9 +176,11 @@ class Str
 
     public static function uuidV4(): string
     {
-        return sprintf('%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
+        return sprintf(
+            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
             // 32 bits for "time_low"
-            mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF),
+            mt_rand(0, 0xFFFF),
+            mt_rand(0, 0xFFFF),
 
             // 16 bits for "time_mid"
             mt_rand(0, 0xFFFF),
@@ -193,7 +195,9 @@ class Str
             mt_rand(0, 0x3FFF) | 0x8000,
 
             // 48 bits for "node"
-            mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF), mt_rand(0, 0xFFFF)
+            mt_rand(0, 0xFFFF),
+            mt_rand(0, 0xFFFF),
+            mt_rand(0, 0xFFFF)
         );
     }
 
@@ -467,7 +471,7 @@ class Str
                     ['h', 'H', 'sht', 'SHT', 'a', 'А', 'y', 'Y'],
                 ],
                 'de' => [
-                    ['ä',  'ö',  'ü',  'Ä',  'Ö',  'Ü'],
+                    ['ä', 'ö', 'ü', 'Ä', 'Ö', 'Ü'],
                     ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'],
                 ],
             ];
