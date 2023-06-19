@@ -94,7 +94,7 @@ class Arr
         return array_key_exists($key, $array);
     }
 
-    public static function first(array $array, callable $callback = null, mixed $default = null)
+    public static function first(array $array, callable $callback = null, mixed $default = null): mixed
     {
         if (is_null($callback)) {
             if (empty($array)) {
@@ -113,7 +113,7 @@ class Arr
         return $default;
     }
 
-    public static function last(array $array, callable $callback = null, mixed $default = null)
+    public static function last(array $array, callable $callback = null, mixed $default = null): mixed
     {
         if (is_null($callback)) {
             return empty($array) ? $default : end($array);

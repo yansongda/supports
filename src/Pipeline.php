@@ -50,7 +50,7 @@ class Pipeline
         return $this;
     }
 
-    public function then(Closure $destination)
+    public function then(Closure $destination): mixed
     {
         $pipeline = array_reduce(array_reverse($this->pipes), $this->carry(), $this->prepareDestination($destination));
 
