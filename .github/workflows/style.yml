@@ -1,45 +1,44 @@
 name: Coding Style
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - master
+  pull_request:
 
 jobs:
   php_cs_fixer:
     name: php_cs_fixer
-    runs-on: "${{ matrix.os }}"
-    strategy:
-      fail-fast: true
-      matrix:
-        os: [ubuntu-latest]
-        php-version:
-          - 8.2
+    runs-on: "ubuntu-latest"
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: '8.3'
+          coverage: none
       - name: Install Dependencies
         run: composer install --no-progress
       - name: Run PHP-CS-Fixer
         run: composer cs-fix
   php_stan:
-    name: php_stan-${{ matrix.os }}-php${{ matrix.php-version }}
-    runs-on: "${{ matrix.os }}"
+    name: php_stan-php${{ matrix.php-version }}
+    runs-on: "ubuntu-latest"
     strategy:
       fail-fast: true
       matrix:
-        os: [ ubuntu-latest ]
         php-version:
-          - 8.0
           - 8.1
           - 8.2
+          - 8.3
     steps:
       -   name: Checkout Code
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
       -   name: PHP
           uses: shivammathur/setup-php@v2
           with:
             php-version: ${{ matrix.php-version }}
+            coverage: none
       -   name: Install Dependencies
           run: composer install --no-progress
       -   name: Run PHP-Stan

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Yansongda\Supports;
 
-use Exception;
+use Random\RandomException;
 
 /**
  * Most of the methods in this file come from illuminate/support.
@@ -147,7 +147,7 @@ class Str
     }
 
     /**
-     * @throws Exception
+     * @throws RandomException
      */
     public static function random(int $length = 16): string
     {

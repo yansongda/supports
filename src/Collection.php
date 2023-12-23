@@ -35,7 +35,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return $value instanceof self ? new static($value) : new static(Arr::wrap($value));
     }
 
-    public static function unwrap(Collection|array $value): array
+    public static function unwrap(array|Collection $value): array
     {
         return $value instanceof self ? $value->all() : $value;
     }
@@ -100,17 +100,17 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return $end;
     }
 
-    public function add(int|string|null $key, mixed $value): void
+    public function add(null|int|string $key, mixed $value): void
     {
         Arr::set($this->items, $key, $value);
     }
 
-    public function set(string|int|null $key, mixed $value): void
+    public function set(null|int|string $key, mixed $value): void
     {
         Arr::set($this->items, $key, $value);
     }
 
-    public function get(string|int|null $key = null, mixed $default = null): mixed
+    public function get(null|int|string $key = null, mixed $default = null): mixed
     {
         return Arr::get($this->items, $key, $default);
     }
@@ -172,7 +172,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return new static(Arr::random($this->items, $number ?? 1));
     }
 
-    public function reduce(callable $callback, mixed $initial = null)
+    public function reduce(callable $callback, mixed $initial = null): mixed
     {
         return array_reduce($this->items, $callback, $initial);
     }

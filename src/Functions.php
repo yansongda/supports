@@ -21,7 +21,7 @@ if (!function_exists('value')) {
 }
 
 if (!function_exists('data_get')) {
-    function data_get(mixed $target, array|int|string|null $key, mixed $default = null): mixed
+    function data_get(mixed $target, null|array|int|string $key, mixed $default = null): mixed
     {
         if (is_null($key)) {
             return $target;
