@@ -69,7 +69,5 @@ trait Accessable
         $this->set($offset, $value);
     }
 
-    public function offsetUnset(mixed $offset): void
-    {
-    }
+    public function offsetUnset(mixed $offset): void {}
 }

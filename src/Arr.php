@@ -85,7 +85,7 @@ class Arr
         return $array;
     }
 
-    public static function exists(ArrayAccess|array $array, int|string $key): bool
+    public static function exists(array|ArrayAccess $array, int|string $key): bool
     {
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
@@ -168,7 +168,7 @@ class Arr
         }
     }
 
-    public static function get(ArrayAccess|array $array, int|string $key = null, mixed $default = null): mixed
+    public static function get(array|ArrayAccess $array, int|string $key = null, mixed $default = null): mixed
     {
         if (!static::accessible($array)) {
             return $default;
@@ -193,7 +193,7 @@ class Arr
         return $array;
     }
 
-    public static function has(ArrayAccess|array $array, array|string|null $keys): bool
+    public static function has(array|ArrayAccess $array, null|array|string $keys): bool
     {
         if (is_null($keys)) {
             return false;
@@ -234,7 +234,7 @@ class Arr
         return array_intersect_key($array, array_flip((array) $keys));
     }
 
-    public static function pluck(array $array, array|string $value, array|string|null $key = null): array
+    public static function pluck(array $array, array|string $value, null|array|string $key = null): array
     {
         $results = [];
 
@@ -303,7 +303,7 @@ class Arr
      * Set an array item to a given value using "dot" notation.
      * If no key is given to the method, the entire array will be replaced.
      */
-    public static function set(array &$array, int|string|null $key, mixed $value): array
+    public static function set(array &$array, null|int|string $key, mixed $value): array
     {
         if (is_null($key)) {
             return $array = $value;

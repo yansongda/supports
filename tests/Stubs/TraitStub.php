@@ -8,7 +8,7 @@ use Yansongda\Supports\Traits\Accessable;
 use Yansongda\Supports\Traits\Arrayable;
 use Yansongda\Supports\Traits\Serializable;
 
-class TraitStub  implements JsonSerializableInterface, ArrayAccess
+class TraitStub  implements JsonSerializableInterface, ArrayAccess, \Serializable
 {
     use Accessable;
     use Arrayable;

@@ -30,7 +30,7 @@ trait Serializable
         return serialize($this);
     }
 
-    public function unserialize($data): void
+    public function unserialize(string $data): void
     {
         unserialize($data);
     }
