@@ -7,19 +7,9 @@ use Yansongda\Supports\Collection;
 
 class CollectionTest extends TestCase
 {
-    /**
-     * data.
-     *
-     * @var array
-     */
-    protected $data = [];
+    protected array $data = [];
 
-    /**
-     * collection.
-     *
-     * @var Collection
-     */
-    protected $collection;
+    protected Collection $collection;
 
     protected function setUp(): void
     {
@@ -98,5 +88,15 @@ class CollectionTest extends TestCase
         $merge = ['haha' => 'enen'];
 
         self::assertEqualsCanonicalizing(array_merge($this->data, $merge), $this->collection->merge($merge)->all());
+    }
+
+    public function testIsEmpty()
+    {
+        self::assertTrue((new Collection())->isEmpty());
+    }
+
+    public function testIsNotEmpty()
+    {
+        self::assertTrue($this->collection->isNotEmpty());
     }
 }

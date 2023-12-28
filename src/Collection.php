@@ -285,6 +285,16 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return count($this->items);
     }
 
+    public function isEmpty(): bool
+    {
+        return empty($this->items);
+    }
+
+    public function isNotEmpty(): bool
+    {
+        return !$this->isEmpty();
+    }
+
     public function offsetUnset(mixed $offset): void
     {
         if ($this->offsetExists($offset)) {
