@@ -423,6 +423,13 @@ class Arr
         return [];
     }
 
+    public static function wrapQuery(string $query): array
+    {
+        parse_str($query, $data);
+
+        return $data;
+    }
+
     public static function unique(array $array): array
     {
         $result = [];

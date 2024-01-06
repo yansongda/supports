@@ -131,4 +131,12 @@ class CollectionTest extends TestCase
 
         self::assertEquals($array, Collection::wrapXml($str)->all());
     }
+
+    public function testWrapQuery()
+    {
+        $array = ['name' => 'yansongda', 'age' => 29];
+        $str = 'name=yansongda&age=29';
+
+        self::assertEquals($array, Collection::wrapQuery($str)->all());
+    }
 }

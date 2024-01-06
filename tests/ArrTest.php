@@ -120,4 +120,12 @@ class ArrTest extends TestCase
 
         self::assertEquals($array, Arr::wrapXml($str));
     }
+
+    public function testWrapQuery()
+    {
+        $array = ['name' => 'yansongda', 'age' => 29];
+        $str = 'name=yansongda&age=29';
+
+        self::assertEquals($array, Arr::wrapQuery($str));
+    }
 }
