@@ -45,6 +45,11 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return new static(Arr::wrapXml($xml));
     }
 
+    public static function wrapQuery(string $query): self
+    {
+        return new static(Arr::wrapQuery($query));
+    }
+
     public static function unwrap(array|Collection $value): array
     {
         return $value instanceof self ? $value->all() : $value;
