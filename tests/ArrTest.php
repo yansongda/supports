@@ -128,4 +128,12 @@ class ArrTest extends TestCase
 
         self::assertEquals($array, Arr::wrapQuery($str));
     }
+
+    public function testWrapQuerySpace()
+    {
+        $array = ['name' => 'yan+song+da', 'age' => 29];
+        $str = 'name=yan+song+da&age=29';
+
+        self::assertEquals($array, Arr::wrapQuery($str, true));
+    }
 }

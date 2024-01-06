@@ -139,4 +139,12 @@ class CollectionTest extends TestCase
 
         self::assertEquals($array, Collection::wrapQuery($str)->all());
     }
+
+    public function testWrapQuerySpace()
+    {
+        $array = ['name' => 'yan+song+da', 'age' => 29];
+        $str = 'name=yan+song+da&age=29';
+
+        self::assertEquals($array, Collection::wrapQuery($str, true)->all());
+    }
 }
