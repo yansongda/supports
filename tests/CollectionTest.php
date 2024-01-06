@@ -115,4 +115,20 @@ class CollectionTest extends TestCase
 
         self::assertEquals($xml, Collection::wrap($array)->toXml());
     }
+
+    public function testWrapJson()
+    {
+        $array = ['name' => 'yansongda', 'age' => 29];
+        $str = '{"name":"yansongda","age":29}';
+
+        self::assertEquals($array, Collection::wrapJson($str)->all());
+    }
+
+    public function testWrapXml()
+    {
+        $array = ['name' => 'yansongda', 'age' => 29];
+        $str = '<xml><name><![CDATA[yansongda]]></name><age>29</age></xml>';
+
+        self::assertEquals($array, Collection::wrapXml($str)->all());
+    }
 }

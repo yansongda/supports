@@ -104,4 +104,20 @@ class ArrTest extends TestCase
 
         self::assertEquals('my_name=yansongda&my_age=27', Arr::toString($a));
     }
+
+    public function testWrapJson()
+    {
+        $array = ['name' => 'yansongda', 'age' => 29];
+        $str = '{"name":"yansongda","age":29}';
+
+        self::assertEquals($array, Arr::wrapJson($str));
+    }
+
+    public function testWrapXml()
+    {
+        $array = ['name' => 'yansongda', 'age' => 29];
+        $str = '<xml><name><![CDATA[yansongda]]></name><age>29</age></xml>';
+
+        self::assertEquals($array, Arr::wrapXml($str));
+    }
 }
