@@ -423,11 +423,31 @@ class Arr
         return [];
     }
 
-    public static function wrapQuery(string $query, bool $spaceToPlus = false): array
+    /**
+     * @param bool $raw 是否原始解析，有些情况下，原始解析会更好
+     * @param bool $spaceToPlus 是否将空格转换为加号
+     */
+    public static function wrapQuery(string $query, bool $raw = false, bool $spaceToPlus = false): array
     {
-        parse_str($query, $data);
+        if (!$raw) {
+            parse_str($query, $data);
 
-        return $spaceToPlus ? self::querySpaceToPlus($data) : $data;
+            return $spaceToPlus ? self::querySpaceToPlus($data) : $data;
+        }
+
+        if (empty($query) || !Str::contains($query, '=')) {
+            return [];
+        }
+
+        $result = [];
+
+        foreach (explode('&', $query) as $item) {
+            $pos = strpos($item, '=');
+
+            $result[substr($item, 0, $pos)] = substr($item, $pos + 1);
+        }
+
+        return $result;
     }
 
     public static function querySpaceToPlus(array $data): array
