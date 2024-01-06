@@ -275,6 +275,20 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return json_encode($this->all(), $option);
     }
 
+    public function toXml(): string
+    {
+        $xml = '<xml>';
+
+        foreach ($this->all() as $key => $val) {
+            $xml .= is_numeric($val) ? '<'.$key.'>'.$val.'</'.$key.'>' :
+                                       '<'.$key.'><![CDATA['.$val.']]></'.$key.'>';
+        }
+
+        $xml .= '</xml>';
+
+        return $xml;
+    }
+
     public function getIterator(): Traversable
     {
         return new ArrayIterator($this->items);

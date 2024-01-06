@@ -99,4 +99,20 @@ class CollectionTest extends TestCase
     {
         self::assertTrue($this->collection->isNotEmpty());
     }
+
+    public function testToJson()
+    {
+        $array = ['name' => 'yansongda', 'age' => 29];
+        $str = '{"name":"yansongda","age":29}';
+
+        self::assertEquals($str, Collection::wrap($array)->toJson());
+    }
+
+    public function testToXml()
+    {
+        $xml = '<xml><name><![CDATA[yansongda]]></name><age>29</age></xml>';
+        $array = ['name' => 'yansongda', 'age' => 29];
+
+        self::assertEquals($xml, Collection::wrap($array)->toXml());
+    }
 }
