@@ -424,7 +424,7 @@ class Arr
     }
 
     /**
-     * @param bool $raw 是否原始解析，有些情况下，原始解析会更好
+     * @param bool $raw         是否原始解析，有些情况下，原始解析会更好
      * @param bool $spaceToPlus 是否将空格转换为加号
      */
     public static function wrapQuery(string $query, bool $raw = false, bool $spaceToPlus = false): array
