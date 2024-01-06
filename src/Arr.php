@@ -423,9 +423,18 @@ class Arr
         return [];
     }
 
-    public static function wrapQuery(string $query): array
+    public static function wrapQuery(string $query, bool $spaceToPlus = false): array
     {
         parse_str($query, $data);
+
+        return $spaceToPlus ? self::querySpaceToPlus($data) : $data;
+    }
+
+    public static function querySpaceToPlus(array $data): array
+    {
+        foreach ($data as $key => $item) {
+            $data[$key] = is_array($item) ? self::querySpaceToPlus($item) : str_replace(' ', '+', $item);
+        }
 
         return $data;
     }
