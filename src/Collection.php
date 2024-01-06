@@ -35,6 +35,16 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return $value instanceof self ? new static($value) : new static(Arr::wrap($value));
     }
 
+    public static function wrapJson(string $json): self
+    {
+        return new static(Arr::wrapJson($json));
+    }
+
+    public static function wrapXml(string $xml): self
+    {
+        return new static(Arr::wrapXml($xml));
+    }
+
     public static function unwrap(array|Collection $value): array
     {
         return $value instanceof self ? $value->all() : $value;
@@ -268,11 +278,6 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     public function toArray(): array
     {
         return $this->all();
-    }
-
-    public function toJson(int $option = JSON_UNESCAPED_UNICODE): string
-    {
-        return json_encode($this->all(), $option);
     }
 
     public function toXml(): string

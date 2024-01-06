@@ -400,6 +400,29 @@ class Arr
         return !is_array($value) ? [$value] : $value;
     }
 
+    public static function wrapJson(string $json): ?array
+    {
+        return json_decode($json, true);
+    }
+
+    public static function wrapXml(string $xml): array
+    {
+        if (empty($xml)) {
+            return [];
+        }
+
+        $data = json_decode(json_encode(
+            simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA),
+            JSON_UNESCAPED_UNICODE
+        ), true);
+
+        if (JSON_ERROR_NONE === json_last_error()) {
+            return $data;
+        }
+
+        return [];
+    }
+
     public static function unique(array $array): array
     {
         $result = [];
