@@ -1,11 +1,10 @@
 <?php
 
 $finder = PhpCsFixer\Finder::create()
-    ->exclude('tests')
-    ->exclude('vendor')
-    ->in(__DIR__);
+    ->in('src');
 
 return (new PhpCsFixer\Config())
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setUsingCache(false)
     ->setRiskyAllowed(true)
     ->setRules([
