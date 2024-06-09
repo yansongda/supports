@@ -109,8 +109,10 @@ class ArrTest extends TestCase
     {
         $array = ['name' => 'yansongda', 'age' => 29];
         $str = '{"name":"yansongda","age":29}';
-
         self::assertEquals($array, Arr::wrapJson($str));
+
+        $str = '"json string"';
+        self::assertEquals('json string', Arr::wrapJson($str));
     }
 
     public function testWrapXml()

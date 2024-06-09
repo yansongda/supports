@@ -37,7 +37,13 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     public static function wrapJson(string $json): self
     {
-        return new static(Arr::wrapJson($json));
+        $json = Arr::wrapJson($json);
+
+        if (is_array($json)) {
+            return new static($json);
+        }
+
+        return new static();
     }
 
     public static function wrapXml(string $xml): self
@@ -82,7 +88,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return new static(Arr::except($this->items, $keys));
     }
 
-    public function filter(callable $callback = null): self
+    public function filter(?callable $callback = null): self
     {
         if ($callback) {
             return new static(Arr::where($this->items, $callback));
@@ -223,7 +229,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return new static($chunks);
     }
 
-    public function sort(callable $callback = null): self
+    public function sort(?callable $callback = null): self
     {
         $items = $this->items;
         $callback ? uasort($items, $callback) : asort($items);

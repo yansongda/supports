@@ -120,8 +120,10 @@ class CollectionTest extends TestCase
     {
         $array = ['name' => 'yansongda', 'age' => 29];
         $str = '{"name":"yansongda","age":29}';
-
         self::assertEquals($array, Collection::wrapJson($str)->all());
+
+        $str = '"json: cannot unmarshal string into Go struct field CreateOrderReq.total_amount of type int64"';
+        self::assertEquals([], Collection::wrapJson($str)->all());
     }
 
     public function testWrapXml()
