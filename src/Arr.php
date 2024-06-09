@@ -400,9 +400,11 @@ class Arr
         return !is_array($value) ? [$value] : $value;
     }
 
-    public static function wrapJson(string $json): mixed
+    public static function wrapJson(string $json): ?array
     {
-        return json_decode($json, true);
+        $result = json_decode($json, true);
+
+        return is_array($result) ? $result : null;
     }
 
     public static function wrapXml(string $xml): array

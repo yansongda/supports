@@ -112,7 +112,7 @@ class ArrTest extends TestCase
         self::assertEquals($array, Arr::wrapJson($str));
 
         $str = '"json string"';
-        self::assertEquals('json string', Arr::wrapJson($str));
+        self::assertNull(Arr::wrapJson($str));
     }
 
     public function testWrapXml()

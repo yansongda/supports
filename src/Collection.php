@@ -37,13 +37,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     public static function wrapJson(string $json): self
     {
-        $json = Arr::wrapJson($json);
-
-        if (is_array($json)) {
-            return new static($json);
-        }
-
-        return new static();
+        return new static(Arr::wrapJson($json));
     }
 
     public static function wrapXml(string $xml): self
