@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Yansongda\Supports;
 
-use Random\RandomException;
-
 /**
  * Most of the methods in this file come from illuminate/support.
  * thanks provide such a useful class.
@@ -146,9 +144,6 @@ class Str
         return static::contains($callback, '@') ? explode('@', $callback, 2) : [$callback, $default];
     }
 
-    /**
-     * @throws RandomException @phpstan-ignore-line
-     */
     public static function random(int $length = 16): string
     {
         $string = '';
