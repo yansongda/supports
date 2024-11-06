@@ -275,10 +275,10 @@ class Str
         return $value;
     }
 
-    public static function startsWith(string $haystack, array|string $needles): bool
+    public static function startsWith(int|string $haystack, array|string $needles): bool
     {
         foreach ((array) $needles as $needle) {
-            if (str_starts_with($haystack, $needle)) {
+            if (str_starts_with(strval($haystack), $needle)) {
                 return true;
             }
         }
