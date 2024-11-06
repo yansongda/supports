@@ -147,7 +147,7 @@ class Str
     }
 
     /**
-     * @throws RandomException // @phpstan-ignore-line
+     * @throws RandomException @phpstan-ignore-line
      */
     public static function random(int $length = 16): string
     {
