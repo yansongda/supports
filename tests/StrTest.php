@@ -30,4 +30,14 @@ class StrTest extends TestCase
         self::assertSame('HelloWorld', Str::studly('hello world'));
         self::assertSame('Hello-World', Str::studly('hello world', '-'));
     }
+
+    public function testStartsWith()
+    {
+        self::assertTrue(Str::startsWith('_key', '_'));
+        self::assertTrue(Str::startsWith('+key', ['_', '+']));
+        self::assertFalse(Str::startsWith('0', '_'));
+        self::assertFalse(Str::startsWith('0', ['_', '+']));
+        self::assertFalse(Str::startsWith(0, '_'));
+        self::assertFalse(Str::startsWith(0, ['_', '+']));
+    }
 }
