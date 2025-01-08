@@ -27,4 +27,12 @@ class SerializableTest extends TestCase
         self::assertInstanceOf(TraitStub::class, $traitStub);
         self::assertEquals('yansongda-a', $traitStub->getName());
     }
+
+    public function testUnserializeArrayIntKey()
+    {
+        $traitStub = $this->class->unserializeArray(['yansongda-a']);
+
+        self::assertInstanceOf(TraitStub::class, $traitStub);
+        self::assertEquals('yansongda', $traitStub->getName());
+    }
 }
