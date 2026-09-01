@@ -115,17 +115,17 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return $end;
     }
 
-    public function add(null|int|string $key, mixed $value): void
+    public function add(int|string|null $key, mixed $value): void
     {
         Arr::set($this->items, $key, $value);
     }
 
-    public function set(null|int|string $key, mixed $value): void
+    public function set(int|string|null $key, mixed $value): void
     {
         Arr::set($this->items, $key, $value);
     }
 
-    public function get(null|int|string $key = null, mixed $default = null): mixed
+    public function get(int|string|null $key = null, mixed $default = null): mixed
     {
         return Arr::get($this->items, $key, $default);
     }
@@ -290,8 +290,8 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         $xml = '<xml>';
 
         foreach ($this->all() as $key => $val) {
-            $xml .= is_numeric($val) ? '<'.$key.'>'.$val.'</'.$key.'>' :
-                                       '<'.$key.'><![CDATA['.$val.']]></'.$key.'>';
+            $xml .= is_numeric($val) ? '<'.$key.'>'.$val.'</'.$key.'>'
+                                       : '<'.$key.'><![CDATA['.$val.']]></'.$key.'>';
         }
 
         $xml .= '</xml>';
