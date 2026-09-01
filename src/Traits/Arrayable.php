@@ -11,9 +11,14 @@ trait Arrayable
 {
     public function toArray(): array
     {
+        // 反射结果按类名缓存，避免每次调用都重建 ReflectionClass
+        static $cache = [];
+
+        $properties = $cache[static::class] ??= (new ReflectionClass(static::class))->getProperties();
+
         $result = [];
 
-        foreach ((new ReflectionClass($this))->getProperties() as $item) {
+        foreach ($properties as $item) {
             $k = $item->getName();
             $method = 'get'.Str::studly($k);
 

@@ -2,6 +2,7 @@
 
 namespace Yansongda\Supports\Tests;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 use Yansongda\Supports\Arr;
@@ -146,5 +147,28 @@ class ArrTest extends TestCase
         $wrapQuery = Arr::wrapQuery($str, true);
 
         self::assertIsObject(openssl_pkey_get_public($wrapQuery['signPubKeyCert']));
+    }
+
+    public function testMergeScalarValueOverwrittenByArray()
+    {
+        self::assertSame(['a' => ['b' => 1]], Arr::merge(['a' => 'x'], ['a' => ['b' => 1]]));
+        self::assertSame(['a' => ['c' => 2, 'b' => 1]], Arr::merge(['a' => ['c' => 2]], ['a' => ['b' => 1]]));
+    }
+
+    public function testToStringWithNonScalarValue()
+    {
+        // null 与标量保持原有拼接行为（签名串场景依赖）
+        self::assertSame('a=&b=1', Arr::toString(['a' => null, 'b' => 1]));
+
+        $this->expectException(InvalidArgumentException::class);
+        Arr::toString(['a' => ['b' => 1]]);
+    }
+
+    public function testWrapXmlInvalid()
+    {
+        self::assertSame([], Arr::wrapXml(''));
+
+        $this->expectException(InvalidArgumentException::class);
+        Arr::wrapXml('<xml><name>');
     }
 }

@@ -17,6 +17,7 @@ class Pipeline
 
     protected mixed $passable;
 
+    /** @var array<int, mixed> */
     protected array $pipes = [];
 
     protected string $method = 'handle';
@@ -97,6 +98,9 @@ class Pipeline
         };
     }
 
+    /**
+     * @return array{0: string, 1: array<int, string>}
+     */
     protected function parsePipeString(string $pipe): array
     {
         [$name, $parameters] = array_pad(explode(':', $pipe, 2), 2, []);
