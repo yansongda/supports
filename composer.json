@@ -13,15 +13,15 @@
         }
     ],
     "require": {
-        "php": ">=8.0",
+        "php": ">=8.2",
         "ext-mbstring": "*",
         "ext-ctype": "*"
     },
     "require-dev": {
-        "phpunit/phpunit": "^9.0",
-        "mockery/mockery": "^1.4",
+        "phpunit/phpunit": "^11.5",
+        "mockery/mockery": "^1.6",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "phpstan/phpstan": "^1.1.0"
+        "phpstan/phpstan": "^2.0"
     },
     "autoload": {
         "files": [
@@ -36,9 +36,8 @@
             "Yansongda\\Supports\\Tests\\": "tests/"
         }
     },
-    "suggest": {
-        "symfony/console": "Use stdout logger",
-        "monolog/monolog": "Use logger"
+    "config": {
+        "sort-packages": true
     },
     "scripts": {
         "test": "./vendor/bin/phpunit -c phpunit.xml --colors=always",

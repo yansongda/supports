@@ -8,6 +8,7 @@ trait Serializable
 {
     public function __serialize(): array
     {
+        /* @phpstan-ignore-next-line */
         if (method_exists($this, 'toArray')) {
             return $this->toArray();
         }
@@ -15,6 +16,9 @@ trait Serializable
         return [];
     }
 
+    /**
+     * @param array<array-key, mixed> $data
+     */
     public function __unserialize(array $data): void
     {
         $this->unserializeArray($data);
@@ -40,14 +44,21 @@ trait Serializable
         return json_encode($this->__serialize(), $option);
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     public function jsonSerialize(): array
     {
         return $this->__serialize();
     }
 
+    /**
+     * @param array<array-key, mixed> $data
+     */
     public function unserializeArray(array $data): self
     {
         foreach ($data as $key => $item) {
+            /* @phpstan-ignore-next-line */
             if (method_exists($this, 'set')) {
                 $this->set(strval($key), $item);
             }
