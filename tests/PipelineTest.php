@@ -10,10 +10,6 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 use Psr\Container\ContainerInterface;
 
-/**
- * @internal
- * @coversNothing
- */
 class PipelineTest extends TestCase
 {
     protected function tearDown(): void
