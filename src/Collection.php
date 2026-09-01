@@ -15,18 +15,29 @@ use Yansongda\Supports\Traits\Accessable;
 use Yansongda\Supports\Traits\Arrayable;
 use Yansongda\Supports\Traits\Serializable;
 
+/**
+ * @implements ArrayAccess<array-key, mixed>
+ * @implements IteratorAggregate<array-key, mixed>
+ */
 class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSerializable
 {
     use Serializable;
     use Accessable;
     use Arrayable;
 
+    /** @var array<array-key, mixed> */
     protected array $items = [];
 
     public function __construct(mixed $items = [])
     {
+        // 快速路径：非点语法键直接赋值（与 Arr::set 单层语义一致），
+        // 仅含点语法的字符串键走 Arr::set 展开，保持既有行为不变。
         foreach ($this->getArrayableItems($items) as $key => $value) {
-            $this->set($key, $value);
+            if (is_string($key) && str_contains($key, '.')) {
+                Arr::set($this->items, $key, $value);
+            } else {
+                $this->items[$key] = $value;
+            }
         }
     }
 
@@ -50,25 +61,37 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return new static(Arr::wrapQuery($query, $raw, $spaceToPlus));
     }
 
+    /**
+     * @param array<array-key, mixed>|Collection $value
+     *
+     * @return array<array-key, mixed>
+     */
     public static function unwrap(array|Collection $value): array
     {
         return $value instanceof self ? $value->all() : $value;
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     public function all(): array
     {
         return $this->items;
     }
 
+    /**
+     * @param array<int, int|string> $keys
+     *
+     * @return array<array-key, mixed>
+     */
     public function only(array $keys): array
     {
         $return = [];
 
         foreach ($keys as $key) {
-            $value = $this->get($key);
-
-            if (!is_null($value)) {
-                $return[$key] = $value;
+            // 存在性语义：键值为 null 时也保留（与 has/Arr::has 一致）
+            if (Arr::has($this->items, $key)) {
+                $return[$key] = Arr::get($this->items, $key);
             }
         }
 
@@ -96,23 +119,27 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return new static(array_merge($this->items, $this->getArrayableItems($items)));
     }
 
-    public function has(int|string $key): bool
+    /**
+     * @param array<int, int|string>|int|string $key
+     */
+    public function has(array|int|string $key): bool
     {
-        return !is_null(Arr::get($this->items, $key));
+        // 存在性语义（支持点语法）：键存在但值为 null 时返回 true，与 Arr::has 一致
+        return Arr::has($this->items, $key);
     }
 
     public function first(): mixed
     {
-        return reset($this->items);
+        $key = array_key_first($this->items);
+
+        return null === $key ? null : $this->items[$key];
     }
 
     public function last(): mixed
     {
-        $end = end($this->items);
+        $key = array_key_last($this->items);
 
-        reset($this->items);
-
-        return $end;
+        return null === $key ? null : $this->items[$key];
     }
 
     public function add(int|string|null $key, mixed $value): void
@@ -280,6 +307,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return Arr::toString($this->all(), $separator);
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     public function toArray(): array
     {
         return $this->all();
@@ -342,6 +372,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         };
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     protected function getArrayableItems(mixed $items): array
     {
         if (is_array($items)) {

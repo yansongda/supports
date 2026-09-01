@@ -40,4 +40,18 @@ class StrTest extends TestCase
         self::assertFalse(Str::startsWith(0, '_'));
         self::assertFalse(Str::startsWith(0, ['_', '+']));
     }
+
+    public function testUuidV4()
+    {
+        $uuids = [];
+
+        for ($i = 0; $i < 10000; ++$i) {
+            $uuid = Str::uuidV4();
+            $uuids[$uuid] = true;
+
+            self::assertMatchesRegularExpression('/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/', $uuid);
+        }
+
+        self::assertCount(10000, $uuids);
+    }
 }

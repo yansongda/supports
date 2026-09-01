@@ -40,6 +40,9 @@ class Str
         return lcfirst(static::studly($value));
     }
 
+    /**
+     * @param array<int, string>|string $needles
+     */
     public static function contains(string $haystack, array|string $needles): bool
     {
         foreach ((array) $needles as $needle) {
@@ -51,6 +54,9 @@ class Str
         return false;
     }
 
+    /**
+     * @param array<int, string>|string $needles
+     */
     public static function endsWith(string $haystack, array|string $needles): bool
     {
         foreach ((array) $needles as $needle) {
@@ -69,6 +75,9 @@ class Str
         return preg_replace('/(?:'.$quoted.')+$/u', '', $value).$cap;
     }
 
+    /**
+     * @param array<int, string>|string $pattern
+     */
     public static function is(array|string $pattern, string $value): bool
     {
         $patterns = Arr::wrap($pattern);
@@ -139,6 +148,9 @@ class Str
         return rtrim($matches[0]).$end;
     }
 
+    /**
+     * @return array{0: string, 1: null|string}
+     */
     public static function parseCallback(string $callback, ?string $default = null): array
     {
         return static::contains($callback, '@') ? explode('@', $callback, 2) : [$callback, $default];
@@ -159,33 +171,24 @@ class Str
         return $string;
     }
 
+    /**
+     * RFC 4122 v4 UUID（加密安全随机源）.
+     */
     public static function uuidV4(): string
     {
-        return sprintf(
-            '%04x%04x-%04x-%04x-%04x-%04x%04x%04x',
-            // 32 bits for "time_low"
-            mt_rand(0, 0xFFFF),
-            mt_rand(0, 0xFFFF),
+        $data = random_bytes(16);
 
-            // 16 bits for "time_mid"
-            mt_rand(0, 0xFFFF),
+        // set the version to 0100
+        $data[6] = chr(ord($data[6]) & 0x0F | 0x40);
+        // set bits 6-7 to 10
+        $data[8] = chr(ord($data[8]) & 0x3F | 0x80);
 
-            // 16 bits for "time_hi_and_version",
-            // four most significant bits holds version number 4
-            mt_rand(0, 0x0FFF) | 0x4000,
-
-            // 16 bits, 8 bits for "clk_seq_hi_res",
-            // 8 bits for "clk_seq_low",
-            // two most significant bits holds zero and one for variant DCE1.1
-            mt_rand(0, 0x3FFF) | 0x8000,
-
-            // 48 bits for "node"
-            mt_rand(0, 0xFFFF),
-            mt_rand(0, 0xFFFF),
-            mt_rand(0, 0xFFFF)
-        );
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
 
+    /**
+     * @param array<int, string> $replace
+     */
     public static function replaceArray(string $search, array $replace, string $subject): string
     {
         foreach ($replace as $value) {
@@ -270,6 +273,9 @@ class Str
         return $value;
     }
 
+    /**
+     * @param array<int, string>|string $needles
+     */
     public static function startsWith(int|string $haystack, array|string $needles): bool
     {
         foreach ((array) $needles as $needle) {
@@ -305,6 +311,8 @@ class Str
 
     /**
      * @see https://github.com/danielstjules/Stringy/blob/3.1.0/LICENSE.txt
+     *
+     * @return array<array-key, list<string>>
      */
     protected static function charsArray(): array
     {
@@ -433,6 +441,8 @@ class Str
 
     /**
      * @see https://github.com/danielstjules/Stringy/blob/3.1.0/LICENSE.txt
+     *
+     * @return null|array{list<string>, list<string>}
      */
     protected static function languageSpecificCharsArray(string $language): ?array
     {
