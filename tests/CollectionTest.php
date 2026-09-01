@@ -158,4 +158,35 @@ class CollectionTest extends TestCase
 
         self::assertIsObject(openssl_pkey_get_public($wrapQuery['signPubKeyCert']));
     }
+
+    public function testFirstAndLastOnEmptyCollection()
+    {
+        $collection = new Collection();
+
+        self::assertNull($collection->first());
+        self::assertNull($collection->last());
+    }
+
+    public function testHasWithNullValue()
+    {
+        $collection = new Collection(['a' => null, 'b' => ['c' => null]]);
+
+        self::assertTrue($collection->has('a'));
+        self::assertTrue($collection->has('b.c'));
+        self::assertFalse($collection->has('non-exist'));
+    }
+
+    public function testOnlyWithNullValue()
+    {
+        $collection = new Collection(['a' => null, 'b' => 1]);
+
+        self::assertSame(['a' => null, 'b' => 1], $collection->only(['a', 'b', 'non-exist']));
+    }
+
+    public function testConstructorWithDotKeys()
+    {
+        $collection = new Collection(['a.b' => 1, 'c' => 2, 5 => 'x']);
+
+        self::assertSame(['a' => ['b' => 1], 'c' => 2, 5 => 'x'], $collection->all());
+    }
 }

@@ -18,6 +18,11 @@ class Arr
         return is_array($value) || $value instanceof ArrayAccess;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
+     */
     public static function add(array $array, string $key, mixed $value): array
     {
         if (is_null(static::get($array, $key))) {
@@ -27,6 +32,11 @@ class Arr
         return $array;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
+     */
     public static function collapse(array $array): array
     {
         $results = [];
@@ -42,6 +52,11 @@ class Arr
         return array_merge([], ...$results);
     }
 
+    /**
+     * @param array<array-key, mixed> ...$arrays
+     *
+     * @return array<int, array<int, mixed>>
+     */
     public static function crossJoin(...$arrays): array
     {
         $results = [[]];
@@ -59,11 +74,21 @@ class Arr
         return $results;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array{0: list<array-key>, 1: list<mixed>}
+     */
     public static function divide(array $array): array
     {
         return [array_keys($array), array_values($array)];
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
+     */
     public static function dot(array $array, string $prepend = ''): array
     {
         $results = [];
@@ -78,6 +103,12 @@ class Arr
         return $results;
     }
 
+    /**
+     * @param array<array-key, mixed>       $array
+     * @param array<int, int|string>|string $keys
+     *
+     * @return array<array-key, mixed>
+     */
     public static function except(array $array, array|string $keys): array
     {
         static::forget($array, $keys);
@@ -85,6 +116,9 @@ class Arr
         return $array;
     }
 
+    /**
+     * @param array<array-key, mixed>|ArrayAccess<array-key, mixed> $array
+     */
     public static function exists(array|ArrayAccess $array, int|string $key): bool
     {
         if ($array instanceof ArrayAccess) {
@@ -94,6 +128,9 @@ class Arr
         return array_key_exists($key, $array);
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     */
     public static function first(array $array, ?callable $callback = null, mixed $default = null): mixed
     {
         if (is_null($callback)) {
@@ -113,6 +150,9 @@ class Arr
         return $default;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     */
     public static function last(array $array, ?callable $callback = null, mixed $default = null): mixed
     {
         if (is_null($callback)) {
@@ -122,6 +162,11 @@ class Arr
         return static::first(array_reverse($array, true), $callback, $default);
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<int, mixed>
+     */
     public static function flatten(array $array, float|int $depth = INF): array
     {
         $result = [];
@@ -139,6 +184,10 @@ class Arr
         return $result;
     }
 
+    /**
+     * @param array<array-key, mixed>       $array
+     * @param array<int, int|string>|string $keys
+     */
     public static function forget(array &$array, array|string $keys): void
     {
         $original = &$array;
@@ -168,6 +217,9 @@ class Arr
         }
     }
 
+    /**
+     * @param array<array-key, mixed>|ArrayAccess<array-key, mixed> $array
+     */
     public static function get(array|ArrayAccess $array, int|string|null $key = null, mixed $default = null): mixed
     {
         if (!static::accessible($array)) {
@@ -193,6 +245,10 @@ class Arr
         return $array;
     }
 
+    /**
+     * @param array<array-key, mixed>|ArrayAccess<array-key, mixed> $array
+     * @param null|array<int, int|string>|string                    $keys
+     */
     public static function has(array|ArrayAccess $array, array|string|null $keys): bool
     {
         if (is_null($keys)) {
@@ -222,6 +278,9 @@ class Arr
         return true;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     */
     public static function isAssoc(array $array): bool
     {
         $keys = array_keys($array);
@@ -229,11 +288,24 @@ class Arr
         return array_keys($keys) !== $keys;
     }
 
+    /**
+     * @param array<array-key, mixed>       $array
+     * @param array<int, int|string>|string $keys
+     *
+     * @return array<array-key, mixed>
+     */
     public static function only(array $array, array|string $keys): array
     {
         return array_intersect_key($array, array_flip((array) $keys));
     }
 
+    /**
+     * @param array<array-key, mixed>            $array
+     * @param array<int, int|string>|string      $value
+     * @param null|array<int, int|string>|string $key
+     *
+     * @return array<array-key, mixed>
+     */
     public static function pluck(array $array, array|string $value, array|string|null $key = null): array
     {
         $results = [];
@@ -257,6 +329,11 @@ class Arr
         return $results;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
+     */
     public static function prepend(array $array, mixed $value, mixed $key = null): array
     {
         if (is_null($key)) {
@@ -268,6 +345,9 @@ class Arr
         return $array;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     */
     public static function pull(array &$array, string $key, mixed $default = null): mixed
     {
         $value = static::get($array, $key, $default);
@@ -277,6 +357,10 @@ class Arr
     }
 
     /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<int, mixed>
+     *
      * @throws InvalidArgumentException
      */
     public static function random(array $array, int $number = 1): array
@@ -302,6 +386,10 @@ class Arr
     /**
      * Set an array item to a given value using "dot" notation.
      * If no key is given to the method, the entire array will be replaced.
+     *
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
      */
     public static function set(array &$array, int|string|null $key, mixed $value): array
     {
@@ -329,6 +417,11 @@ class Arr
         return $array;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
+     */
     public static function shuffle(array $array, ?int $seed = null): array
     {
         if (is_null($seed)) {
@@ -343,6 +436,11 @@ class Arr
         return $array;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
+     */
     public static function sort(array $array, callable $callback): array
     {
         $results = [];
@@ -354,6 +452,11 @@ class Arr
         return $results;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
+     */
     public static function sortRecursive(array $array): array
     {
         foreach ($array as &$value) {
@@ -370,27 +473,47 @@ class Arr
         return $array;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     */
     public static function query(array $array, int $encodingType = PHP_QUERY_RFC1738): string
     {
         return http_build_query($array, '', '&', $encodingType);
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @throws InvalidArgumentException 值为数组或对象时抛出（此类值原本会产生 warning 并拼接出无效字符串）
+     */
     public static function toString(array $array, string $separator = '&'): string
     {
         $result = '';
 
         foreach ($array as $key => $value) {
+            if (is_array($value) || is_object($value)) {
+                throw new InvalidArgumentException('The value of key ['.$key.'] must be scalar, '.get_debug_type($value).' given.');
+            }
+
             $result .= $key.'='.$value.$separator;
         }
 
         return substr($result, 0, 0 - Str::length($separator));
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
+     */
     public static function where(array $array, callable $callback): array
     {
         return array_filter($array, $callback, ARRAY_FILTER_USE_BOTH);
     }
 
+    /**
+     * @return array<array-key, mixed>
+     */
     public static function wrap(mixed $value): array
     {
         if (is_null($value)) {
@@ -400,6 +523,9 @@ class Arr
         return !is_array($value) ? [$value] : $value;
     }
 
+    /**
+     * @return null|array<array-key, mixed>
+     */
     public static function wrapJson(string $json): ?array
     {
         $result = json_decode($json, true);
@@ -407,27 +533,45 @@ class Arr
         return is_array($result) ? $result : null;
     }
 
+    /**
+     * 注意：基于 SimpleXML 的一次性转换，XML 属性与同名多节点会丢失（保持历史行为）。
+     *
+     * @return array<array-key, mixed>
+     *
+     * @throws InvalidArgumentException XML 非法时抛出（原本是 warning + 返回空数组）
+     */
     public static function wrapXml(string $xml): array
     {
         if (empty($xml)) {
             return [];
         }
 
-        $data = json_decode(json_encode(
-            simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA),
-            JSON_UNESCAPED_UNICODE
-        ), true);
+        $useInternalErrors = libxml_use_internal_errors(true);
 
-        if (JSON_ERROR_NONE === json_last_error()) {
-            return $data;
+        try {
+            $xmlObject = simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA | LIBXML_NONET);
+
+            if (false === $xmlObject) {
+                $error = libxml_get_last_error();
+                $message = false !== $error ? trim($error->message) : 'unknown error';
+
+                throw new InvalidArgumentException('Invalid XML string: '.$message);
+            }
+
+            $result = json_decode(json_encode($xmlObject, JSON_UNESCAPED_UNICODE), true);
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors($useInternalErrors);
         }
 
-        return [];
+        return is_array($result) ? $result : [];
     }
 
     /**
      * @param bool $raw         是否原始解析，有些情况下，原始解析会更好
      * @param bool $spaceToPlus 是否将空格转换为加号
+     *
+     * @return array<array-key, mixed>
      */
     public static function wrapQuery(string $query, bool $raw = false, bool $spaceToPlus = false): array
     {
@@ -452,6 +596,11 @@ class Arr
         return $result;
     }
 
+    /**
+     * @param array<array-key, mixed> $data
+     *
+     * @return array<array-key, mixed>
+     */
     public static function querySpaceToPlus(array $data): array
     {
         foreach ($data as $key => $item) {
@@ -461,6 +610,11 @@ class Arr
         return $data;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
+     */
     public static function unique(array $array): array
     {
         $result = [];
@@ -479,13 +633,19 @@ class Arr
         return $result;
     }
 
+    /**
+     * @param array<array-key, mixed> $array1
+     * @param array<array-key, mixed> $array2
+     *
+     * @return array<array-key, mixed>
+     */
     public static function merge(array $array1, array $array2, bool $unique = true): array
     {
         $isAssoc = static::isAssoc($array1 ?: $array2);
         if ($isAssoc) {
             foreach ($array2 as $key => $value) {
                 if (is_array($value)) {
-                    $array1[$key] = static::merge($array1[$key] ?? [], $value, $unique);
+                    $array1[$key] = static::merge(is_array($array1[$key] ?? null) ? $array1[$key] : [], $value, $unique);
                 } else {
                     $array1[$key] = $value;
                 }
@@ -504,6 +664,11 @@ class Arr
         return $array1;
     }
 
+    /**
+     * @param array<array-key, mixed> $array
+     *
+     * @return array<array-key, mixed>
+     */
     public static function encoding(array $array, string $to_encoding, string $from_encoding = 'gb2312'): array
     {
         $encoded = [];
