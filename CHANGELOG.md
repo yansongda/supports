@@ -2,6 +2,8 @@
 
 ## [Unreleased]
 
+## [v4.1.0] - 2026-09-02
+
 ### Changed
 - PHP 最低版本从 8.0 提升至 8.2
 - `Collection::has()`/`Collection::only()` 改为键存在性语义（键值为 `null` 时 `has` 返回 `true`、`only` 保留该键），与 `Arr::has()` 一致
