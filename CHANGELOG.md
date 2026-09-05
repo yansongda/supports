@@ -2,6 +2,12 @@
 
 ## [Unreleased]
 
+## [v4.1.1] - 2026-09-05
+
+### Fixed
+
+- composer.json 显式声明 `psr/container` 依赖（`^1.1.1 || ^2.0`）：`Pipeline` 生产代码直接使用 `Psr\Container\ContainerInterface`，此前该包仅作为传递依赖存在，下游单独安装时可能出现 `Class not found` (#38)
+
 ## [v4.1.0] - 2026-09-02
 
 ### Changed
