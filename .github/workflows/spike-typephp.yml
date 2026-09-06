@@ -14,7 +14,7 @@ jobs:
       TPC_URL: https://github.com/swoole/typephp/releases/download/v0.7.0/tpc_v0.7.0_linux_x64.tar.gz
       TPC_DIST: /tmp/typephp-dist
       SPIKE_DIR: /tmp/typephp-spike
-      PHPX_HOME: ${{ github.workspace }}/third_party/phpx
+      PHPX_HOME: /tmp/typephp-dist/tpc_v0.7.0_linux_x64/vendor/swoole/phpx
       TYPEPHP_REF: v0.7.0
       TYPEPHP_PATCH_URL: https://raw.githubusercontent.com/swoole/typephp/v0.7.0/.github/patches/php-hash-cxx.patch
     steps:
@@ -126,15 +126,9 @@ jobs:
             php-config --version
           } | tee "$SPIKE_DIR/php-home.txt"
 
-      - name: Checkout PHPX (swoole/phpx, official typephp CI uses master)
-        uses: actions/checkout@v4
-        with:
-          repository: swoole/phpx
-          ref: master
-          path: third_party/phpx
-
       - name: Build libphpx.so (official typephp CI cmake invocation)
         run: |
+          echo "phpx source: $PHPX_HOME"
           set -o pipefail
           cmake -S "$PHPX_HOME" -B "$PHPX_HOME/build" \
             -D CMAKE_BUILD_TYPE=Release \
