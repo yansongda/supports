@@ -1,3 +1,0 @@
---- dry build dir ($GITHUB_WORKSPACE/build/spike) ---
---- tpc --dry exit code ---
-tpc --dry exit code: 255

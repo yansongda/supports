@@ -1,8 +1,0 @@
-=== spike-typephp summary ===
-TPC_VERSION=v0.7.0
-TPC_URL=https://github.com/swoole/typephp/releases/download/v0.7.0/tpc_v0.7.0_linux_x64.tar.gz
-PHP_HOME=/usr
-PHPX_HOME=/tmp/typephp-dist/tpc_v0.7.0_linux_x64/vendor/swoole/phpx
-LD_LIBRARY_PATH=/tmp/typephp-dist/tpc_v0.7.0_linux_x64/vendor/swoole/phpx/lib:/usr/lib
-tpc --help exit code: 0
-ldd-after: all resolved

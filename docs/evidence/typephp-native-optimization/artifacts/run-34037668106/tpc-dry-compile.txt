@@ -1,7 +1,0 @@
-Initialized platform/backend: Linux + GCC (g++)
-PHP Fatal error:  Uncaught InvalidArgumentException: Directory does not exist: /home/runner/work/supports/supports/vendor/psr/container/src in /home/runner/work/typephp/typephp/src/compiler.php:9
-Stack trace:
-#0 [internal function]: TypePhp\Build\FileScanner->__construct()
-#1 /home/runner/work/typephp/typephp/src/compiler.php(9): main()
-#2 {main}
-  thrown in /home/runner/work/typephp/typephp/src/compiler.php on line 9

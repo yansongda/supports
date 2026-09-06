@@ -1,3 +1,0 @@
-PHP_HOME=/usr
-embed library: /usr/lib/libphp.so
-8.5.10
