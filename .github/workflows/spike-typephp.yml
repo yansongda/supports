@@ -152,7 +152,7 @@ jobs:
 
       - name: Install Project Composer Dependencies (for spike-tmp sources)
         run: |
-          COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-progress --no-audit --no-scripts
+          COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-progress --no-scripts
           test -f vendor/autoload.php
           test -d vendor/psr/container/src
 
