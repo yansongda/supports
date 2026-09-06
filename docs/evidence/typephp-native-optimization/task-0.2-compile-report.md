@@ -67,3 +67,74 @@ main-stub.php：`<?php declare(strict_types=1); function main(): void {}`（合�
 3. workflow 追加步骤审查：位置正确（Assert tpc --help 之后、Spike Summary 之前）；continue-on-error + pipefail + 退出码捕获齐全；双候选 build-dir 列目录兜底；输出全入 $SPIKE_DIR 随既有 artifact 上传。
 4. YAML 双文件自检复跑 OK；commit `a31ed19` 仅含 3 文件（spike-tmp 临时入库已在 evidence 与 commit message 注明决议）；`git status --porcelain` 仅预期未跟踪文件。
 5. 结论：**阶段 1 验证通过**。T0.2 整体验收（A/B 归类 + 两条结论）待 CI run log 回传后阶段 2 定稿。
+
+# 2026-09-06 22:09 vendor 缺失修复（T0.2 tpc --dry CI 失败，worker）
+
+- **CI 报错原文**（run `34037668106`，`Spike Compile src/ (tpc --dry, collect error list)` 步骤，exit 255）：
+  ```
+  PHP Fatal error: Uncaught InvalidArgumentException: Directory does not exist: /home/runner/work/supports/supports/vendor/psr/container/src
+  ```
+- **根因**：`vendor/` 与 `composer.lock` 均被 .gitignore 忽略，CI checkout 后项目根不存在 vendor/；而 `spike-tmp/project.yml` 的 sources 引用 `../vendor/psr/container/src`（相对 spike-tmp/ 即项目根 vendor/），tpc 解析该目录时直接 Fatal error。本地可跑是因为本地有 vendor/，属环境差异而非 project.yml 写错。
+- **修复**：workflow 在 `Configure Native Library Path (LD_LIBRARY_PATH)` 之后、`Inspect tpc Dynamic Library Requirements (after provisioning)` 之前插入步骤 `Install Project Composer Dependencies (for spike-tmp sources)`：
+  ```yaml
+  - name: Install Project Composer Dependencies (for spike-tmp sources)
+    run: |
+      COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-progress --no-audit --no-scripts
+      test -f vendor/autoload.php
+      test -d vendor/psr/container/src
+  ```
+  即先 `composer install`（`--no-scripts` 防止 vendor 内脚本干扰，项目 composer.json 第 19 行已声明 `psr/container` 依赖，install 后必然产生 `vendor/psr/container/src`），再断言 `vendor/autoload.php` 文件与 `vendor/psr/container/src` 目录存在，断言通过后才进入后续 tpc 调用。插入位置位于所有 Spike Compile/native_types/boundary 组之前，不影响 libphpx/libphp 预置组。commit `0b612f7`（仅 workflow 文件），YAML safe_load 自检通过。
+
+# 2026-09-06 22:15:20 --no-audit 兼容性修复（T0.2 composer install 步骤 CI 失败，worker）
+
+- **CI 报错原文**（run `34038440997`，`Install Project Composer Dependencies (for spike-tmp sources)` 步骤）：
+  ```
+  ##[error]The "--no-audit" option does not exist.
+  ```
+- **根因**：ubuntu-22.04 runner 环境中实际生效的 composer 版本不支持 `composer install --no-audit` 选项，命令直接报错退出，vendor 未安装。
+- **修复**：该步骤命令移除 ` --no-audit`，即
+  ```yaml
+  COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-progress --no-scripts
+  ```
+  其余选项不变，步骤内两行断言（`test -f vendor/autoload.php`、`test -d vendor/psr/container/src`）不动。commit `1951c7f`（仅 workflow 文件），YAML safe_load 自检通过。
+
+# 2026-09-06 22:21:03 阶段 2：编译报错清单定稿（run 34038640605）
+
+## CI 运行事实
+
+- **run**：`34038640605`（spike-typephp.yml，PR #40），URL：https://github.com/yansongda/supports/actions/runs/34038640605 ，**conclusion = success**。
+- `tpc --dry` 退出码 **0**（`tpc-dry-exit-code.txt`：`tpc --dry exit code: 0`）。
+- **13 个源文件 prepare 完成**（`prepare completed: 13 source files in total`）：vendor/psr/container/src 3 个（ContainerExceptionInterface / ContainerInterface / NotFoundExceptionInterface）+ src/ 9 个（Arr / Collection / Config / Functions / Pipeline / Str / Traits/Accessable / Traits/Arrayable / Traits/Serializable）+ spike-tmp/main-stub.php；逐文件 convert + generate arginfo 全部无 fatal。
+- **7 个 C++ 文件生成**（`Dry run completed: 7 C++ source file(s) generated in /home/runner/work/supports/supports/build/spike`）。
+- 前置提示行（非致命）：`libphp.so is missing... or set PHP_HOME` 等若干提示——`--dry` 仅生成 C++ 不链接，未阻塞，exit 0，符合预期。
+- 全量输出仅两处 WARNING（无 fatal/error）：
+  - `Use this expression carefully, which may be inconsistent with the dynamic execution behavior in /home/runner/work/supports/supports/src/Collection.php:103`
+  - `Use this expression carefully, which may be inconsistent with the dynamic execution behavior in /home/runner/work/supports/supports/src/Pipeline.php:39`
+- 同 run 复核项（回归确认）：native_types 输出 `12`/`4`（nt-typephp.txt，与 T0.4 定稿一致）；boundary diff exit 1 且唯一差异仍为 PAT_FOREACH_REF（与 T0.5 定稿一致）。
+
+## A/B 归类表
+
+| # | 归类 | 位置 | plan 预判项 | 实测结果 |
+|---|------|------|-------------|----------|
+| 1 | **A 类（plan 预判项）** | `src/Collection.php:103`（except + func_get_args） | func_get_args 预期报错/告警 | **WARNING（`Use this expression carefully...` 形态）非 fatal**，convert/arginfo 正常完成 |
+| 2 | **A 类（plan 预判项）** | `src/Pipeline.php:39`（through + func_get_args） | 同上 | **同上 WARNING 非 fatal**，convert/arginfo 正常完成 |
+| 3 | **A 类（plan 预判项）** | `src/Collection.php:305`（toString 方法定义） | 关键字方法拦截待实测 | **零诊断**（方法定义编译层无任何报错/告警） |
+| 4 | **A 类（plan 预判项）** | vendor/psr/container 三个接口文件（strict_types=1） | 文档预期不报错 | **零报错**（13 文件 prepare 全通过，契约 #6「strict_types=1 为允许值」实测通过） |
+| — | **B 类（未知新项）** | — | — | **零**（全量输出中无任何 A 类之外的报错/告警） |
+
+## 两条显式结论（plan 要求）
+
+1. **`Arr::toString` 静态调用未被关键字拦截**：`src/Arr.php:489` toString（静态、带参）在编译层无任何诊断——"关键字方法硬冲突"预案不成立。结合第 3 行实测（`Collection.php:305` toString 方法定义零诊断），关键字解析语义（"Reserved keyword methods ... are resolved before ordinary object methods"）**发生在调用点/运行期而非类定义编译**，带参定义本身不触发编译期冲突。
+2. **`toArray()` declared 豁免在定义编译层无诊断**：`Collection.php` 整文件 convert + arginfo 无任何针对 toArray 的诊断（声明豁免/关键字解析均未在定义编译层产生拦截）；**调用期豁免效果留待 T2.1 运行期冒烟确认**（`$collection->toArray()` 实际分发到用户方法还是 builtin）。
+
+## 重要解读（对 Wave 1 的意义）
+
+关键字方法拦截发生在**调用点/运行期**而非类定义编译；func_get_args 在 typephp 运行期的严格参数计数下仍会出问题（契约 #2，两处 WARNING 即编译器对该表达式的显式提示）。因此：
+
+- **Wave 1 的 toString 更名与两处变参化（except/through）仍然必要**——保障**运行期正确性**（避免调用点被 builtin 语义截胡、func_get_args 严格计数错位）；
+- 但风险等级从"硬冲突"（编译不过）**下调为"运行期语义风险"**（编译层 exit 0 全绿，问题只会在运行期冒烟暴露）；
+- T2.1 冒烟必须重点覆盖：`Arr::toString` 静态调用、`Collection::except(...)` 多参、`Pipeline::through(callable)` 实际分发行为、`Collection::toArray()` 调用点。
+
+## Artifact 归档
+
+- 26 个诊断文件归档入库：`docs/evidence/typephp-native-optimization/artifacts/run-34038640605/`（含 `tpc-dry-compile.txt` 全量输出、`tpc-dry-exit-code.txt`、`tpc-dry-build-dir.txt`、`spike-summary.txt` 及 T0.1/T0.4/T0.5 复核文件）。

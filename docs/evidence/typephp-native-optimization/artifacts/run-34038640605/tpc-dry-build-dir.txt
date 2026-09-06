@@ -1,0 +1,29 @@
+--- dry build dir ($GITHUB_WORKSPACE/build/spike) ---
+/home/runner/work/supports/supports/build/spike
+/home/runner/work/supports/supports/build/spike/extension-spike.cc
+/home/runner/work/supports/supports/build/spike/include
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_spike_tmp_main_stub_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_src_Arr_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_src_Collection_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_src_Config_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_src_Functions_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_src_Pipeline_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_src_Str_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_src_Traits_Accessable_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_src_Traits_Arrayable_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_src_Traits_Serializable_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_vendor_psr_container_src_ContainerExceptionInterface_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_vendor_psr_container_src_ContainerInterface_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_home_runner_work_supports_supports_vendor_psr_container_src_NotFoundExceptionInterface_arginfo.h
+/home/runner/work/supports/supports/build/spike/include/php_spike_data_decl.h
+/home/runner/work/supports/supports/build/spike/include/php_spike_func_decl.h
+/home/runner/work/supports/supports/build/spike/spike-tmp
+/home/runner/work/supports/supports/build/spike/spike-tmp/main-stub.cc
+/home/runner/work/supports/supports/build/spike/src
+/home/runner/work/supports/supports/build/spike/src/Arr.cc
+/home/runner/work/supports/supports/build/spike/src/Collection.cc
+/home/runner/work/supports/supports/build/spike/src/Functions.cc
+/home/runner/work/supports/supports/build/spike/src/Pipeline.cc
+/home/runner/work/supports/supports/build/spike/src/Str.cc
+--- tpc --dry exit code ---
+tpc --dry exit code: 0

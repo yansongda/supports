@@ -1,0 +1,47 @@
+Initialized platform/backend: Linux + GCC (g++)
+libphp.so is missing. Run tpc.php in an interactive terminal to build it automatically, or set PHP_HOME.
+The `libphp.so` is not found
+Neither libphp.so nor libphp.a found. Run tpc.php in an interactive terminal to build it automatically, or set PHP_HOME
+prepare: home/runner/work/supports/supports/vendor/psr/container/src/ContainerExceptionInterface.php
+prepare: home/runner/work/supports/supports/vendor/psr/container/src/ContainerInterface.php
+prepare: home/runner/work/supports/supports/vendor/psr/container/src/NotFoundExceptionInterface.php
+prepare: home/runner/work/supports/supports/src/Arr.php
+prepare: home/runner/work/supports/supports/src/Collection.php
+prepare: home/runner/work/supports/supports/src/Config.php
+prepare: home/runner/work/supports/supports/src/Functions.php
+prepare: home/runner/work/supports/supports/src/Pipeline.php
+prepare: home/runner/work/supports/supports/src/Str.php
+prepare: home/runner/work/supports/supports/src/Traits/Accessable.php
+prepare: home/runner/work/supports/supports/src/Traits/Arrayable.php
+prepare: home/runner/work/supports/supports/src/Traits/Serializable.php
+prepare: home/runner/work/supports/supports/spike-tmp/main-stub.php
+prepare completed: 13 source files in total
+convert: home/runner/work/supports/supports/vendor/psr/container/src/ContainerExceptionInterface.php
+generate arginfo file: home/runner/work/supports/supports/vendor/psr/container/src/ContainerExceptionInterface.php
+convert: home/runner/work/supports/supports/vendor/psr/container/src/ContainerInterface.php
+generate arginfo file: home/runner/work/supports/supports/vendor/psr/container/src/ContainerInterface.php
+convert: home/runner/work/supports/supports/vendor/psr/container/src/NotFoundExceptionInterface.php
+generate arginfo file: home/runner/work/supports/supports/vendor/psr/container/src/NotFoundExceptionInterface.php
+convert: home/runner/work/supports/supports/src/Arr.php
+generate arginfo file: home/runner/work/supports/supports/src/Arr.php
+convert: home/runner/work/supports/supports/src/Traits/Serializable.php
+generate arginfo file: home/runner/work/supports/supports/src/Traits/Serializable.php
+convert: home/runner/work/supports/supports/src/Traits/Accessable.php
+generate arginfo file: home/runner/work/supports/supports/src/Traits/Accessable.php
+convert: home/runner/work/supports/supports/src/Traits/Arrayable.php
+generate arginfo file: home/runner/work/supports/supports/src/Traits/Arrayable.php
+convert: home/runner/work/supports/supports/src/Collection.php
+Use this expression carefully, which may be inconsistent with the dynamic execution behavior in /home/runner/work/supports/supports/src/Collection.php:103
+generate arginfo file: home/runner/work/supports/supports/src/Collection.php
+convert: home/runner/work/supports/supports/src/Config.php
+generate arginfo file: home/runner/work/supports/supports/src/Config.php
+convert: home/runner/work/supports/supports/src/Functions.php
+generate arginfo file: home/runner/work/supports/supports/src/Functions.php
+convert: home/runner/work/supports/supports/src/Pipeline.php
+Use this expression carefully, which may be inconsistent with the dynamic execution behavior in /home/runner/work/supports/supports/src/Pipeline.php:39
+generate arginfo file: home/runner/work/supports/supports/src/Pipeline.php
+convert: home/runner/work/supports/supports/src/Str.php
+generate arginfo file: home/runner/work/supports/supports/src/Str.php
+convert: home/runner/work/supports/supports/spike-tmp/main-stub.php
+generate arginfo file: home/runner/work/supports/supports/spike-tmp/main-stub.php
+Dry run completed: 7 C++ source file(s) generated in /home/runner/work/supports/supports/build/spike
