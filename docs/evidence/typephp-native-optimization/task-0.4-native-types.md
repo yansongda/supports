@@ -88,3 +88,25 @@ function main(): void
 3. `spike-tmp/nt/nt.php` 内容与 todo 原文逐句一致；workflow 新增两步（compile/run，均 continue-on-error，输出双文件入 $SPIKE_DIR）位置正确；YAML 自检复跑 OK。
 4. commit `8587cd1` 仅 2 文件（spike-tmp/nt/nt.php + workflow）。
 5. 结论：**阶段 1（Zend 侧）验证通过**；tpc 侧（预期 12/4）待 CI 回传后阶段 2 定稿。
+
+# 2026-09-06 22:04:39 — 阶段 2：双运行时结论（定稿）
+
+## CI 回传结果（run 34037668106，PR #40，conclusion=success）
+
+- **tpc 侧**（artifact `nt-typephp.txt`）：实际输出两行 **`12`**、**`4`**；`nt-typephp-exit-code.txt` = `nt binary exit code: 0`；编译步骤 `nt-compile-exit-code.txt` = `tpc nt.php compile exit code: 0`（Build successful，g++ 链接 -lphpx -lphp -lgmp -lgmpxx -lmpfr）。
+- **Zend 侧**（阶段 1 已录）：输出 **`12.5`**、**`4`**，退出码 0（伴随 `use native_types` 的 Warning，非 fatal）。
+
+## 定稿结论
+
+1. **`use native_types` 在 Zend 下为 Warning 级 no-op 成立**：输出语义不变（int+=float → float 提升，12.5），退出码 0，仅产生 `The use statement with non-compound name 'native_types' has no effect` 提示性 Warning → 不触发 QA failure 预案。
+2. **`Int += Float` 截断语义差异在 typephp 下真实存在**：tpc 编译产物输出 `12`（10+2.5 → 截断回 int64_t），与 Zend 的 `12.5` 构成真实语义差异，与 NATIVE_TYPES.md Note（"intentional semantics"）完全一致。
+3. **T3.2 决策链状态**：前两个条件均已满足——① Zend no-op 成立 ✓；② tpc 编译运行通过 ✓。第三条件（benchmark 收益数据）由 T3.1 提供。**注意**：截断语义差异本身即在"采用 native_types 可改变行为"的风险清单内（Str/Arr 热点代码若存在 `$int += $float` 形态将产生行为变化），T3.2 决策时须同时权衡收益（T3.1）与该语义差异的审计结果。
+4. **文件作用域隔离**按 plan 说明留待 T3.2 全量冒烟验证（本单文件 spike 无法证明 `use native_types` 不泄漏到 include 的无声明文件）。
+
+## Acceptance 状态（T0.4 定稿）
+
+- [x] nt.php 创建且 Zend 侧 Docker 实测完成（12.5/4，退出码 0，非 fatal）
+- [x] workflow 步骤追加，YAML 自检通过
+- [x] 临时 commit `8587cd1`（仅 spike-tmp/nt/ 与 workflow）
+- [x] evidence 阶段 1 小节 + learning 追加
+- [x] （CI 回传）tpc 侧输出 12/4 + 退出码 0 → 阶段 2 定稿结论（本节）
