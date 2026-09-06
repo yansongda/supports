@@ -98,9 +98,11 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return $return;
     }
 
-    public function except(mixed $keys): self
+    public function except(mixed ...$keys): self
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        if (1 === count($keys) && is_array($keys[0])) {
+            $keys = $keys[0];
+        }
 
         return new static(Arr::except($this->items, $keys));
     }
@@ -302,7 +304,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return Arr::query($this->all(), $encodingType);
     }
 
-    public function toString(string $separator = '&'): string
+    public function toQueryString(string $separator = '&'): string
     {
         return Arr::toString($this->all(), $separator);
     }
