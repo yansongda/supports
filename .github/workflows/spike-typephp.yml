@@ -7,7 +7,7 @@ on:
 jobs:
   spike:
     name: spike
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       TPC_VERSION: v0.7.0
       TPC_ASSET: tpc_v0.7.0_linux_x64.tar.gz
@@ -28,42 +28,22 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.5'
-          phpts: ts
-
-      - name: Verify PHP ZTS (first attempt)
-        id: zts_attempt1
-        continue-on-error: true
-        run: |
-          {
-            php -v
-            echo '--- php -i | grep -i thread ---'
-            php -i | grep -i thread || true
-            echo "PHP_ZTS=$(php -r 'echo PHP_ZTS;')"
-          } > "$SPIKE_DIR/php-zts-attempt1.txt" 2>&1
-          cat "$SPIKE_DIR/php-zts-attempt1.txt"
-          test "$(php -r 'echo PHP_ZTS;')" = "1"
-
-      - name: Retry Setup PHP 8.5 (ZTS) with update:true (only when NTS detected)
-        if: steps.zts_attempt1.outcome == 'failure'
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.5'
+          coverage: none
+          tools: composer:v2
+        env:
           phpts: ts
           update: true
 
-      - name: Verify PHP ZTS (final, must pass)
+      - name: Verify PHP ZTS
         run: |
           {
             php -v
             echo '--- php -i | grep -i thread ---'
             php -i | grep -i thread || true
-            echo "PHP_ZTS=$(php -r 'echo PHP_ZTS;')"
+            php -r 'printf("PHP_ZTS=%d\n", PHP_ZTS);'
           } > "$SPIKE_DIR/php-zts.txt" 2>&1
           cat "$SPIKE_DIR/php-zts.txt"
-          if [ "$(php -r 'echo PHP_ZTS;')" != "1" ]; then
-            echo "::error::PHP is NTS, ZTS build is required for typephp tpc"
-            exit 1
-          fi
+          php -r 'exit(PHP_ZTS ? 0 : 1);'
           echo 'ZTS confirmed'
 
       - name: Install System Dependencies (official typephp CI list + cmake)
