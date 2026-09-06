@@ -1,0 +1,6 @@
+name: spike
+build-mode: bin
+sources:
+  - ../vendor/psr/container/src
+  - ../src
+  - main-stub.php

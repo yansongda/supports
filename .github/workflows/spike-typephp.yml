@@ -214,6 +214,30 @@ jobs:
           fi
           echo 'T0.1 acceptance: tpc --help exit code 0 OK'
 
+      - name: Spike Compile src/ (tpc --dry, collect error list)
+        continue-on-error: true
+        run: |
+          TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
+          set -o pipefail
+          set +e
+          "$TPC_BIN" spike-tmp/project.yml --dry --build-dir build/spike 2>&1 \
+            | tee "$SPIKE_DIR/tpc-dry-compile.txt"
+          TPC_DRY_EXIT=$?
+          set -e
+          echo "tpc --dry exit code: $TPC_DRY_EXIT" > "$SPIKE_DIR/tpc-dry-exit-code.txt"
+          cat "$SPIKE_DIR/tpc-dry-exit-code.txt"
+
+      - name: Spike Compile src/ (list dry build artifacts)
+        if: always()
+        run: |
+          {
+            echo '--- dry build dir candidates (build/spike, spike-tmp/build/spike) ---'
+            find build/spike spike-tmp/build/spike -maxdepth 2 2>/dev/null | sort | head -100 || true
+            echo '--- tpc --dry exit code ---'
+            cat "$SPIKE_DIR/tpc-dry-exit-code.txt" 2>/dev/null || echo 'not captured'
+          } > "$SPIKE_DIR/tpc-dry-build-dir.txt" 2>&1
+          cat "$SPIKE_DIR/tpc-dry-build-dir.txt"
+
       - name: Spike Summary
         if: always()
         run: |
