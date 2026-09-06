@@ -13,6 +13,9 @@ jobs:
       TPC_URL: https://github.com/swoole/typephp/releases/download/v0.7.0/tpc_v0.7.0_linux_x64.tar.gz
       TPC_DIST: /tmp/typephp-dist
       SPIKE_DIR: /tmp/typephp-spike
+      PHPX_HOME: ${{ github.workspace }}/third_party/phpx
+      TYPEPHP_REF: v0.7.0
+      TYPEPHP_PATCH_URL: https://raw.githubusercontent.com/swoole/typephp/v0.7.0/.github/patches/php-hash-cxx.patch
     steps:
       - name: Checkout Code
         uses: actions/checkout@v7
@@ -62,14 +65,15 @@ jobs:
           fi
           echo 'ZTS confirmed'
 
-      - name: Install System Dependencies (libgmp-dev libmpfr-dev cmake)
+      - name: Install System Dependencies (official typephp CI list + cmake)
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgmp-dev libmpfr-dev cmake
+          sudo apt-get install -y build-essential cmake libgmp-dev libmpfr-dev pkg-config python3-dev
           {
             echo '--- dpkg package versions ---'
-            dpkg -s libgmp-dev 2>/dev/null | grep -E '^(Package|Version)' || true
-            dpkg -s libmpfr-dev 2>/dev/null | grep -E '^(Package|Version)' || true
+            for pkg in build-essential cmake libgmp-dev libmpfr-dev pkg-config python3-dev; do
+              dpkg -s "$pkg" 2>/dev/null | grep -E '^(Package|Version)' || true
+            done
             echo '--- cmake --version ---'
             cmake --version | head -n1
           } > "$SPIKE_DIR/system-deps.txt" 2>&1
@@ -103,12 +107,84 @@ jobs:
           } > "$SPIKE_DIR/tpc-download.txt" 2>&1
           cat "$SPIKE_DIR/tpc-download.txt"
 
-      - name: Inspect tpc Dynamic Library Requirements
+      - name: Inspect tpc Dynamic Library Requirements (before provisioning)
         run: |
           TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
           echo "tpc binary: $TPC_BIN"
-          ldd "$TPC_BIN" > "$SPIKE_DIR/tpc-ldd.txt" 2>&1 || true
-          cat "$SPIKE_DIR/tpc-ldd.txt"
+          ldd "$TPC_BIN" > "$SPIKE_DIR/tpc-ldd-before.txt" 2>&1 || true
+          cat "$SPIKE_DIR/tpc-ldd-before.txt"
+
+      # --- libphp.so + libphpx.so provisioning (mirrors official typephp CI) ---
+
+      - name: Download php_hash.h C++ Compatibility Patch (typephp v0.7.0)
+        run: |
+          curl -fsSL -o "$SPIKE_DIR/php-hash-cxx.patch" "$TYPEPHP_PATCH_URL"
+          head -5 "$SPIKE_DIR/php-hash-cxx.patch"
+
+      - name: Patch php_hash.h C++ Compatibility (official typephp workaround)
+        run: |
+          php_include_dir="$(php-config --include-dir)"
+          php_hash_header="${php_include_dir}/ext/hash/php_hash.h"
+          if grep -Fq 'char *base = ecalloc(' "${php_hash_header}"; then
+            sudo patch --directory="${php_include_dir}" --strip=1 < "$SPIKE_DIR/php-hash-cxx.patch"
+            echo 'php_hash.h patched for C++ compatibility'
+          else
+            echo 'php_hash.h already contains the upstream C++ fix'
+          fi
+
+      - name: Configure ZTS PHP Embed Library (PHP_HOME from setup-php)
+        run: |
+          php_home="$(php-config --prefix)"
+          embed_library="${php_home}/lib/libphp.so"
+          test -x "${php_home}/bin/php-config"
+          test -f "${embed_library}"
+          echo "PHP_HOME=${php_home}" >> "${GITHUB_ENV}"
+          {
+            echo "PHP_HOME=${php_home}"
+            echo "embed library: ${embed_library}"
+            php-config --version
+          } | tee "$SPIKE_DIR/php-home.txt"
+
+      - name: Checkout PHPX (swoole/phpx, official typephp CI uses master)
+        uses: actions/checkout@v4
+        with:
+          repository: swoole/phpx
+          ref: master
+          path: third_party/phpx
+
+      - name: Build libphpx.so (official typephp CI cmake invocation)
+        run: |
+          set -o pipefail
+          cmake -S "$PHPX_HOME" -B "$PHPX_HOME/build" \
+            -D CMAKE_BUILD_TYPE=Release \
+            -D BUILD_TESTS=OFF \
+            -D BUILD_EXT=OFF \
+            -D GITHUB_ACTION=ON \
+            -D php_dir="${PHP_HOME}" \
+            | tee "$SPIKE_DIR/phpx-cmake-configure.txt"
+          cmake --build "$PHPX_HOME/build" --target phpx --parallel 2 \
+            | tee "$SPIKE_DIR/phpx-cmake-build.txt"
+          test -f "${PHPX_HOME}/lib/libphpx.so"
+          {
+            echo "libphpx.so: ${PHPX_HOME}/lib/libphpx.so"
+            ls -la "${PHPX_HOME}/lib/"
+          } | tee "$SPIKE_DIR/phpx-build-result.txt"
+
+      - name: Configure Native Library Path (LD_LIBRARY_PATH)
+        run: |
+          echo "LD_LIBRARY_PATH=${PHPX_HOME}/lib:${PHP_HOME}/lib" >> "${GITHUB_ENV}"
+          echo "LD_LIBRARY_PATH=${PHPX_HOME}/lib:${PHP_HOME}/lib"
+
+      - name: Inspect tpc Dynamic Library Requirements (after provisioning)
+        run: |
+          TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
+          ldd "$TPC_BIN" > "$SPIKE_DIR/tpc-ldd-after.txt" 2>&1 || true
+          cat "$SPIKE_DIR/tpc-ldd-after.txt"
+          if grep -q 'not found' "$SPIKE_DIR/tpc-ldd-after.txt"; then
+            echo '::error::tpc still has unresolved dynamic libraries'
+          else
+            echo 'all shared library dependencies resolved'
+          fi
 
       - name: Run tpc --help
         id: tpc_help
@@ -124,6 +200,20 @@ jobs:
           echo "tpc --help exit code: $TPC_EXIT" > "$SPIKE_DIR/tpc-help-exit-code.txt"
           cat "$SPIKE_DIR/tpc-help-exit-code.txt"
 
+      - name: Assert tpc --help Exit Code 0
+        run: |
+          if [ ! -f "$SPIKE_DIR/tpc-help-exit-code.txt" ]; then
+            echo '::error::tpc --help exit code file missing (tpc --help step did not run)'
+            exit 1
+          fi
+          exit_code="$(sed 's/.*: //' "$SPIKE_DIR/tpc-help-exit-code.txt")"
+          echo "tpc --help exit code: $exit_code"
+          if [ "$exit_code" != "0" ]; then
+            echo "::error::tpc --help exited with code $exit_code (T0.1 acceptance requires 0)"
+            exit 1
+          fi
+          echo 'T0.1 acceptance: tpc --help exit code 0 OK'
+
       - name: Spike Summary
         if: always()
         run: |
@@ -131,7 +221,15 @@ jobs:
             echo '=== spike-typephp summary ==='
             echo "TPC_VERSION=$TPC_VERSION"
             echo "TPC_URL=$TPC_URL"
+            echo "PHP_HOME=${PHP_HOME:-not set}"
+            echo "PHPX_HOME=${PHPX_HOME:-not set}"
+            echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-not set}"
             cat "$SPIKE_DIR/tpc-help-exit-code.txt" 2>/dev/null || echo 'tpc --help exit code: not captured'
+            if grep -q 'not found' "$SPIKE_DIR/tpc-ldd-after.txt" 2>/dev/null; then
+              echo 'ldd-after: UNRESOLVED libraries present'
+            else
+              echo 'ldd-after: all resolved'
+            fi
           } > "$SPIKE_DIR/spike-summary.txt" 2>&1
           cat "$SPIKE_DIR/spike-summary.txt"
 
