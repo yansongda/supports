@@ -166,9 +166,11 @@ jobs:
         continue-on-error: true
         run: |
           TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
+          TPC_HOME="$(dirname "$TPC_BIN")"
           chmod +x "$TPC_BIN" || true
           set +e
-          "$TPC_BIN" --help > "$SPIKE_DIR/tpc-help.txt" 2>&1
+          # 内嵌 compiler.php 以 CWD 相对方式 require vendor/autoload.php，必须 cd 到解压根目录运行
+          (cd "$TPC_HOME" && "$TPC_BIN" --help) > "$SPIKE_DIR/tpc-help.txt" 2>&1
           TPC_EXIT=$?
           set -e
           cat "$SPIKE_DIR/tpc-help.txt"
@@ -193,9 +195,10 @@ jobs:
         continue-on-error: true
         run: |
           TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
+          TPC_HOME="$(dirname "$TPC_BIN")"
           set -o pipefail
           set +e
-          "$TPC_BIN" spike-tmp/project.yml --dry --build-dir build/spike 2>&1 \
+          (cd "$TPC_HOME" && "$TPC_BIN" "$GITHUB_WORKSPACE/spike-tmp/project.yml" --dry --build-dir "$GITHUB_WORKSPACE/build/spike") 2>&1 \
             | tee "$SPIKE_DIR/tpc-dry-compile.txt"
           TPC_DRY_EXIT=$?
           set -e
@@ -206,8 +209,8 @@ jobs:
         if: always()
         run: |
           {
-            echo '--- dry build dir candidates (build/spike, spike-tmp/build/spike) ---'
-            find build/spike spike-tmp/build/spike -maxdepth 2 2>/dev/null | sort | head -100 || true
+            echo '--- dry build dir ($GITHUB_WORKSPACE/build/spike) ---'
+            find "$GITHUB_WORKSPACE/build/spike" -maxdepth 2 2>/dev/null | sort | head -100 || true
             echo '--- tpc --dry exit code ---'
             cat "$SPIKE_DIR/tpc-dry-exit-code.txt" 2>/dev/null || echo 'not captured'
           } > "$SPIKE_DIR/tpc-dry-build-dir.txt" 2>&1
@@ -217,10 +220,11 @@ jobs:
         continue-on-error: true
         run: |
           TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
-          mkdir -p build/nt
+          TPC_HOME="$(dirname "$TPC_BIN")"
+          mkdir -p "$GITHUB_WORKSPACE/build/nt"
           set -o pipefail
           set +e
-          "$TPC_BIN" spike-tmp/nt/nt.php -o build/nt/nt 2>&1 \
+          (cd "$TPC_HOME" && "$TPC_BIN" "$GITHUB_WORKSPACE/spike-tmp/nt/nt.php" -o "$GITHUB_WORKSPACE/build/nt/nt") 2>&1 \
             | tee "$SPIKE_DIR/nt-compile.txt"
           NT_COMPILE_EXIT=$?
           set -e
@@ -232,7 +236,7 @@ jobs:
         run: |
           set -o pipefail
           set +e
-          ./build/nt/nt 2>&1 | tee "$SPIKE_DIR/nt-typephp.txt"
+          "$GITHUB_WORKSPACE/build/nt/nt" 2>&1 | tee "$SPIKE_DIR/nt-typephp.txt"
           NT_RUN_EXIT=$?
           set -e
           echo "nt binary exit code: $NT_RUN_EXIT" > "$SPIKE_DIR/nt-typephp-exit-code.txt"
@@ -242,10 +246,11 @@ jobs:
         continue-on-error: true
         run: |
           TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
-          mkdir -p build/boundary
+          TPC_HOME="$(dirname "$TPC_BIN")"
+          mkdir -p "$GITHUB_WORKSPACE/build/boundary"
           set -o pipefail
           set +e
-          "$TPC_BIN" spike-tmp/boundary/main.php -o build/boundary/main 2>&1 \
+          (cd "$TPC_HOME" && "$TPC_BIN" "$GITHUB_WORKSPACE/spike-tmp/boundary/main.php" -o "$GITHUB_WORKSPACE/build/boundary/main") 2>&1 \
             | tee "$SPIKE_DIR/boundary-compile.txt"
           BC_EXIT=$?
           set -e
@@ -257,7 +262,7 @@ jobs:
         run: |
           set -o pipefail
           set +e
-          ./build/boundary/main 2>&1 | tee "$SPIKE_DIR/boundary-typephp.txt"
+          "$GITHUB_WORKSPACE/build/boundary/main" 2>&1 | tee "$SPIKE_DIR/boundary-typephp.txt"
           BR_EXIT=$?
           set -e
           echo "boundary binary exit code: $BR_EXIT" > "$SPIKE_DIR/boundary-typephp-exit-code.txt"
@@ -268,7 +273,7 @@ jobs:
         run: |
           set -o pipefail
           set +e
-          diff "$SPIKE_DIR/boundary-typephp.txt" spike-tmp/boundary/zend-output.txt 2>&1 \
+          diff "$SPIKE_DIR/boundary-typephp.txt" "$GITHUB_WORKSPACE/spike-tmp/boundary/zend-output.txt" 2>&1 \
             | tee "$SPIKE_DIR/boundary-diff.txt"
           BD_EXIT=$?
           set -e
