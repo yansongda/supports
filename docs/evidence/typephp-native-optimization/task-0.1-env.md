@@ -98,3 +98,170 @@ main agent 内容审查发现：release 包不含 libphp/libphpx（v0.7.0 资产
 3. 关键 URL 独立复核：release v0.7.0 linux-x64 资产（GitHub API 实测存在）、php-hash-cxx.patch@v0.7.0 tag（HTTP 200，内容为 ecalloc 强转补丁）。
 4. YAML 自检复跑：`python3 -c "import yaml;yaml.safe_load(...)"` → OK。
 5. 结论：**阶段 1 + 补强验证通过**。T0.1 整体验收（tpc --help 退出码 0）待用户 push + workflow_dispatch 后凭 run log 定稿（阶段 2），todo 暂不勾选。
+
+# 2026-09-06 17:03 触发机制偏差修正
+
+## 三种触发路径实测失败结论（main agent 实测）
+
+spike-typephp.yml 原触发器仅有 `workflow_dispatch:`，且该 workflow 文件**仅存在于非默认分支** `feat/typephp-native-optimization`。三条人工触发路径全部实测失败：
+
+1. **REST API dispatch**：`POST /repos/.../actions/workflows/spike-typephp.yml/dispatches` 返回 **404**（GitHub 按 workflow 文件路径解析时以默认分支为准，非默认分支上的 workflow 文件查不到）。
+2. **GitHub CLI**：`gh workflow run spike-typephp.yml` 报错原文：**"workflow spike-typephp.yml not found on the default branch"**。
+3. **Actions UI**：workflow 页面为软 404，无 Run 按钮。
+
+结论：workflow_dispatch / UI dispatch 均要求 workflow 文件存在于**默认分支**，非默认分支上的 workflow 无法人工触发。
+
+## 本修正说明
+
+`.github/workflows/spike-typephp.yml` 顶部 `on:` 块追加 `pull_request:`（默认 types，不加 branches 过滤），`workflow_dispatch:` 保留不动，其余内容零改动。解法模式：main agent 开 **draft PR**，PR 创建事件自动运行 **PR 分支上的 workflow 文件**（pull_request 事件使用触发分支上的 workflow 定义，不受默认分支限制）。YAML 自检通过；commit `42ea96e`（仅该文件，+1 行）。
+
+## 对 T3.1 的前瞻（重要，派发时必须带上）
+
+`.github/workflows/benchmark-typephp.yml`（T3.1 基准测试）同为 `workflow_dispatch:` 触发，**届时会遇到完全相同的限制**。T3.1 必须二选一：
+
+- 同样给 benchmark-typephp.yml 加 `pull_request:` 触发器 + draft PR 自动运行（与本次 spike 修正同模式）；
+- 或届时仓库已合并进默认分支（workflow 文件在默认分支后 workflow_dispatch 恢复可用）再触发。
+
+**T3.1 派发 prompt 必须带此结论**，避免重复踩坑。
+
+# 2026-09-06 21:41:48 — ZTS 装配失败修复（phpts/update 改为 setup-php env 参数 + 固定 ubuntu-22.04）
+
+## 失败 run 证据（main agent 实测诊断）
+
+- 失败 run：PR #40 spike-typephp，run id **34036623836**，URL：https://github.com/yansongda/supports/actions/runs/34036623836 ，失败步骤 **"Verify PHP ZTS (final, must pass)"**（setup-php 装出 PHP 8.5.10 **NTS**，Thread Safety => disabled）。
+- runner 原始 warning（决定性证据）：
+  ```
+  ##[warning]Unexpected input(s) 'phpts', valid inputs are ['php-version', 'php-version-file', 'extensions', 'ini-file', 'ini-values', 'coverage', 'tools', 'github-token']
+  ```
+  即 `phpts` **不是** `shivammathur/setup-php@v2` 的 `with:` 输入（当前 v2 action.yml 无该输入），GitHub Actions 对未知 input 仅告警并静默忽略 → 实际装的是默认 NTS 包。
+
+## 官方 typephp CI 原文写法（已抓取原文核实）
+
+官方 linux-x64 CI 的 Setup PHP 步骤（`phpts`/`update` 均为 step **env:**，非 with:）：
+
+```yaml
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          ini-values: precision=17, memory_limit=4G, error_reporting=E_ERROR|E_WARNING, display_errors=1, display_startup_errors=1, log_errors=0
+          tools: composer:v2
+        env:
+          fail-fast: true
+          phpts: ts
+          update: true
+```
+
+官方另有两个关键差异：① `runs-on: ubuntu-22.04`（非 ubuntu-latest/24.04）；② ZTS 验证用 `php -r 'printf("PHP_ZTS=%d\n", PHP_ZTS)'`（ZTS 时输出 `PHP_ZTS=1`）。
+
+## 本次修正要点（commit 仅含 workflow 文件）
+
+1. job `spike` `runs-on: ubuntu-latest` → `runs-on: ubuntu-22.04`（官方实证；ubuntu-latest/24.04 未验证）。
+2. 删除原三步 dance（`Setup PHP 8.5 (ZTS)` with: phpts 版 / `Verify PHP ZTS (first attempt)` / `Retry Setup PHP 8.5 (ZTS) with update:true` / `Verify PHP ZTS (final, must pass)`），替换为两步：
+   - `Setup PHP 8.5 (ZTS)`：with: `php-version: '8.5'` + `coverage: none` + `tools: composer:v2`（后两项照官方；ini-values 本项目无此需求未照抄）；**`phpts: ts` 与 `update: true` 移入 step `env:`**。
+   - `Verify PHP ZTS`：`php -r 'printf("PHP_ZTS=%d\n", PHP_ZTS);'` 输出到 `$SPIKE_DIR/php-zts.txt`（保留 php -v 与 php -i thread 诊断行），`php -r 'exit(PHP_ZTS ? 0 : 1);'` 作硬门禁，通过后 `echo 'ZTS confirmed'`。
+3. 其余步骤（tpc 下载、patch、PHP_HOME、phpx 构建、--dry、native_types、boundary、Summary、Upload）零改动。
+4. YAML 自检通过：`python3 -c "import yaml;yaml.safe_load(open('.github/workflows/spike-typephp.yml'))"` → OK。
+
+## 历史小节纠错声明
+
+此前小节（"T0.1 阶段 1 补强"，15:33:22）将官方写法转述为 "`shivammathur/setup-php@v2`（`phpts: ts` + env `update: true`）"，且 learning 中 15:25 小节记为 "`phpts: ts`" 是 with 输入、"`update: true`" 仅作 NTS 重试——**该转述有误**（实为 setup-php 步骤失败主因）。正确结论：**`phpts` 与 `update` 都是 setup-php 步骤的 `env:` 参数，不是 `with:` 输入**；以本节为准。
+
+# 2026-09-06 21:48 phpx ABI 不匹配修复（worker，run 34036983975 实证）
+
+## 症状（PR #40 spike run 34036983975）
+
+所有动态库已成功解析（ldd 显示 libphp.so / libphpx.so 均 found），但 `tpc --help` 退出码 127，报错原文：
+
+```
+symbol lookup error: .../tpc: undefined symbol: _ZN3php21FunctionCallCacheSlot4callERKNS_7VariantEjP12_zval_structP11_zend_array
+```
+
+`php::` 命名空间符号 = phpx 的 C++ 符号 → **从 swoole/phpx master 构建的 libphpx.so 与 tpc v0.7.0 release 二进制 ABI 不匹配**（`php::FunctionCallCacheSlot::call(php::Variant const&, unsigned, _zval_struct*, _zend_array*)` 在 tpc 二进制中未定义，说明运行时加载的 libphpx.so 导出的该符号签名/存在性与 tpc 编译期预期不一致）。
+
+## 已核实事实
+
+1. **ldd-after 全 resolved**：`$SPIKE_DIR/tpc-ldd-after.txt` 无 "not found"，libphp.so 与 libphpx.so 均被找到——失败不是"找不到库"，而是"库内容不匹配"。
+2. **tpc v0.7.0 release tarball 自带与该二进制同源构建的 `vendor/swoole/phpx` 完整源码**（含 CMakeLists.txt），包内路径 `tpc_v0.7.0_linux_x64/vendor/swoole/phpx`，解压后位于 `$TPC_DIST`=/tmp/typephp-dist 下。LIBPHP_INSTALLER.md 本就规定 libphpx 查找顺序含 "TypePHP 源仓库 vendor/swoole/phpx"。
+3. typephp v0.7.0 composer.json 约束 `swoole/phpx: ~2.7.0`；phpx 仓库最新 2.7.x tag 为 v2.7.0（备选方案，仅记录不采用）。
+
+## 修复方案与理由
+
+workflow `.github/workflows/spike-typephp.yml`（commit 99ba584）：
+
+1. job env `PHPX_HOME: ${{ github.workspace }}/third_party/phpx` → `PHPX_HOME: /tmp/typephp-dist/tpc_v0.7.0_linux_x64/vendor/swoole/phpx`（与 TPC_DIST=/tmp/typephp-dist 同源，写死完整路径）。
+2. 删除步骤 `Checkout PHPX (swoole/phpx, official typephp CI uses master)`（不再 clone master）。
+3. `Build libphpx.so` 步骤原 cmake 命令零改动，仅 run 开头加 `echo "phpx source: $PHPX_HOME"`；PHPX_HOME 改指包内路径后自动生效。
+
+**为何优于 pin v2.7.0 tag**：release tarball 内 vendor/swoole/phpx 是官方构建 tpc v0.7.0 二进制时实际使用的源码快照，与其 ABI 天然逐符号一致；v2.7.0 tag 只保证 "~2.7.0" 语义约束，不能保证与 tpc v0.7.0 构建时的 commit 完全相同（2.7.x 分支在 tag 之后仍可能演进），ABI 仍存在漂移风险。
+
+## 遗留观察项
+
+- 本修复待下次 CI run 实测验证。若 `tpc --help` 仍报个别 undefined symbol，再逐个归因（如包内源码与二进制仍非同 commit 的极端情况），届时考虑反推 tpc 二进制符号表比对。
+- 其余步骤（Setup PHP、Verify ZTS、apt、cmake 断言、tpc 下载、patch、PHP_HOME、LD_LIBRARY_PATH、ldd、--dry/native_types/boundary 各 spike 组、Summary、Upload）本次零改动。
+
+# 2026-09-06 21:55:31 tpc 运行目录修复（worker，run 34037299648 实测诊断）
+
+## 症状（PR #40 spike run 34037299648）
+
+前一修复（libphpx 从 release 包内 vendor/swoole/phpx 源码构建）已生效：全部动态库解析成功、**tpc 已能启动**（内嵌 compiler.php 开始执行）。新失败（exit 255），Fatal error 原文：
+
+```
+PHP Fatal error: Uncaught Error: Failed opening required '/home/runner/work/supports/supports/vendor/autoload.php'
+in /home/runner/work/typephp/typephp/src/compiler.php:9
+```
+
+## 诊断推理
+
+1. **CWD 相对 require**：报错路径 `/home/runner/work/supports/supports/vendor/autoload.php` 正是 tpc 运行时 CWD（workspace 根）下的相对路径 `vendor/autoload.php` 拼接结果；而内嵌 compiler.php 自身位于 `/home/runner/work/typephp/typephp/src/compiler.php`（二进制内嵌源码，与 supports 仓库无关）——证明 release `tpc` 二进制内嵌的 compiler.php 以 **CWD 相对方式** require `vendor/autoload.php`。
+2. **包内自带 vendor**：release tarball 自带完整 `vendor/`（composer 生产依赖），其正确用法 = **cd 到解压根目录再调用 tpc**（等价 composer 安装形态 vendor/bin/tpc.php 的运行环境）；从 workspace 根运行故缺 autoloader。
+3. **二进制位于解压根**：ldd 证实二进制就在解压根 `/tmp/typephp-dist/tpc_v0.7.0_linux_x64/tpc`，即解压根 = tpc 包根目录。
+
+## 修复模式（commit ci(spike): tpc 统一改为解压根目录运行）
+
+workflow `.github/workflows/spike-typephp.yml`，所有 tpc 调用统一改为「子 shell cd 到 tpc 包根目录 + 绝对路径」模式：
+
+1. 每个含 tpc 调用的步骤定义 `TPC_BIN="$(find ...)"` + `TPC_HOME="$(dirname "$TPC_BIN")"`，执行改为 `(cd "$TPC_HOME" && "$TPC_BIN" ...)`。
+2. **所有传给 tpc 的入参与产物路径一律绝对路径**（`$GITHUB_WORKSPACE/spike-tmp/...`、`$GITHUB_WORKSPACE/build/...`）：project.yml 内相对路径以 project.yml 所在目录为基准（已实证），但 CWD 已变为 tpc 包根，绝对路径消除 CWD 变化带来的歧义。
+3. **编译产物运行**（nt run / boundary run）：产物为独立 AOT 二进制，不依赖 tpc 包根目录，保持 workspace 运行，仅路径改绝对；boundary diff 的 zend-output.txt 同步改绝对路径。
+4. 其余步骤（Setup PHP、Verify ZTS、apt、cmake 断言、tpc 下载、ldd、patch、PHP_HOME、Build libphpx、LD_LIBRARY_PATH、Assert、Summary、Upload）零改动。
+
+# 2026-09-06 22:04:39 — 阶段 2：CI 验证结论（定稿）
+
+## CI run 信息
+
+- **run id**：`34037668106`（PR #40，workflow `spike-typephp.yml`）
+- **URL**：https://github.com/yansongda/supports/actions/runs/34037668106
+- **conclusion**：**success**（main agent 已亲自从 artifact 逐文件核对）
+- **artifact 归档**：`docs/evidence/typephp-native-optimization/artifacts/run-34037668106/`（26 个诊断文件整体随 evidence 入库，纯文本）。
+
+## 验收对照表（全部满足）
+
+| 验收项 | 证据（artifact 文件） | 实测 | 结论 |
+|---|---|---|---|
+| tpc 版本 v0.7.0 | `tpc-help.txt` | `TypePHP Compiler (AOT) v0.7.0` + USAGE 正常输出 | ✓ |
+| release URL 实测可下载 | `tpc-download.txt` | 固定 URL `.../v0.7.0/tpc_v0.7.0_linux_x64.tar.gz` 下载 + SHA256SUMS 校验解压成功 | ✓ |
+| ZTS PHP | `php-zts.txt` | PHP 8.5.10 (ZTS)，`Thread Safety => enabled`，`PHP_ZTS=1` | ✓ |
+| cmake ≥ 3.24 | `system-deps.txt` | `cmake version 3.31.6`（≥ 3.24） | ✓ |
+| libphp.so + libphpx.so 预置成功 | `tpc-ldd-after.txt` | `libphpx.so => .../tpc_v0.7.0_linux_x64/vendor/swoole/phpx/lib/libphpx.so`（release 包内源码构建）、`libphp.so => /usr/lib/libphp.so`（setup-php ZTS 包自带），全解析**无 not found** | ✓ |
+| `tpc --help` 退出码 0 | `tpc-help-exit-code.txt` | `tpc --help exit code: 0`（run 内 Assert 硬门禁步骤通过） | ✓ |
+
+## CI 迭代史摘要（3 次修复，详见前文各小节）
+
+1. **pull_request 触发机制**（commit `42ea96e`）：workflow_dispatch/UI/REST 对非默认分支上的 workflow 文件均不可触发（404 / "not found on the default branch"）→ 加 `pull_request:` 触发器 + draft PR 自动运行。
+2. **setup-php ZTS 写法 + ubuntu-22.04**（commit `90c345c`）：`phpts`/`update` 是步骤 `env:` 参数而非 `with:` 输入（误写被静默忽略装出 NTS）→ 移入 env 并固定 `runs-on: ubuntu-22.04`（官方 CI 实证）。
+3. **包内 phpx 源码 + 包根目录运行**（commit `99ba584` + `929745a`）：swoole/phpx master 构建的 libphpx.so 与 tpc v0.7.0 release 二进制 ABI 不匹配（undefined symbol）→ 改用 release tarball 自带 `vendor/swoole/phpx` 源码构建；tpc 内嵌 compiler.php 以 CWD 相对 require vendor/autoload.php → 统一 cd 解压根目录调用并以绝对路径传参。
+
+## Acceptance 状态（T0.1 定稿）
+
+- [x] spike-typephp.yml 创建，YAML 语法自检通过
+- [x] .gitignore 追加三行，原内容未动
+- [x] 阶段 1 补强 commit `ea82687`（仅 workflow 文件）
+- [x] （CI 回传）tpc 版本号记录 + `tpc --help` 退出码 0 运行记录 + 预置步骤组全部成功 → run 34037668106 success，验收全部满足
+- [x] 阶段 2 定稿：本节 + artifact 归档入库
+
+## 范围说明
+
+- **T0.2 不在本次定稿范围**：`tpc --dry` 退出码 255（CI 检出无 supports vendor/，报 `Directory does not exist: .../vendor/psr/container/src`），其修复（composer install）另行处理。
+- 附带产物：`nt-*` / `boundary-*` 诊断文件属 T0.4 / T0.5，各自 evidence 定稿，不在本文件展开。

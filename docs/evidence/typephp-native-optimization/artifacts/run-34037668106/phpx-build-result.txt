@@ -1,0 +1,7 @@
+libphpx.so: /tmp/typephp-dist/tpc_v0.7.0_linux_x64/vendor/swoole/phpx/lib/libphpx.so
+total 2088
+drwxr-xr-x  2 runner runner    4096 Sep  6 13:58 .
+drwxr-xr-x 14 runner runner    4096 Sep  6 13:58 ..
+-rw-r--r--  1 runner runner  399122 Sep  6 13:58 libmpdecimal.a
+-rwxr-xr-x  1 runner runner 1716744 Sep  6 13:58 libphpx.so
+-rw-r--r--  1 runner runner    6766 Sep  6 13:58 libwren_gc.a

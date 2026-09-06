@@ -1,0 +1,9 @@
+PHP 8.5.10 (cli) (built: Aug 27 2026 16:07:30) (ZTS)
+Copyright (c) The PHP Group
+Zend Engine v4.5.10, Copyright (c) Zend Technologies
+    with Zend OPcache v8.5.10, Copyright (c), by Zend Technologies
+--- php -i | grep -i thread ---
+Thread Safety => enabled
+Thread API => POSIX Threads
+imagick.set_single_thread => 1 => 1
+PHP_ZTS=1

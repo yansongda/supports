@@ -1,0 +1,5 @@
+PAT_STATIC_CACHE: {"id":9,"name":"demo"} cached=true
+PAT_REF_REBIND: {"b":{"d":3},"e":{"f":[]},"missing":{"y":5}}
+PAT_FOREACH_REF: 
+PAT_MAGIC_IFACE: exists=true gone=false count=3 iter=a=1,c=3,0=4 json={"a":1,"c":3,"0":4} toArray={"a":1,"c":3,"0":4}
+PAT_FUNC_STATIC: count=4 sample=["\u00b0","\u2080","\u06f0","\uff10"] cached=true

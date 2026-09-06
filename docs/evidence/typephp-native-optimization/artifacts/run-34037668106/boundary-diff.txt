@@ -1,0 +1,4 @@
+3c3
+< PAT_FOREACH_REF: 
+---
+> PAT_FOREACH_REF: {"a":{"c":3,"d":4},"list":[1,2,3],"z":{"a":1,"b":2}}

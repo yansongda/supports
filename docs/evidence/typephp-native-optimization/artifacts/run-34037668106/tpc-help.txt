@@ -1,0 +1,50 @@
+TypePHP Compiler (AOT) v0.7.0
+
+USAGE:
+	/tmp/typephp-dist/tpc_v0.7.0_linux_x64/tpc <file/dir/config.yml> [options]
+
+ARGUMENTS:
+	<file>    Input PHP file/directory/YAML config to compile
+
+EXAMPLES:
+	/tmp/typephp-dist/tpc_v0.7.0_linux_x64/tpc hello.php
+	/tmp/typephp-dist/tpc_v0.7.0_linux_x64/tpc bench.php -O2
+	/tmp/typephp-dist/tpc_v0.7.0_linux_x64/tpc project/config.yml -O2
+	/tmp/typephp-dist/tpc_v0.7.0_linux_x64/tpc my-ext/ -O2 -o myapp -m ext
+	/tmp/typephp-dist/tpc_v0.7.0_linux_x64/tpc app.php -r -O2 -- --flag1 value1
+
+OPTIONS:
+	-O <level>           Optimization level (0-3, default: 0)
+	--profile            Enable performance profiling (adds -lprofiler, forces recompile)
+	-d, --debug            Enable debug mode (auto-disable optimizations, add debug symbols)
+	-o, --output <file>  Output binary name (default: input basename)
+	-v, --version        Show version
+	-h, --help           Show this help message
+	-f, --force          Force recompile phpx misc files (ignore cache)
+	-m, --mode <mode>    Compilation mode: bin (binary), lib (shared library), or ext (PHP extension); default: bin
+	-r, --run           Run the compiled binary after build
+	-j, --job <num>      Number of parallel compilation jobs (default: 4)
+	--cxx-std <ver>      C++ standard version (c++17, c++20, etc., default: c++17)
+	--compiler <cmd>     C++ compiler command to use (e.g. --compiler=/usr/bin/clang)
+	--march <arch>       Target CPU instruction set (e.g. native, x86-64-v3, armv8-a)
+	--target-platform <triple> Cross-compilation target triple (e.g. aarch64-linux-gnu)
+	--wasm[=profile]     Build WASI component (default) or browser output
+	--gen-python-helper <module> [--output-dir <dir>] Generate a Python namespace IDE helper
+	--convert-python-to-php <file.py> Convert Python source to TypePHP source
+	--generate-completion=bash Generate Bash completion script
+	--lto                Enable Link Time Optimization (-flto)
+	--no-literal-strings Disable literal strings optimization
+	--php-version <ver>  PHP language version to accept (8.4-8.5, default: 8.5)
+	--no-progress        Disable progress bar, output per-file compilation progress line by line
+	--no-console         Hide console window (Windows only, GUI application)
+	--no-color           Disable ANSI color output
+	--sanitize <type>    Enable sanitizers (address, undefined, etc.)
+	--build-dir <dir>   Specify build directory for generated C++ code (default: <root>/build)
+	--dry                Dry run: only generate C++ code, skip compilation and linking
+	-I, --include-path <dir> Add an additional C++ include directory (repeatable)
+	-D, --define <macro>  Define a preprocessor macro (repeatable, e.g. -D FOO=bar)
+	--format             Enable clang-format code formatting (disabled by default)
+	-l, --link-lib <lib> Link against a library (repeatable, e.g. -lcurl)
+	-L, --link-path <dir> Add a library search path (repeatable, e.g. -L/usr/local/lib)
+	--full-static        Link fully statically against the bundled SDK (phpx/full-static/sdk)
+
