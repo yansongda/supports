@@ -117,3 +117,12 @@ by your project in composer.json is PHP 8.2. ...
 
 - 无方案性偏差。机械性偏差：无（三条命令一次通过，未触发 composer install / DNS fix）。
 - 仅新增本 evidence 文件，未修改任何源码/配置。
+
+# 2026-09-06 15:26 main agent 亲自验证（T0.3）
+
+1. git 层面：`git show --stat HEAD` → commit `86378bd chore(spike): Zend 基线记录`，仅含 evidence 1 个文件（119 行新增），无越界；`git status --porcelain` 仅有预期未跟踪目录（docs/implementation/、docs/learning/ 待 T0.1 补 gitignore；docs/typephp-native-optimization.md 为既有本地文件）。
+2. 命令复跑（Docker cli-8.3-alpine，亲自执行）：
+   - `composer test` → `OK (55 tests, 10101 assertions)`，EXIT=0
+   - `composer analyse` → `[OK] No errors`
+   - `composer cs-fix` → `Found 0 of 9 files that can be fixed`
+3. 结论：与 worker 报告及 evidence 记录一致，**验证通过**，T0.3 勾选 [x]。
