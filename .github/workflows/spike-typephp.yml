@@ -150,6 +150,12 @@ jobs:
           echo "LD_LIBRARY_PATH=${PHPX_HOME}/lib:${PHP_HOME}/lib" >> "${GITHUB_ENV}"
           echo "LD_LIBRARY_PATH=${PHPX_HOME}/lib:${PHP_HOME}/lib"
 
+      - name: Install Project Composer Dependencies (for spike-tmp sources)
+        run: |
+          COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-progress --no-audit --no-scripts
+          test -f vendor/autoload.php
+          test -d vendor/psr/container/src
+
       - name: Inspect tpc Dynamic Library Requirements (after provisioning)
         run: |
           TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
