@@ -67,3 +67,41 @@
 3. workflow 追加步骤位置确认（grep step 名）：boundary 组位于 native_types 之后、Spike Summary 之前；YAML 自检复跑 OK。
 4. commit `d1e8248` 仅 3 文件（main.php / zend-output.txt / workflow）。
 5. 结论：**阶段 1 验证通过**；每模式 PASS/FAIL 待 CI 回传后阶段 2 定稿。机械性偏差（单名 use 改 FQCN 避免 Warning 污染基线）合理已记录。
+
+# 2026-09-06 22:04:39 — 阶段 2：每模式结论（定稿）
+
+## CI 回传结果（run 34037668106，PR #40，conclusion=success）
+
+- **编译**：`boundary-compile-exit-code.txt` = `tpc boundary/main.php compile exit code: 0`（Build successful，g++ 链接 -lphpx -lphp -lgmp -lgmpxx -lmpfr）。
+- **运行**：`boundary-typephp-exit-code.txt` = `boundary binary exit code: 0`。
+- **总 diff**：`boundary-diff-exit-code.txt` = `boundary diff exit code: 1 (0 = identical)`；`boundary-diff.txt` 仅第 3 行一处差异（`3c3`），其余四行字节级一致。
+
+## 逐模式结论表
+
+| 模式 | 结论 |
+|---|---|
+| PAT_STATIC_CACHE（static 缓存 ??= + 反射 + 动态属性） | PASS（字节级一致） |
+| PAT_REF_REBIND（& 引用重绑定 + continue 2，仿 Arr::forget） | PASS（字节级一致） |
+| PAT_FOREACH_REF（foreach &$v + 循环内递归 + ksort，仿 sortRecursive） | **FAIL：tpc 输出为空（json_encode 返回 false 形态），Zend 正常** |
+| PAT_MAGIC_IFACE（ArrayAccess/Countable/IteratorAggregate/JsonSerializable + declared toArray） | PASS（字节级一致） |
+| PAT_FUNC_STATIC（函数级 static + isset + unicode 大字面量，仿 charsArray） | PASS（字节级一致） |
+
+## PAT_FOREACH_REF 差异细节（**4/5 PASS，唯一 FAIL**）
+
+- Zend 基线（`spike-tmp/boundary/zend-output.txt`）：`PAT_FOREACH_REF: {"a":{"c":3,"d":4},"list":[1,2,3],"z":{"a":1,"b":2}}`
+- tpc 实际（artifact `boundary-typephp.txt`）：`PAT_FOREACH_REF: ` **后无内容**（json_encode 返回 false 的形态），即 foreach 引用遍历 + 循环体内递归自调用组合在 tpc AOT 产物下未产出任何数据（`$array` 疑似为空/false 态），而非报错——二进制本身退出码 0。
+
+## 规避建议（仅记录，不改 src）
+
+- 热点路径避免「**foreach 引用遍历 + 循环体内递归自调用**」组合，可用键位赋值改写：`foreach ($array as $k => $v) { $array[$k] = recurse($v); }` 形态（键位赋值写法的行为待 T2.1 冒烟进一步实证）。
+- 该差异影响面 = `src/Arr.php` sortRecursive 一处（Wave 1 各 todo 均不触碰 sortRecursive）。
+- 需写入 T3.3 `docs/typephp.md` 已知差异清单，并供 T2.1 冒烟设计参考。
+
+## Acceptance 状态（T0.5 定稿）
+
+- [x] main.php 覆盖全部 5 类模式且零顶层语句、自包含
+- [x] Zend 侧 Docker 实测完成（exit 0，zend-output.txt 固化 5 行基线）
+- [x] workflow 步骤追加，YAML 自检通过
+- [x] 临时 commit `d1e8248`（仅 spike-tmp/boundary/ 与 workflow）
+- [x] （CI 回传）tpc 编译 0 / 运行 0 / diff exit 1 → 阶段 2 每模式 PASS/FAIL 结论（本节：4/5 PASS，PAT_FOREACH_REF FAIL 已归因）
+- [ ] Wave 0 收尾（闸门通过后由 main agent 另行指派）：删除 spike-tmp/ 整目录，本次不做
