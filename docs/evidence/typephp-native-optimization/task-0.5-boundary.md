@@ -105,3 +105,9 @@
 - [x] 临时 commit `d1e8248`（仅 spike-tmp/boundary/ 与 workflow）
 - [x] （CI 回传）tpc 编译 0 / 运行 0 / diff exit 1 → 阶段 2 每模式 PASS/FAIL 结论（本节：4/5 PASS，PAT_FOREACH_REF FAIL 已归因）
 - [ ] Wave 0 收尾（闸门通过后由 main agent 另行指派）：删除 spike-tmp/ 整目录，本次不做
+
+# 2026-09-06 22:25 main agent 闸门核验（T0.5）
+
+1. 亲自核对 run 34037668106 与 34038640605 双 run 的 boundary 数据（一致）：编译 0/运行 0/diff exit 1；4/5 模式字节级一致；唯一 FAIL = PAT_FOREACH_REF（foreach 引用 + 循环内递归，tpc 输出空）。
+2. 按计划 QA 条款"单模式 FAIL → 记录规避建议"处理：已记录键位赋值改写建议与影响面（仅 src/Arr.php sortRecursive；Wave 1 不触碰）。该发现将在 Wave 0 闸门报告中显式呈报用户，并要求进入 T2.1 冒烟设计考量与 T3.3 已知差异文档。
+3. 结论：**T0.5 验收通过（含一项已归档的行为差异记录），勾选 [x]**。

@@ -138,3 +138,9 @@ main-stub.php：`<?php declare(strict_types=1); function main(): void {}`（合�
 ## Artifact 归档
 
 - 26 个诊断文件归档入库：`docs/evidence/typephp-native-optimization/artifacts/run-34038640605/`（含 `tpc-dry-compile.txt` 全量输出、`tpc-dry-exit-code.txt`、`tpc-dry-build-dir.txt`、`spike-summary.txt` 及 T0.1/T0.4/T0.5 复核文件）。
+
+# 2026-09-06 22:25 main agent 闸门核验（T0.2）
+
+1. 亲自核对 run 34038640605 的 tpc-dry-compile.txt 全文：exit 0、13 文件 prepare、仅 Collection.php:103 与 Pipeline.php:39 两处 warningUndefinedBehavior 形态 WARNING、toString 零诊断、psr 三接口零报错、7 个 C++ 文件生成。
+2. A/B 归类表与两条结论复核无误；B 类为零；预案（Arr::toString 被拦截）不触发。
+3. 结论：**T0.2 验收通过，勾选 [x]**。Wave 1 改造必要性维持（运行期调用语义），风险等级下调已记录。

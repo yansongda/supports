@@ -110,3 +110,8 @@ function main(): void
 - [x] 临时 commit `8587cd1`（仅 spike-tmp/nt/ 与 workflow）
 - [x] evidence 阶段 1 小节 + learning 追加
 - [x] （CI 回传）tpc 侧输出 12/4 + 退出码 0 → 阶段 2 定稿结论（本节）
+
+# 2026-09-06 22:25 main agent 闸门核验（T0.4）
+
+1. 双运行时输出亲自核对：Zend 12.5/4（本地 Docker 亲跑）+ tpc 12/4（run 34037668106 nt-typephp.txt，exit 0；run 34038640605 复核一致）。Int+=Float 截断语义差异实证成立。
+2. 结论：**T0.4 验收通过，勾选 [x]**。T3.2 决策链前两条件满足，第三条件（benchmark）由 T3.1 提供。

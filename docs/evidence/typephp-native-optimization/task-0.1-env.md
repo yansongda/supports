@@ -265,3 +265,9 @@ workflow `.github/workflows/spike-typephp.yml`，所有 tpc 调用统一改为�
 
 - **T0.2 不在本次定稿范围**：`tpc --dry` 退出码 255（CI 检出无 supports vendor/，报 `Directory does not exist: .../vendor/psr/container/src`），其修复（composer install）另行处理。
 - 附带产物：`nt-*` / `boundary-*` 诊断文件属 T0.4 / T0.5，各自 evidence 定稿，不在本文件展开。
+
+# 2026-09-06 22:25 main agent 闸门核验（T0.1）
+
+1. 亲自核对 run 34037668106 artifact 全部 26 文件：PHP_ZTS=1、cmake 3.31.6、tpc-ldd-after 全解析、**tpc --help 退出码 0**（TypePHP Compiler (AOT) v0.7.0）。验收对照表 6/6 ✓。
+2. CI 迭代 3 次修复（触发机制/环境变量写法/包内 phpx/包根目录运行）均由本人诊断定位、worker 修复、本人验证，全程记录于本文件历史小节。
+3. 结论：**T0.1 验收通过，勾选 [x]**。
