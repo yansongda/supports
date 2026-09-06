@@ -171,4 +171,40 @@ class ArrTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         Arr::wrapXml('<xml><name>');
     }
+
+    public function testSortRecursive()
+    {
+        // 嵌套 assoc + list 混合结构：递归排序子数组，assoc 键位 ksort
+        $array = ['b' => 2, 'a' => [3, 1, 2], 'c' => ['z' => 26, 'm' => ['y' => 2, 'x' => 1]]];
+
+        self::assertSame(
+            ['a' => [1, 2, 3], 'b' => 2, 'c' => ['m' => ['x' => 1, 'y' => 2], 'z' => 26]],
+            Arr::sortRecursive($array)
+        );
+
+        // 深嵌套（4 层）
+        self::assertSame(
+            ['d' => ['a' => 3, 'c' => ['b' => ['a' => 1, 'c' => 0]]], 'e' => 2],
+            Arr::sortRecursive(['d' => ['c' => ['b' => ['a' => 1, 'c' => 0]], 'a' => 3], 'e' => 2])
+        );
+    }
+
+    public function testSortRecursiveList()
+    {
+        // list 排序（嵌套数组元素按 sort 现行为排在标量之后，内部仍递归排序）
+        self::assertSame(
+            [1, 2, 3, 10, ['a' => 2, 'z' => 1]],
+            Arr::sortRecursive([3, 1, 2, ['z' => 1, 'a' => 2], 10])
+        );
+
+        self::assertSame([1, 3, 5, 9], Arr::sortRecursive([5, 3, 9, 1]));
+    }
+
+    public function testSortRecursiveEmpty()
+    {
+        self::assertSame([], Arr::sortRecursive([]));
+
+        // 嵌套空数组：空数组判定为非 assoc，sort 无变化，外层照常 ksort
+        self::assertSame(['a' => ['b' => []], 'e' => []], Arr::sortRecursive(['e' => [], 'a' => ['b' => []]]));
+    }
 }
