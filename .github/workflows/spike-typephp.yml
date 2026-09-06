@@ -1,0 +1,144 @@
+name: spike-typephp
+
+on:
+  workflow_dispatch:
+
+jobs:
+  spike:
+    name: spike
+    runs-on: ubuntu-latest
+    env:
+      TPC_VERSION: v0.7.0
+      TPC_ASSET: tpc_v0.7.0_linux_x64.tar.gz
+      TPC_URL: https://github.com/swoole/typephp/releases/download/v0.7.0/tpc_v0.7.0_linux_x64.tar.gz
+      TPC_DIST: /tmp/typephp-dist
+      SPIKE_DIR: /tmp/typephp-spike
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Prepare Spike Output Directory
+        run: mkdir -p "$SPIKE_DIR"
+
+      - name: Setup PHP 8.5 (ZTS)
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          phpts: ts
+
+      - name: Verify PHP ZTS (first attempt)
+        id: zts_attempt1
+        continue-on-error: true
+        run: |
+          {
+            php -v
+            echo '--- php -i | grep -i thread ---'
+            php -i | grep -i thread || true
+            echo "PHP_ZTS=$(php -r 'echo PHP_ZTS;')"
+          } > "$SPIKE_DIR/php-zts-attempt1.txt" 2>&1
+          cat "$SPIKE_DIR/php-zts-attempt1.txt"
+          test "$(php -r 'echo PHP_ZTS;')" = "1"
+
+      - name: Retry Setup PHP 8.5 (ZTS) with update:true (only when NTS detected)
+        if: steps.zts_attempt1.outcome == 'failure'
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          phpts: ts
+          update: true
+
+      - name: Verify PHP ZTS (final, must pass)
+        run: |
+          {
+            php -v
+            echo '--- php -i | grep -i thread ---'
+            php -i | grep -i thread || true
+            echo "PHP_ZTS=$(php -r 'echo PHP_ZTS;')"
+          } > "$SPIKE_DIR/php-zts.txt" 2>&1
+          cat "$SPIKE_DIR/php-zts.txt"
+          if [ "$(php -r 'echo PHP_ZTS;')" != "1" ]; then
+            echo "::error::PHP is NTS, ZTS build is required for typephp tpc"
+            exit 1
+          fi
+          echo 'ZTS confirmed'
+
+      - name: Install System Dependencies (libgmp-dev libmpfr-dev cmake)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgmp-dev libmpfr-dev cmake
+          {
+            echo '--- dpkg package versions ---'
+            dpkg -s libgmp-dev 2>/dev/null | grep -E '^(Package|Version)' || true
+            dpkg -s libmpfr-dev 2>/dev/null | grep -E '^(Package|Version)' || true
+            echo '--- cmake --version ---'
+            cmake --version | head -n1
+          } > "$SPIKE_DIR/system-deps.txt" 2>&1
+          cat "$SPIKE_DIR/system-deps.txt"
+
+      - name: Check cmake >= 3.24
+        run: |
+          CMAKE_VER="$(cmake --version | head -n1 | awk '{print $3}')"
+          OLDEST_OK="$(printf '%s\n3.24\n' "$CMAKE_VER" | sort -V | head -n1)"
+          echo "cmake version: $CMAKE_VER (oldest allowed: 3.24)"
+          if [ "$OLDEST_OK" != "3.24" ]; then
+            echo "::error::cmake >= 3.24 required, got $CMAKE_VER"
+            exit 1
+          fi
+          echo "cmake $CMAKE_VER >= 3.24 OK"
+
+      - name: Download and Extract tpc (linux-x64 release)
+        run: |
+          mkdir -p "$TPC_DIST"
+          cd "$TPC_DIST"
+          echo "Downloading $TPC_URL"
+          curl -fsSL -o "$TPC_ASSET" "$TPC_URL"
+          curl -fsSL -o SHA256SUMS "https://github.com/swoole/typephp/releases/download/${TPC_VERSION}/SHA256SUMS"
+          grep "$TPC_ASSET" SHA256SUMS | sha256sum -c -
+          tar -xzf "$TPC_ASSET"
+          {
+            echo "TPC_VERSION=$TPC_VERSION"
+            echo "TPC_URL=$TPC_URL"
+            echo '--- extracted files ---'
+            find . -not -path './.*' | sort
+          } > "$SPIKE_DIR/tpc-download.txt" 2>&1
+          cat "$SPIKE_DIR/tpc-download.txt"
+
+      - name: Inspect tpc Dynamic Library Requirements
+        run: |
+          TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
+          echo "tpc binary: $TPC_BIN"
+          ldd "$TPC_BIN" > "$SPIKE_DIR/tpc-ldd.txt" 2>&1 || true
+          cat "$SPIKE_DIR/tpc-ldd.txt"
+
+      - name: Run tpc --help
+        id: tpc_help
+        continue-on-error: true
+        run: |
+          TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
+          chmod +x "$TPC_BIN" || true
+          set +e
+          "$TPC_BIN" --help > "$SPIKE_DIR/tpc-help.txt" 2>&1
+          TPC_EXIT=$?
+          set -e
+          cat "$SPIKE_DIR/tpc-help.txt"
+          echo "tpc --help exit code: $TPC_EXIT" > "$SPIKE_DIR/tpc-help-exit-code.txt"
+          cat "$SPIKE_DIR/tpc-help-exit-code.txt"
+
+      - name: Spike Summary
+        if: always()
+        run: |
+          {
+            echo '=== spike-typephp summary ==='
+            echo "TPC_VERSION=$TPC_VERSION"
+            echo "TPC_URL=$TPC_URL"
+            cat "$SPIKE_DIR/tpc-help-exit-code.txt" 2>/dev/null || echo 'tpc --help exit code: not captured'
+          } > "$SPIKE_DIR/spike-summary.txt" 2>&1
+          cat "$SPIKE_DIR/spike-summary.txt"
+
+      - name: Upload Spike Evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: spike-typephp-evidence
+          path: ${{ env.SPIKE_DIR }}/
+          if-no-files-found: error
