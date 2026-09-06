@@ -263,6 +263,43 @@ jobs:
           echo "nt binary exit code: $NT_RUN_EXIT" > "$SPIKE_DIR/nt-typephp-exit-code.txt"
           cat "$SPIKE_DIR/nt-typephp-exit-code.txt"
 
+      - name: Spike boundary (compile single file)
+        continue-on-error: true
+        run: |
+          TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
+          mkdir -p build/boundary
+          set -o pipefail
+          set +e
+          "$TPC_BIN" spike-tmp/boundary/main.php -o build/boundary/main 2>&1 \
+            | tee "$SPIKE_DIR/boundary-compile.txt"
+          BC_EXIT=$?
+          set -e
+          echo "tpc boundary/main.php compile exit code: $BC_EXIT" > "$SPIKE_DIR/boundary-compile-exit-code.txt"
+          cat "$SPIKE_DIR/boundary-compile-exit-code.txt"
+
+      - name: Spike boundary (run compiled binary)
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          set +e
+          ./build/boundary/main 2>&1 | tee "$SPIKE_DIR/boundary-typephp.txt"
+          BR_EXIT=$?
+          set -e
+          echo "boundary binary exit code: $BR_EXIT" > "$SPIKE_DIR/boundary-typephp-exit-code.txt"
+          cat "$SPIKE_DIR/boundary-typephp-exit-code.txt"
+
+      - name: Spike boundary (diff against Zend baseline)
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          set +e
+          diff "$SPIKE_DIR/boundary-typephp.txt" spike-tmp/boundary/zend-output.txt 2>&1 \
+            | tee "$SPIKE_DIR/boundary-diff.txt"
+          BD_EXIT=$?
+          set -e
+          echo "boundary diff exit code: $BD_EXIT (0 = identical)" > "$SPIKE_DIR/boundary-diff-exit-code.txt"
+          cat "$SPIKE_DIR/boundary-diff-exit-code.txt"
+
       - name: Spike Summary
         if: always()
         run: |
