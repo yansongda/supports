@@ -60,9 +60,9 @@ SMOKE_STR_01: 'user_name'
 SMOKE_STR_02: 'UserNameId'
 SMOKE_STR_03: 'userName'
 SMOKE_STR_04: 2
-SMOKE_STR_05: 'EXCEPTION:TypeError'
-SMOKE_STR_06: 'EXCEPTION:TypeError'
-SMOKE_STR_07: 'EXCEPTION:TypeError'
+SMOKE_STR_05: 'hello-world-50-c-at-cafe'
+SMOKE_STR_06: 'deja u'
+SMOKE_STR_07: 'schoene aenderung'
 SMOKE_STR_08: array (
   0 => true,
   1 => true,

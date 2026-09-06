@@ -130,29 +130,15 @@ function smoke_str(): void
     smoke_out('SMOKE_STR_04', Str::length('你好'));
 
     // charsArray 函数级 static 路径：'°' 映射 '0'；'@' 转换为 '-at-'
-    // 注意：src/Str.php:27 str_replace($val, $key, ...) 中 charsArray 数字字符串键 '0'-'9'
-    // 被 PHP 规范化为 int 键，strict_types=1 下 str_replace 收到 int 抛 TypeError——
-    // 存量行为（Wave 1 未触碰 Str.php，tests 对 slug/ascii/kebab 零覆盖），
-    // 此处 try/catch 只输出异常类名（消息文本跨 PHP 版本不稳定），把现行为钉进双运行时基线。
-    try {
-        smoke_out('SMOKE_STR_05', Str::slug('Hello_World 5° C @ cafe'));
-    } catch (\Throwable $e) {
-        smoke_out('SMOKE_STR_05', 'EXCEPTION:'.get_class($e));
-    }
+    // （历史坑：charsArray 数字字符串键 '0'-'9' 被 PHP 规范化为 int 键，strict_types=1 下
+    // str_replace 收到 int 抛 TypeError，已由 fix(str) 以 (string) $key 修复并重生成基线）
+    smoke_out('SMOKE_STR_05', Str::slug('Hello_World 5° C @ cafe'));
 
-    // charsArray 路径：'é'/'à'/'ü' 分别映射 'e'/'a'/'u'（同样命中 int 键 TypeError，见上）
-    try {
-        smoke_out('SMOKE_STR_06', Str::ascii('déjà ü'));
-    } catch (\Throwable $e) {
-        smoke_out('SMOKE_STR_06', 'EXCEPTION:'.get_class($e));
-    }
+    // charsArray 路径：'é'/'à'/'ü' 分别映射 'e'/'a'/'u'
+    smoke_out('SMOKE_STR_06', Str::ascii('déjà ü'));
 
-    // languageSpecificCharsArray 函数级 static 路径（de 语种替换先于 charsArray 循环抛错前执行）
-    try {
-        smoke_out('SMOKE_STR_07', Str::ascii('schöne änderung', 'de'));
-    } catch (\Throwable $e) {
-        smoke_out('SMOKE_STR_07', 'EXCEPTION:'.get_class($e));
-    }
+    // languageSpecificCharsArray 函数级 static 路径（de 语种替换先于 charsArray 循环执行）
+    smoke_out('SMOKE_STR_07', Str::ascii('schöne änderung', 'de'));
 
     $random = Str::random(32);
     smoke_out('SMOKE_STR_08', [strlen($random) === 32, 1 === preg_match('/^[A-Za-z0-9]{32}$/', $random)]);
