@@ -238,6 +238,31 @@ jobs:
           } > "$SPIKE_DIR/tpc-dry-build-dir.txt" 2>&1
           cat "$SPIKE_DIR/tpc-dry-build-dir.txt"
 
+      - name: Spike native_types (compile single file)
+        continue-on-error: true
+        run: |
+          TPC_BIN="$(find "$TPC_DIST" -type f -name tpc | head -n1)"
+          mkdir -p build/nt
+          set -o pipefail
+          set +e
+          "$TPC_BIN" spike-tmp/nt/nt.php -o build/nt/nt 2>&1 \
+            | tee "$SPIKE_DIR/nt-compile.txt"
+          NT_COMPILE_EXIT=$?
+          set -e
+          echo "tpc nt.php compile exit code: $NT_COMPILE_EXIT" > "$SPIKE_DIR/nt-compile-exit-code.txt"
+          cat "$SPIKE_DIR/nt-compile-exit-code.txt"
+
+      - name: Spike native_types (run compiled binary)
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          set +e
+          ./build/nt/nt 2>&1 | tee "$SPIKE_DIR/nt-typephp.txt"
+          NT_RUN_EXIT=$?
+          set -e
+          echo "nt binary exit code: $NT_RUN_EXIT" > "$SPIKE_DIR/nt-typephp-exit-code.txt"
+          cat "$SPIKE_DIR/nt-typephp-exit-code.txt"
+
       - name: Spike Summary
         if: always()
         run: |
