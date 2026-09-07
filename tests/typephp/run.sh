@@ -14,6 +14,10 @@
 # （tpc 内嵌 compiler.php 以 CWD 相对方式 require 自带 vendor/autoload.php）；
 # project.yml 内相对路径相对 project.yml 所在目录解析，与 tpc 的 CWD 无关。
 #
+# tpc CLI 解析规则（CI run 34139563499 实证）：tpc 取第一个非选项 token 为输入文件，
+# 因此选项（如 -O 3 --lto）必须置于 project.yml 之后——与 benchmark-typephp.yml 已实证
+# 成功的形态（project.yml 在前、-O 3 --lto 在后，O3+LTO 数据正常产出）一致。
+#
 # 脚本保持 POSIX 兼容（busybox ash 可运行），shebang 为 bash 供 CI 使用。
 
 set -eu
@@ -50,7 +54,7 @@ case "${MODE}" in
         mkdir -p "$(dirname "${OUT_BIN}")"
         (
             cd "${TPC_HOME}" || exit 1
-            "./${TPC_CMD}" ${TPC_OPTS} "${REPO_DIR}/tests/typephp/project.yml" -o "${OUT_BIN}"
+            "./${TPC_CMD}" "${REPO_DIR}/tests/typephp/project.yml" ${TPC_OPTS} -o "${OUT_BIN}"
         )
         # 先捕获二进制输出与退出码（stdout/stderr 分离）：tpc 严格实参计数等运行期错误
         # 会以非 0 退出码退出，若无 pipefail 的管道形态会只报 diff 行差而丢失退出码
