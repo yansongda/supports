@@ -32,6 +32,11 @@ jobs:
   typephp-smoke:
     name: typephp-smoke
     runs-on: ubuntu-22.04
+    # 容器镜像已实测：PHP 8.5.10 ZTS + libphp.so 内置（php-config --prefix=/usr/local）
+    # + php-config + mbstring/ctype/simplexml/libxml/json + Composer，root 用户；
+    # 缺 git/cmake/libgmp-dev/libmpfr-dev，由首步 apt 安装（须在 checkout 之前装 git）
+    container:
+      image: ghcr.io/yansongda/docker-php:zts-8.5-trixie
     env:
       TPC_VERSION: v0.7.0
       TPC_ASSET: tpc_v0.7.0_linux_x64.tar.gz
@@ -40,29 +45,13 @@ jobs:
       PHPX_HOME: /tmp/typephp-dist/tpc_v0.7.0_linux_x64/vendor/swoole/phpx
       TYPEPHP_PATCH_URL: https://raw.githubusercontent.com/swoole/typephp/v0.7.0/.github/patches/php-hash-cxx.patch
     steps:
+      - name: Install CI Toolchain (git for checkout, cmake & gmp/mpfr for phpx)
+        run: |
+          apt-get update
+          apt-get install -y git cmake libgmp-dev libmpfr-dev
+
       - name: Checkout Code
         uses: actions/checkout@v7
-
-      - name: Setup PHP 8.5 (ZTS)
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.5'
-          coverage: none
-          tools: composer:v2
-        env:
-          phpts: ts
-          update: true
-
-      - name: Verify PHP ZTS
-        run: |
-          php -v
-          php -r 'exit(PHP_ZTS ? 0 : 1);'
-          echo 'PHP ZTS confirmed'
-
-      - name: Install System Dependencies (official typephp CI list)
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y build-essential cmake libgmp-dev libmpfr-dev pkg-config python3-dev
 
       - name: Download and Extract tpc (linux-x64 release)
         run: |
@@ -80,13 +69,13 @@ jobs:
           php_include_dir="$(php-config --include-dir)"
           php_hash_header="${php_include_dir}/ext/hash/php_hash.h"
           if grep -Fq 'char *base = ecalloc(' "${php_hash_header}"; then
-            sudo patch --directory="${php_include_dir}" --strip=1 < /tmp/php-hash-cxx.patch
+            patch --directory="${php_include_dir}" --strip=1 < /tmp/php-hash-cxx.patch
             echo 'php_hash.h patched for C++ compatibility'
           else
             echo 'php_hash.h already contains the upstream C++ fix'
           fi
 
-      - name: Configure ZTS PHP Embed Library (PHP_HOME from setup-php)
+      - name: Configure PHP Embed Library (PHP_HOME from container php-config)
         run: |
           php_home="$(php-config --prefix)"
           embed_library="${php_home}/lib/libphp.so"
