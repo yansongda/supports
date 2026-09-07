@@ -369,7 +369,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
             return $value;
         }
 
-        return function ($item) use ($value) {
+        return function ($item, $key = null) use ($value) {
             return data_get($item, $value);
         };
     }

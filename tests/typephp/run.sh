@@ -49,6 +49,8 @@ case "${MODE}" in
         "${OUT_BIN}" > /tmp/smoke-actual.txt 2> /tmp/smoke-err.txt || {
             echo 'tpc binary exited non-zero' >&2
             cat /tmp/smoke-err.txt >&2
+            echo '--- smoke stdout tail ---' >&2
+            tail -20 /tmp/smoke-actual.txt >&2
             exit 1
         }
         diff /tmp/smoke-actual.txt "${EXPECTED}" || {
