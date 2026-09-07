@@ -5,6 +5,7 @@
 #   ./run.sh                        # zend 模式（默认）：php + vendor/autoload.php，对照 expected.txt
 #   ./run.sh tpc                    # tpc 模式：release tpc 二进制按 project.yml 编译 bin 后运行，对照 expected.txt
 #   TPC_BIN=/path/to/tpc ./run.sh tpc   # 显式指定 tpc 二进制（默认取 PATH 中的 tpc）
+#   TPC_OPTS="-O 0" ./run.sh tpc    # 自定义 tpc 编译参数（默认 -O 3 --lto；显式 -O 0 回退编译器默认档）
 #
 # 基准 expected.txt 由 Zend(PHP 8.3) 产出；tpc(PHP 8.5) diff 失败时先排查 8.3/8.5 输出漂移，
 # 再判定是否为 typephp 语义差异。
@@ -31,6 +32,13 @@ case "${MODE}" in
         ;;
     tpc)
         TPC_BIN="${TPC_BIN:-tpc}"
+        # 编译档位默认 -O 3 --lto：benchmark 首轮以 tpc 编译器默认档（-O <0-3> 默认 0，
+        # COMPILER_CLI.md）测得全面慢于 Zend 1.7x~8.4x，性能测试必须显式指定优化档位。
+        # 注意 ${TPC_OPTS:-...} 在 unset 与空串时均取默认值；需回退编译器默认档（-O0）
+        # 时请显式 TPC_OPTS="-O 0" ./run.sh tpc（置空串不会回退）。
+        # ${TPC_OPTS} 故意不加引号：默认值由两个独立参数（-O 3 与 --lto）构成，加引号会被
+        # tpc 当作单个参数；shellcheck SC2086 风格在此为有意为之。
+        TPC_OPTS="${TPC_OPTS:--O 3 --lto}"
         # 裸命令名先经 PATH 解析为绝对路径
         case "${TPC_BIN}" in
             */*) ;;
@@ -42,7 +50,7 @@ case "${MODE}" in
         mkdir -p "$(dirname "${OUT_BIN}")"
         (
             cd "${TPC_HOME}" || exit 1
-            "./${TPC_CMD}" "${REPO_DIR}/tests/typephp/project.yml" -o "${OUT_BIN}"
+            "./${TPC_CMD}" ${TPC_OPTS} "${REPO_DIR}/tests/typephp/project.yml" -o "${OUT_BIN}"
         )
         # 先捕获二进制输出与退出码（stdout/stderr 分离）：tpc 严格实参计数等运行期错误
         # 会以非 0 退出码退出，若无 pipefail 的管道形态会只报 diff 行差而丢失退出码
