@@ -110,7 +110,9 @@ jobs:
           test -f vendor/autoload.php
           test -d vendor/psr/container/src
 
-      - name: Run typephp Smoke (tests/typephp/run.sh tpc)
+      - name: Run typephp Smoke (tests/typephp/run.sh tpc, O3+LTO via run.sh)
+        # 编译档位经 run.sh 默认 -O 3 --lto（TPC_OPTS 未设置即取默认），与 benchmark 编译档位一致；
+        # 不降档保一致性。-O3+LTO 下 pch+11 文件+链接编译时长预计 3~6 分钟，属预期开销。
         run: |
           TPC_BIN="$TPC_DIST/tpc_v0.7.0_linux_x64/tpc" bash tests/typephp/run.sh tpc
           rm -rf build

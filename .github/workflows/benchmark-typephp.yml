@@ -97,12 +97,14 @@ jobs:
             --runtime=zend --case=all --rounds=5 \
             --output="$GITHUB_WORKSPACE/build/bench-zend.json"
 
-      - name: Compile Benchmark Binary (tpc, bin mode)
+      - name: Compile Benchmark Binary (tpc, bin mode, O3+LTO)
         # release tpc 标准调用模式：cd 解压根 + 全绝对路径参数。
-        # tpc 会把 -o 名规范化为合法 C 标识符（连字符→下划线），输出名统一用下划线 bench_tpc_bin
+        # tpc 会把 -o 名规范化为合法 C 标识符（连字符→下划线），输出名统一用下划线 bench_tpc_bin。
+        # -O 3 --lto（COMPILER_CLI.md：-O <0-3> 默认 0，--lto 开启 LTO）：首轮 benchmark 用
+        # 编译器默认档 -O0 测得全面慢于 Zend，本轮测 AOT 真实档位。
         run: |
           cd "$TPC_DIST/tpc_v0.7.0_linux_x64"
-          ./tpc "$GITHUB_WORKSPACE/tests/benchmark/project.yml" -o "$GITHUB_WORKSPACE/build/bench_tpc_bin"
+          ./tpc "$GITHUB_WORKSPACE/tests/benchmark/project.yml" -O 3 --lto -o "$GITHUB_WORKSPACE/build/bench_tpc_bin"
 
       - name: Run typephp Benchmark (AOT binary on the same runner)
         run: |
