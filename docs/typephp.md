@@ -53,9 +53,24 @@ sources:
 
 ## benchmark 数据
 
-CI 同机（同一 GitHub Actions runner）双运行时实测：Zend = 容器内 PHP 8.5.10 ZTS CLI，typephp = tpc v0.7.0 AOT 二进制（SAPI: embed），rounds=5 取最优（best-of-5）。**ratio = typephp_ms / zend_ms**，大于 1 表示 typephp 慢于 Zend。
+CI 同机（同一 GitHub Actions runner）双运行时实测：Zend = 容器内 PHP 8.5.10 ZTS CLI，typephp = tpc v0.7.0 AOT 二进制（SAPI: embed），rounds=5 取最优（best-of-5）。**ratio = typephp_ms / zend_ms**，大于 1 表示 typephp 慢于 Zend。以下给出两个编译档位的对照数据（`-O0` = tpc 编译器默认档，`-O 3 --lto` = 最高优化档）。
 
-数据来源：Benchmark run `34135976686` artifact（bench-report.json），10 case 原样引用，未做任何修饰：
+**双档对照总览**（10 case ratio；第一轮 run `34135976686`，第二轮 run `34139563493`）：
+
+| case | -O0 ratio | -O 3 --lto ratio |
+|---|---:|---:|
+| str_snake | 2.894 | 2.127 |
+| str_slug | 2.910 | 2.209 |
+| str_random | 1.936 | 1.456 |
+| str_uuid_v4 | 1.696 | 1.396 |
+| arr_collapse | 8.418 | 2.749 |
+| arr_merge | 4.774 | 3.310 |
+| arr_dot | 5.453 | 3.585 |
+| arr_camel_case_key | 4.254 | 2.619 |
+| collection_map_filter_sort | 4.183 | 2.415 |
+| pipeline_full_chain | 5.507 | 2.794 |
+
+**第一轮：tpc 编译器默认档 `-O0`**，数据来源：Benchmark run `34135976686` artifact（bench-report.json），10 case 原样引用，未做任何修饰：
 
 | case | n | zend_ms | typephp_ms | ratio |
 |---|---:|---:|---:|---:|
@@ -70,10 +85,27 @@ CI 同机（同一 GitHub Actions runner）双运行时实测：Zend = 容器内
 | collection_map_filter_sort | 5000 | 34.431 | 144.041 | 4.183 |
 | pipeline_full_chain | 2000 | 4.993 | 27.496 | 5.507 |
 
+**第二轮：`-O 3 --lto`**，数据来源：Benchmark run `34139563493` artifact（bench-report.json），10 case 原样引用，未做任何修饰：
+
+| case | n | zend_ms | typephp_ms | ratio |
+|---|---:|---:|---:|---:|
+| str_snake | 100000 | 69.097 | 146.945 | 2.127 |
+| str_slug | 50000 | 752.041 | 1661.615 | 2.209 |
+| str_random | 10000 | 11.701 | 17.031 | 1.456 |
+| str_uuid_v4 | 10000 | 14.318 | 19.981 | 1.396 |
+| arr_collapse | 20000 | 7.014 | 19.278 | 2.749 |
+| arr_merge | 20000 | 16.977 | 56.188 | 3.310 |
+| arr_dot | 10000 | 8.214 | 29.450 | 3.585 |
+| arr_camel_case_key | 10000 | 26.963 | 70.606 | 2.619 |
+| collection_map_filter_sort | 5000 | 34.867 | 84.212 | 2.415 |
+| pipeline_full_chain | 2000 | 5.072 | 14.169 | 2.794 |
+
 **方法论与取舍说明**：
 
 - 同机同 PHP 版本对比消除了跨机器/跨版本误差，结论方向可信；但 CI 共享 runner 存在负载噪声，绝对耗时与本地裸机会有出入——**判断性能请看 ratio 的量级而非绝对毫秒数**。
-- tpc v0.7.0 为 beta，编译日志可见 `-O0`（无优化编译）。在当前版本下本库工作负载 typephp 全面慢于 Zend（ratio 1.696 ~ 8.418），未来 tpc 开启优化编译后需重测，本表数据不代表 tpc 正式版表现。
+- **档位陷阱：tpc 的 `-O <0-3>` 默认 0**（官方 COMPILER_CLI.md），未显式传 `-O` 时以无优化编译运行——第一轮 benchmark 未传 `-O` 即落在 `-O0` 档。凡 tpc 性能测试必须显式指定档位；本库 `tests/typephp/run.sh` 与 benchmark workflow 均已显式使用 `-O 3 --lto`（run.sh 的 `TPC_OPTS` 可覆盖）。
+- **`-O 3 --lto` 相比 `-O0` ratio 改善 1.2 ~ 3 倍**（如 arr_collapse 8.418 → 2.749、pipeline_full_chain 5.507 → 2.794），但 10 case 仍全面慢于 Zend（ratio 1.396 ~ 3.585）——tpc v0.7.0 的 beta 定位不变，本表数据不代表 tpc 正式版表现。
+- **输出等价性已覆盖最高优化档**：`typephp-smoke` 在 `-O 3 --lto` 编译下全绿（run `34140111034`），tpc 侧输出与 Zend 基线逐行一致——优化档位不改变可观察行为。
 - 复现脚本：`tests/benchmark/`（`run.php` 支持 `--runtime=zend|typephp --rounds=N --output=<file>` 与 `--merge` 合并报告），CI 由 `.github/workflows/benchmark-typephp.yml` 双触发自动执行。
 
 ## `use native_types` 决策记录
@@ -91,6 +123,8 @@ CI 同机（同一 GitHub Actions runner）双运行时实测：Zend = 容器内
 - `use native_types` 为**文件级**语义：声明后该文件内 `Int += Float` 复合赋值会截断回 int（Zend 下变量提升为 float）。在收益为负时引入此行为差异风险没有意义。
 - 本库 src 中存在 `int`/`float` 混合运算路径，截断语义审计成本高、收益为零。
 - **未来 tpc 版本（开启优化编译、消除 -O0 背景后）将重新评估**，届时重跑 benchmark 并重审本库 `$int += $float` 形态路径。
+
+**O3+LTO 复核（Benchmark run `34139563493`，`-O 3 --lto`）**：优化档位下 int 路径收益仍 < 0——str_snake 2.127 / str_slug 2.209 / str_random 1.456 / str_uuid_v4 1.396，对照 `-O0` 档 2.894 / 2.910 / 1.936 / 1.696（同样全部 > 1）。**决策维持"不加 `use native_types`"**：三条件中的条件 3（benchmark int 路径收益 > 0）在两个编译档位下均不成立，结论跨档位稳固；上表条件 3 的依据列保留 `-O0` 档首次实测数据。
 
 ## 下游使用约束 / 已知差异清单
 
