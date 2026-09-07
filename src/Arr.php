@@ -428,7 +428,8 @@ class Arr
             shuffle($array);
         } else {
             srand($seed);
-            usort($array, function () {
+            // usort 契约恒 2 参调用：闭包声明完整签名（Zend 忽略多余实参，tpc 严格实参计数兼容）
+            usort($array, function ($a, $b) {
                 return rand(-1, 1);
             });
         }

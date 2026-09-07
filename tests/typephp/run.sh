@@ -44,7 +44,14 @@ case "${MODE}" in
             cd "${TPC_HOME}" || exit 1
             "./${TPC_CMD}" "${REPO_DIR}/tests/typephp/project.yml" -o "${OUT_BIN}"
         )
-        "${OUT_BIN}" | diff - "${EXPECTED}" || {
+        # 先捕获二进制输出与退出码（stdout/stderr 分离）：tpc 严格实参计数等运行期错误
+        # 会以非 0 退出码退出，若无 pipefail 的管道形态会只报 diff 行差而丢失退出码
+        "${OUT_BIN}" > /tmp/smoke-actual.txt 2> /tmp/smoke-err.txt || {
+            echo 'tpc binary exited non-zero' >&2
+            cat /tmp/smoke-err.txt >&2
+            exit 1
+        }
+        diff /tmp/smoke-actual.txt "${EXPECTED}" || {
             echo 'smoke diff FAILED (tpc output vs zend baseline expected.txt)' >&2
             echo 'hint: 先排查 PHP 8.3(zend 基线) 与 PHP 8.5(tpc) 的输出漂移，再判定是否为 typephp 语义差异' >&2
             exit 1

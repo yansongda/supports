@@ -250,12 +250,13 @@ function bench_case_collection_map_filter_sort(int $n): void
         ['id' => 6, 'v' => 5],
     ];
     for ($i = 0; $i < $n; ++$i) {
-        // sortBy('id') 走 valueRetriever 的 data_get 路径；闭包保持 T2.1 冒烟的无类型标注形态
+        // sortBy('id') 走 valueRetriever 的 data_get 路径；map/filter 闭包声明完整契约签名
+        // （array_map 双数组与 ARRAY_FILTER_USE_BOTH 均为 (item, key) 2 参调用，tpc 严格实参计数兼容）
         $result = (new Collection($items))
-            ->map(function ($item) {
+            ->map(function ($item, $key) {
                 return ['id' => $item['id'], 'v' => $item['v'] * 2];
             })
-            ->filter(function ($item) {
+            ->filter(function ($item, $key) {
                 return $item['v'] > 4;
             })
             ->sortBy('id');

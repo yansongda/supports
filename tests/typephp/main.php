@@ -156,11 +156,14 @@ function smoke_collection(): void
 {
     $col = new Collection(['name' => 'yansongda', 'age' => 28, 'tags' => ['php', 'swoole']]);
 
-    smoke_out('SMOKE_COL_01', $col->map(function ($item) {
+    // 回调闭包声明完整契约签名：map 经 array_map 双数组形态、filter 经 Arr::where 的
+    // ARRAY_FILTER_USE_BOTH 均以 (item, key) 2 参调用；Zend 忽略闭包多余实参，
+    // tpc 严格实参计数下 1 参闭包会误抛 ArgumentCountError
+    smoke_out('SMOKE_COL_01', $col->map(function ($item, $key) {
         return is_int($item) ? $item * 2 : $item;
     })->all());
 
-    smoke_out('SMOKE_COL_02', $col->filter(function ($item) {
+    smoke_out('SMOKE_COL_02', $col->filter(function ($item, $key) {
         return !is_array($item);
     })->all());
 
