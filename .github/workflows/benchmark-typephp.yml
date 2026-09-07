@@ -1,0 +1,155 @@
+name: Benchmark typephp
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  benchmark-typephp:
+    name: benchmark-typephp (Zend vs tpc, same runner)
+    runs-on: ubuntu-22.04
+    env:
+      TPC_VERSION: v0.7.0
+      TPC_ASSET: tpc_v0.7.0_linux_x64.tar.gz
+      TPC_URL: https://github.com/swoole/typephp/releases/download/v0.7.0/tpc_v0.7.0_linux_x64.tar.gz
+      TPC_DIST: /tmp/typephp-dist
+      PHPX_HOME: /tmp/typephp-dist/tpc_v0.7.0_linux_x64/vendor/swoole/phpx
+      TYPEPHP_PATCH_URL: https://raw.githubusercontent.com/swoole/typephp/v0.7.0/.github/patches/php-hash-cxx.patch
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v7
+
+      - name: Setup PHP 8.5 (ZTS)
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          coverage: none
+          tools: composer:v2
+        env:
+          phpts: ts
+          update: true
+
+      - name: Verify PHP ZTS
+        run: |
+          php -v
+          php -r 'exit(PHP_ZTS ? 0 : 1);'
+          echo 'PHP ZTS confirmed'
+
+      - name: Install System Dependencies (official typephp CI list)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake libgmp-dev libmpfr-dev pkg-config python3-dev
+
+      - name: Download and Extract tpc (linux-x64 release)
+        run: |
+          mkdir -p "$TPC_DIST"
+          cd "$TPC_DIST"
+          echo "Downloading $TPC_URL"
+          curl -fsSL -o "$TPC_ASSET" "$TPC_URL"
+          curl -fsSL -o SHA256SUMS "https://github.com/swoole/typephp/releases/download/${TPC_VERSION}/SHA256SUMS"
+          grep "$TPC_ASSET" SHA256SUMS | sha256sum -c -
+          tar -xzf "$TPC_ASSET"
+
+      - name: Patch php_hash.h C++ Compatibility (official typephp workaround)
+        run: |
+          curl -fsSL -o /tmp/php-hash-cxx.patch "$TYPEPHP_PATCH_URL"
+          php_include_dir="$(php-config --include-dir)"
+          php_hash_header="${php_include_dir}/ext/hash/php_hash.h"
+          if grep -Fq 'char *base = ecalloc(' "${php_hash_header}"; then
+            sudo patch --directory="${php_include_dir}" --strip=1 < /tmp/php-hash-cxx.patch
+            echo 'php_hash.h patched for C++ compatibility'
+          else
+            echo 'php_hash.h already contains the upstream C++ fix'
+          fi
+
+      - name: Configure ZTS PHP Embed Library (PHP_HOME from setup-php)
+        run: |
+          php_home="$(php-config --prefix)"
+          embed_library="${php_home}/lib/libphp.so"
+          test -x "${php_home}/bin/php-config"
+          test -f "${embed_library}"
+          echo "PHP_HOME=${php_home}" >> "${GITHUB_ENV}"
+          echo "PHP_HOME=${php_home}"
+          echo "embed library: ${embed_library}"
+          php-config --version
+
+      - name: Build libphpx.so (from tpc release package vendor/swoole/phpx)
+        run: |
+          echo "phpx source: $PHPX_HOME"
+          cmake -S "$PHPX_HOME" -B "$PHPX_HOME/build" \
+            -D CMAKE_BUILD_TYPE=Release \
+            -D BUILD_TESTS=OFF \
+            -D BUILD_EXT=OFF \
+            -D GITHUB_ACTION=ON \
+            -D php_dir="${PHP_HOME}"
+          cmake --build "$PHPX_HOME/build" --target phpx --parallel 2
+          test -f "${PHPX_HOME}/lib/libphpx.so"
+          ls -la "${PHPX_HOME}/lib/"
+
+      - name: Configure Native Library Path (LD_LIBRARY_PATH)
+        run: |
+          echo "LD_LIBRARY_PATH=${PHPX_HOME}/lib:${PHP_HOME}/lib" >> "${GITHUB_ENV}"
+          echo "LD_LIBRARY_PATH=${PHPX_HOME}/lib:${PHP_HOME}/lib"
+
+      - name: Install Project Composer Dependencies (for tpc benchmark sources)
+        run: |
+          COMPOSER_ALLOW_SUPERUSER=1 composer install --no-interaction --no-progress --no-scripts
+          test -f vendor/autoload.php
+          test -d vendor/psr/container/src
+
+      - name: Run Zend Benchmark (PHP CLI on the same runner)
+        # typephp 禁止全局可执行语句，run.php/bench-main.php 均不可被 `php xxx.php` 直跑触发，
+        # Zend 侧由 php -r driver 显式加载 cases.php + run.php 后调用 bench_cli_main()
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/build"
+          php -r 'require "vendor/autoload.php"; require "tests/benchmark/cases.php"; require "tests/benchmark/run.php"; bench_cli_main((int) $argc, $argv);' \
+            -- \
+            --runtime=zend --case=all --rounds=5 \
+            --output="$GITHUB_WORKSPACE/build/bench-zend.json"
+
+      - name: Compile Benchmark Binary (tpc, bin mode)
+        # release tpc 标准调用模式：cd 解压根 + 全绝对路径参数
+        run: |
+          cd "$TPC_DIST/tpc_v0.7.0_linux_x64"
+          ./tpc "$GITHUB_WORKSPACE/tests/benchmark/project.yml" -o "$GITHUB_WORKSPACE/build/bench-tpc-bin"
+
+      - name: Run typephp Benchmark (AOT binary on the same runner)
+        run: |
+          "$GITHUB_WORKSPACE/build/bench-tpc-bin" \
+            --runtime=typephp --case=all --rounds=5 \
+            --output="$GITHUB_WORKSPACE/build/bench-typephp.json"
+
+      - name: Merge Benchmark Report (Zend vs typephp)
+        run: |
+          php -r 'require "vendor/autoload.php"; require "tests/benchmark/cases.php"; require "tests/benchmark/run.php"; bench_cli_main((int) $argc, $argv);' \
+            -- \
+            --merge="$GITHUB_WORKSPACE/build/bench-zend.json,$GITHUB_WORKSPACE/build/bench-typephp.json" \
+            --output="$GITHUB_WORKSPACE/build/bench-report.json"
+
+      - name: Upload bench-zend.json
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-zend
+          path: build/bench-zend.json
+          if-no-files-found: ignore
+
+      - name: Upload bench-typephp.json
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-typephp
+          path: build/bench-typephp.json
+          if-no-files-found: ignore
+
+      - name: Upload bench-report.json (merged)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bench-report
+          path: build/bench-report.json
+          if-no-files-found: ignore
+
+      - name: Cleanup build directory
+        if: always()
+        run: rm -rf build

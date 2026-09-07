@@ -1,0 +1,8 @@
+name: supports-benchmark
+build-mode: bin
+sources:
+  - ../../vendor/psr/container/src
+  - ../../src
+  - cases.php
+  - run.php
+  - bench-main.php
