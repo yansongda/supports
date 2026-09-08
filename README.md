@@ -9,8 +9,3 @@
 
 handle with array/config/Pipeline etc.
 
-## Documentation
-
-- [TypePHP（tpc AOT）兼容与优化说明](docs/typephp.md)
-- [升级指南（UPGRADE）](UPGRADE.md)
-

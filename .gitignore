@@ -3,6 +3,3 @@ vendor/
 composer.lock
 .DS_Store
 .phpunit.cache/
-docs/implementation/
-docs/evidence/
-docs/learning/

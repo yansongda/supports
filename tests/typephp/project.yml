@@ -1,6 +1,0 @@
-name: supports-smoke
-build-mode: bin
-sources:
-  - ../../vendor/psr/container/src
-  - ../../src
-  - main.php
