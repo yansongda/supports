@@ -6,13 +6,12 @@
 
 - composer.json 显式声明 `ext-simplexml` 与 `ext-libxml` 依赖（`Collection::toXml()`/`Arr::wrapXml()` 实际所需，此前未显式声明）
 - 新增 `Collection::toQueryString()` 方法：查询串构造（等价原 `toString()` 能力，`Arr::toString()` 静态方法不变）
-- 新增 `UPGRADE.md` 升级指南
 
 ### Changed
 
-- `Collection::toString()` 标记 `@deprecated`（phpdoc + PHP 8 原生 `#[\Deprecated]` 注解，PHP 8.4+ 调用时自动触发 deprecation 提示）：继续可用，实现改为委托新增的 `toQueryString()`，行为不变；将在后续大版本移除，建议迁移（写法见 UPGRADE.md）
+- `Collection::toString()` 标记 `@deprecated`（phpdoc + PHP 8 原生 `#[\Deprecated]` 注解，PHP 8.4+ 调用时自动触发 deprecation 提示）：继续可用，实现改为委托新增的 `toQueryString()`，行为不变；将在后续大版本移除，建议迁移
 - `Arr::sortRecursive()` 内部实现由引用遍历改写为键位赋值形态，`Arr::shuffle()`/`Collection::valueRetriever()` 内部回调闭包签名补全：均为内部实现优化，签名与可观察行为不变
-- ! `Collection::except()` 改为变参签名（`mixed ...$keys`）：主用形态行为不变，仅 `except(['a'], ['b'])` 由旧静默丢弃多余实参改为执行期 `TypeError`（形态对照见 UPGRADE.md）
+- ! `Collection::except()` 改为变参签名（`mixed ...$keys`）：主用形态行为不变，仅 `except(['a'], ['b'])` 由旧静默丢弃多余实参改为执行期 `TypeError`
 - ! `Pipeline::through()` 改为变参签名（`mixed ...$pipes`）：主用形态行为不变，仅 `through(['a'], 'b')` 由旧静默丢弃改为执行期 `TypeError`；`through([$obj, 'method'])` 语义由"对象 + 字符串两管道"修正为"单个 callable-array 管道"（与 illuminate 主流用法一致）
 
 ### Fixed
