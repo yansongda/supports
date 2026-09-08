@@ -44,6 +44,15 @@ class CollectionTest extends TestCase
         self::assertEquals('', (new Collection())->toQueryString());
     }
 
+    public function testToStringDeprecatedDelegate()
+    {
+        $collection = new Collection(['a' => 1, 'b' => 2]);
+
+        self::assertEquals('a=1&b=2', $collection->toString());
+        self::assertEquals($collection->toQueryString(), $collection->toString());
+        self::assertEquals($collection->toQueryString(';'), $collection->toString(';'));
+    }
+
     public function testMagicGet()
     {
         self::assertEquals('yansongda', $this->collection->name);

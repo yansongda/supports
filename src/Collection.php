@@ -7,6 +7,7 @@ namespace Yansongda\Supports;
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
+use Deprecated;
 use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
@@ -307,6 +308,15 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     public function toQueryString(string $separator = '&'): string
     {
         return Arr::toString($this->all(), $separator);
+    }
+
+    /**
+     * @deprecated 自 4.2.0 起使用 {@see toQueryString()} 代替，本方法将在后续大版本移除。
+     */
+    #[Deprecated(message: 'use toQueryString() instead', since: '4.2.0')]
+    public function toString(string $separator = '&'): string
+    {
+        return $this->toQueryString($separator);
     }
 
     /**
