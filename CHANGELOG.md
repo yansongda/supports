@@ -5,21 +5,19 @@
 ### Added
 
 - composer.json 显式声明 `ext-simplexml` 与 `ext-libxml` 依赖（`Collection::toXml()`/`Arr::wrapXml()` 实际所需，此前未显式声明）
-- TypePHP（tpc AOT）兼容基建：`tests/typephp/` 编译冒烟（tester.yml `typephp-smoke` job，每 PR 自动跑）与 `tests/benchmark/` Zend vs typephp 双运行时对比（benchmark workflow，workflow_dispatch + pull_request 双触发）
-- 新增 `docs/typephp.md`（TypePHP 兼容层级、编译方式、benchmark 数据与已知差异清单）与 `UPGRADE.md`（升级指南）
+- 新增 `Collection::toQueryString()` 方法：查询串构造（等价原 `toString()` 能力，`Arr::toString()` 静态方法不变）
+- 新增 `UPGRADE.md` 升级指南
 
 ### Changed
 
-- ! `Collection::toString()` 更名为 `Collection::toQueryString()`：TypePHP 将 `toString()` 等作为保留关键字方法拦截，故更名；`Arr::toString()` 静态方法保留不变（迁移写法见 UPGRADE.md）
-- ! `Collection::except()` 改为变参签名（`mixed ...$keys`）：兼容 TypePHP 严格参数计数；主用形态行为不变，仅 `except(['a'], ['b'])` 由旧静默丢弃多余实参改为执行期 `TypeError`（形态对照见 UPGRADE.md）
-- ! `Pipeline::through()` 改为变参签名（`mixed ...$pipes`）：兼容 TypePHP 严格参数计数；主用形态行为不变，仅 `through(['a'], 'b')` 由旧静默丢弃改为执行期 `TypeError`；`through([$obj, 'method'])` 语义由"对象 + 字符串两管道"修正为"单个 callable-array 管道"（与 illuminate 主流用法一致）
+- `Collection::toString()` 标记 `@deprecated`（phpdoc + PHP 8 原生 `#[\Deprecated]` 注解，PHP 8.4+ 调用时自动触发 deprecation 提示）：继续可用，实现改为委托新增的 `toQueryString()`，行为不变；将在后续大版本移除，建议迁移（写法见 UPGRADE.md）
+- `Arr::sortRecursive()` 内部实现由引用遍历改写为键位赋值形态，`Arr::shuffle()`/`Collection::valueRetriever()` 内部回调闭包签名补全：均为内部实现优化，签名与可观察行为不变
+- ! `Collection::except()` 改为变参签名（`mixed ...$keys`）：主用形态行为不变，仅 `except(['a'], ['b'])` 由旧静默丢弃多余实参改为执行期 `TypeError`（形态对照见 UPGRADE.md）
+- ! `Pipeline::through()` 改为变参签名（`mixed ...$pipes`）：主用形态行为不变，仅 `through(['a'], 'b')` 由旧静默丢弃改为执行期 `TypeError`；`through([$obj, 'method'])` 语义由"对象 + 字符串两管道"修正为"单个 callable-array 管道"（与 illuminate 主流用法一致）
 
 ### Fixed
 
 - `Str::ascii()`/`Str::slug()`/`Str::kebab()` 在 `strict_types=1` 下对任意输入必抛 `TypeError` 的 bug（`charsArray()` 数字字符串键被 PHP 规范化为 int 键，`str_replace()` 收到 int 抛错）
-- `Arr::sortRecursive()` 内部实现改写为键位赋值形态：避免「foreach 引用遍历 + 循环体内递归」组合在 TypePHP 下的行为差异，签名与可观察行为不变
-- `Arr::shuffle()` 内部 usort 回调闭包补全 (value, key) 双参签名，兼容 TypePHP 严格实参计数
-- `Collection::valueRetriever()` 返回的回调闭包补可选 `$key` 参数（every/sortBy 以双参调用），兼容 TypePHP 严格实参计数
 
 ## [v4.1.1] - 2026-09-05
 
