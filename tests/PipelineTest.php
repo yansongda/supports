@@ -39,6 +39,148 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.one'], $_SERVER['__test.pipe.two']);
     }
 
+    public function testPipelineThroughWithArray()
+    {
+        $pipeTwo = function ($piped, $next) {
+            $_SERVER['__test.pipe.two'] = $piped;
+
+            return $next($piped);
+        };
+
+        $result = (new Pipeline($this->getContainer()))
+            ->send('foo')
+            ->through([PipelineTestPipeOne::class, $pipeTwo])
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        static::assertSame('foo', $result);
+        static::assertSame('foo', $_SERVER['__test.pipe.one']);
+        static::assertSame('foo', $_SERVER['__test.pipe.two']);
+
+        unset($_SERVER['__test.pipe.one'], $_SERVER['__test.pipe.two']);
+    }
+
+    public function testPipelineThroughWithVariadic()
+    {
+        $pipeTwo = function ($piped, $next) {
+            $_SERVER['__test.pipe.two'] = $piped;
+
+            return $next($piped);
+        };
+
+        $result = (new Pipeline($this->getContainer()))
+            ->send('foo')
+            ->through(PipelineTestPipeOne::class, $pipeTwo)
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        static::assertSame('foo', $result);
+        static::assertSame('foo', $_SERVER['__test.pipe.one']);
+        static::assertSame('foo', $_SERVER['__test.pipe.two']);
+
+        unset($_SERVER['__test.pipe.one'], $_SERVER['__test.pipe.two']);
+    }
+
+    public function testPipelineThroughWithSinglePipe()
+    {
+        $result = (new Pipeline($this->getContainer()))
+            ->send('foo')
+            ->through(PipelineTestPipeOne::class)
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        static::assertSame('foo', $result);
+        static::assertSame('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineThroughWithCallableArrayPipe()
+    {
+        $result = (new Pipeline($this->getContainer()))
+            ->send('foo')
+            ->through([[new PipelineTestPipeOne(), 'handle']])
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        static::assertSame('foo', $result);
+        static::assertSame('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineThroughWithObjectMethodCallableArray()
+    {
+        $result = (new Pipeline($this->getContainer()))
+            ->send('foo')
+            ->through([new PipelineTestPipeOne(), 'handle'])
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        static::assertSame('foo', $result);
+        static::assertSame('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineThroughWithClosure()
+    {
+        $function = function ($piped, $next) {
+            $_SERVER['__test.pipe.one'] = $piped;
+
+            return $next($piped);
+        };
+
+        $result = (new Pipeline($this->getContainer()))
+            ->send('foo')
+            ->through($function)
+            ->then(function ($piped) {
+                return $piped;
+            });
+
+        static::assertSame('foo', $result);
+        static::assertSame('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineThroughWithArrayAndExtraArgumentThrowsTypeError()
+    {
+        // 旧实现静默丢弃额外参数（仅取 ['a']），新实现将额外参数纳入管道列表，
+        // 首管道 ['a'] 非 callable 数组，执行期 then() -> carry() -> parsePipeString() 抛 TypeError。
+        $pipeline = (new Pipeline($this->getContainer()))
+            ->send('foo')
+            ->through(['a'], 'b');
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('parsePipeString(): Argument #1 ($pipe) must be of type string, array given');
+
+        $pipeline->then(function ($piped) {
+            return $piped;
+        });
+    }
+
+    public function testPipelineThroughWithNestedArrayThrowsTypeError()
+    {
+        // 新旧实现行为一致：一层展开后管道值仍为嵌套数组 ['a', 'b']，
+        // 执行期 then() -> carry() -> parsePipeString() 收到 array 抛 TypeError。
+        $pipeline = (new Pipeline($this->getContainer()))
+            ->send('foo')
+            ->through([['a', 'b']]);
+
+        $this->expectException(\TypeError::class);
+        $this->expectExceptionMessage('parsePipeString(): Argument #1 ($pipe) must be of type string, array given');
+
+        $pipeline->then(function ($piped) {
+            return $piped;
+        });
+    }
+
     public function testPipelineUsageWithObjects()
     {
         $result = (new Pipeline($this->getContainer()))

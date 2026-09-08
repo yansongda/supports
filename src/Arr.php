@@ -142,7 +142,7 @@ class Arr
             }
         }
         foreach ($array as $key => $value) {
-            if (call_user_func($callback, $value, $key)) {
+            if ($callback($value, $key)) {
                 return $value;
             }
         }
@@ -428,7 +428,8 @@ class Arr
             shuffle($array);
         } else {
             srand($seed);
-            usort($array, function () {
+            // usort 契约恒 2 参调用：闭包声明完整签名
+            usort($array, function ($a, $b) {
                 return rand(-1, 1);
             });
         }
@@ -459,9 +460,9 @@ class Arr
      */
     public static function sortRecursive(array $array): array
     {
-        foreach ($array as &$value) {
+        foreach ($array as $key => $value) {
             if (is_array($value)) {
-                $value = static::sortRecursive($value);
+                $array[$key] = static::sortRecursive($value);
             }
         }
         if (static::isAssoc($array)) {

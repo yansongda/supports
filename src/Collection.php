@@ -7,6 +7,7 @@ namespace Yansongda\Supports;
 use ArrayAccess;
 use ArrayIterator;
 use Countable;
+use Deprecated;
 use InvalidArgumentException;
 use IteratorAggregate;
 use JsonSerializable;
@@ -98,9 +99,11 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return $return;
     }
 
-    public function except(mixed $keys): self
+    public function except(mixed ...$keys): self
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        if (1 === count($keys) && is_array($keys[0])) {
+            $keys = $keys[0];
+        }
 
         return new static(Arr::except($this->items, $keys));
     }
@@ -302,9 +305,18 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
         return Arr::query($this->all(), $encodingType);
     }
 
-    public function toString(string $separator = '&'): string
+    public function toQueryString(string $separator = '&'): string
     {
         return Arr::toString($this->all(), $separator);
+    }
+
+    /**
+     * @deprecated 自 4.2.0 起使用 {@see toQueryString()} 代替，本方法将在后续大版本移除。
+     */
+    #[Deprecated(message: 'use toQueryString() instead', since: '4.2.0')]
+    public function toString(string $separator = '&'): string
+    {
+        return $this->toQueryString($separator);
     }
 
     /**
@@ -367,7 +379,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
             return $value;
         }
 
-        return function ($item) use ($value) {
+        return function ($item, $key = null) use ($value) {
             return data_get($item, $value);
         };
     }

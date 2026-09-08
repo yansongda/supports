@@ -34,9 +34,12 @@ class Pipeline
         return $this;
     }
 
-    public function through(mixed $pipes): self
+    public function through(mixed ...$pipes): self
     {
-        $this->pipes = is_array($pipes) ? $pipes : func_get_args();
+        if (1 === count($pipes) && is_array($pipes[0]) && !is_callable($pipes[0])) {
+            $pipes = $pipes[0];
+        }
+        $this->pipes = $pipes;
 
         return $this;
     }

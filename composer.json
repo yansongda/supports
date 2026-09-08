@@ -14,8 +14,10 @@
     ],
     "require": {
         "php": ">=8.2",
-        "ext-mbstring": "*",
         "ext-ctype": "*",
+        "ext-libxml": "*",
+        "ext-mbstring": "*",
+        "ext-simplexml": "*",
         "psr/container": "^1.1.1 || ^2.0"
     },
     "require-dev": {

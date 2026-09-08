@@ -41,6 +41,25 @@ class StrTest extends TestCase
         self::assertFalse(Str::startsWith(0, ['_', '+']));
     }
 
+    public function testAscii()
+    {
+        self::assertSame('abc', Str::ascii('abc'));
+        self::assertSame('test-', Str::ascii('test-你好'));
+        self::assertSame('deja u', Str::ascii('déjà ü'));
+        self::assertSame('schoene aenderung', Str::ascii('schöne änderung', 'de'));
+    }
+
+    public function testSlug()
+    {
+        self::assertSame('hello-world', Str::slug('hello world'));
+        self::assertSame('hello-world-50-c-at-cafe', Str::slug('Hello_World 5° C @ cafe'));
+    }
+
+    public function testKebab()
+    {
+        self::assertSame('hello-world', Str::kebab('hello world'));
+    }
+
     public function testUuidV4()
     {
         $uuids = [];

@@ -2,6 +2,22 @@
 
 ## [Unreleased]
 
+### Added
+
+- composer.json 显式声明 `ext-simplexml` 与 `ext-libxml` 依赖（`Collection::toXml()`/`Arr::wrapXml()` 实际所需，此前未显式声明）
+- 新增 `Collection::toQueryString()` 方法：查询串构造（等价原 `toString()` 能力，`Arr::toString()` 静态方法不变）
+
+### Changed
+
+- `Collection::toString()` 标记 `@deprecated`（phpdoc + PHP 8 原生 `#[\Deprecated]` 注解，PHP 8.4+ 调用时自动触发 deprecation 提示）：继续可用，实现改为委托新增的 `toQueryString()`，行为不变；将在后续大版本移除，建议迁移
+- `Arr::sortRecursive()` 内部实现由引用遍历改写为键位赋值形态，`Arr::shuffle()`/`Collection::valueRetriever()` 内部回调闭包签名补全：均为内部实现优化，签名与可观察行为不变
+- ! `Collection::except()` 改为变参签名（`mixed ...$keys`）：主用形态行为不变，仅 `except(['a'], ['b'])` 由旧静默丢弃多余实参改为执行期 `TypeError`
+- ! `Pipeline::through()` 改为变参签名（`mixed ...$pipes`）：主用形态行为不变，仅 `through(['a'], 'b')` 由旧静默丢弃改为执行期 `TypeError`；`through([$obj, 'method'])` 语义由"对象 + 字符串两管道"修正为"单个 callable-array 管道"（与 illuminate 主流用法一致）
+
+### Fixed
+
+- `Str::ascii()`/`Str::slug()`/`Str::kebab()` 在 `strict_types=1` 下对任意输入必抛 `TypeError` 的 bug（`charsArray()` 数字字符串键被 PHP 规范化为 int 键，`str_replace()` 收到 int 抛错）
+
 ## [v4.1.1] - 2026-09-05
 
 ### Fixed

@@ -3,6 +3,7 @@
 namespace Yansongda\Supports\Tests;
 
 use PHPUnit\Framework\TestCase;
+use TypeError;
 use Yansongda\Supports\Collection;
 
 class CollectionTest extends TestCase
@@ -32,6 +33,24 @@ class CollectionTest extends TestCase
 
         self::assertEquals($json, $this->collection->toJson());
         self::assertEquals($json, $this->collection->__toString());
+    }
+
+    public function testToQueryString()
+    {
+        $collection = new Collection(['a' => 1, 'b' => 2]);
+
+        self::assertEquals('a=1&b=2', $collection->toQueryString());
+        self::assertEquals('a=1;b=2', $collection->toQueryString(';'));
+        self::assertEquals('', (new Collection())->toQueryString());
+    }
+
+    public function testToStringDeprecatedDelegate()
+    {
+        $collection = new Collection(['a' => 1, 'b' => 2]);
+
+        self::assertEquals('a=1&b=2', $collection->toString());
+        self::assertEquals($collection->toQueryString(), $collection->toString());
+        self::assertEquals($collection->toQueryString(';'), $collection->toString(';'));
     }
 
     public function testMagicGet()
@@ -81,6 +100,44 @@ class CollectionTest extends TestCase
             'age' => 26,
             'sex' => 1,
         ], $this->collection->except('language')->all());
+    }
+
+    public function testExceptWithArrayAndVariadicForms()
+    {
+        $expected = [
+            'name' => 'yansongda',
+        ];
+
+        self::assertEquals($expected, $this->collection->except(['age', 'sex', 'language'])->all());
+        self::assertEquals($expected, $this->collection->except('age', 'sex', 'language')->all());
+
+        // 单键形态：只删除该键（数组形态 except(['age']) 等价）
+        self::assertEquals([
+            'name' => 'yansongda',
+            'sex' => 1,
+            'language' => ['php', 'java', 'rust'],
+        ], $this->collection->except('age')->all());
+    }
+
+    public function testExceptWithMultipleArraysThrowsTypeError()
+    {
+        $collection = new Collection(['a' => 1, 'b' => 2, 'c' => 3]);
+
+        $this->expectException(TypeError::class);
+
+        $collection->except(['a'], ['b']);
+    }
+
+    public function testExceptWithNestedSingleArray()
+    {
+        $collection = new Collection(['a' => 1, 'b' => 2, 'c' => 3]);
+
+        // 嵌套单参数组：变参打包后 $keys = [[['a','b']]]，给定实现形态展开一次
+        // 得 [['a','b']]，仍为嵌套数组，执行期在 Arr::exists(int|string) 处 TypeError
+        // （与旧实现行为一致）。容器 php -r + probe 双重实验证实。
+        $this->expectException(TypeError::class);
+
+        $collection->except([['a', 'b']]);
     }
 
     public function testMerge()
