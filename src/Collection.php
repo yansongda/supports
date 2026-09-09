@@ -311,9 +311,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
     }
 
     /**
-     * @deprecated 自 4.2.0 起使用 {@see toQueryString()} 代替，本方法将在后续大版本移除。
+     * @deprecated 自 4.1.2 起使用 {@see toQueryString()} 代替，本方法将在后续大版本移除。
      */
-    #[Deprecated(message: 'use toQueryString() instead', since: '4.2.0')]
+    #[Deprecated(message: 'use toQueryString() instead', since: '4.1.2')]
     public function toString(string $separator = '&'): string
     {
         return $this->toQueryString($separator);
