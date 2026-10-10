@@ -1,47 +1,37 @@
 ---
 name: releasing-php-package
-description: Use when preparing to publish a new version of a PHP Composer package and need to write or update CHANGELOG, upgrade guides, and documentation before tagging and releasing
+description: Use when preparing to publish a new version of a PHP Composer package and need to write or update the CHANGELOG before tagging and releasing
 ---
 
 # 发布 PHP Composer 包
 
 ## 概述
 
-用于发布 PHP Composer 包的结构化流程，避免 CHANGELOG 格式混乱、升级指南缺失、文档示例过期等常见问题，并强制要求在打 tag 前通过独立分支 + PR 完成文档改动。
+用于发布 PHP Composer 包的结构化流程，避免 CHANGELOG 格式混乱、发布时序错乱（PR 未合并就打 tag）等常见问题，并强制要求：改动走独立分支 + PR，人工合并后方可打 tag。
 
 **硬性约束（违反即流程无效）：**
 - Agent 只负责创建 PR，**严禁自行合并 PR**（包括 `gh pr merge`、平台合并 API 等任何形式的自动合并）
 - PR 必须由人工审核后合并；在获得人工「PR 已合并」确认前，Agent 不得打 tag、不得创建 Release
-- **升级指南只在「有独立文档站」的仓库编写**；无独立文档站的仓库把全部变更说明写进 `CHANGELOG.md`，跳过步骤 3、4、5
-- **版本号以仓库维护者指定为准**：本 skill 的 Patch/Minor/Major 分类仅作默认建议，维护者指定后不得「纠正」
+- **版本号以维护者指定为准**：Patch/Minor/Major 分类仅作默认建议，维护者指定后不得「纠正」
 
 ## 使用场景
 
 - 准备发布新版本（patch/minor/major/beta/rc）
 - CHANGELOG 使用了非标准分类或前缀
-- 目标版本还没有对应的升级指南
-- 文档中包含已移除或已弃用功能的示例
-- 上次发布曾因文档问题被反馈
+- 上次发布曾因 CHANGELOG 问题被反馈
 
 **不要使用：**
 - 项目已有自动化发布工具（semantic-release、release-please）
 - 仅单文件改动且对用户无可见影响
-- 为「没有独立文档站」的仓库新建升级指南文件（这类仓库只维护 `CHANGELOG.md`）
-
-**本仓库（`yansongda/supports`）适配：** 无独立文档站——只有 `README.md` + `CHANGELOG.md`，无 `docs/v*/upgrade/`、无 `.vitepress/`、无 `mkdocs.yml`。因此发布流程为：分支隔离 → 规范化 `CHANGELOG.md` → PR（人工合并）→ annotated tag → GitHub Release。**步骤 3（升级指南）、步骤 4（清理文档示例）、步骤 5（更新导航）一律跳过**，变更说明与迁移示例直接写在 CHANGELOG 的对应版本小节内。
 
 ## 版本分类
 
-| 变更类型 | 版本号变化 | 是否需要升级指南 |
-|---|---|---|
-| 仅 Bug 修复 | Patch（1.0.X） | 否 |
-| 新功能，向后兼容 | Minor（1.X.0） | 是（仅限有独立文档站） |
-| 破坏性变更 | Major（X.0.0） | 是（仅限有独立文档站） |
-| 预发布（beta/rc/alpha） | 预发布版本（1.0.0-beta.1） | 是（仅限有独立文档站） |
-
-> **「有独立文档站」的判断：** 仓库存在 `docs/v{major}/upgrade/`、`web/docs/`、`src/docs/`、`.vitepress/`、`mkdocs.yml` 之一。
-> 不满足时（如本项目）不建升级指南：把使用者可见的行为/签名变化、迁移示例、破坏性变更（必须给「旧写法 → 新写法」）、运行环境要求变化全部写入 `CHANGELOG.md` 对应版本小节。
-> 即使是新功能，只要维护者指定 patch 版本，就按指定版本发布。
+| 变更类型 | 版本号变化 |
+|---|---|
+| 仅 Bug 修复 | Patch（1.0.X） |
+| 新功能，向后兼容 | Minor（1.X.0） |
+| 破坏性变更 | Major（X.0.0） |
+| 预发布（beta/rc/alpha） | 预发布版本（1.0.0-beta.1） |
 
 ## 核心模式
 
@@ -85,12 +75,10 @@ description: Use when preparing to publish a new version of a PHP Composer packa
 | 任务 | 命令 / 文件 | 关键规则 |
 |---|---|---|
 | 查看当前分支 | `git branch --show-current` | 禁止在 `master`/`main` 上直接修改 CHANGELOG |
-| 创建发布分支 | `git checkout -b docs/changelog-vX.Y.Z` | 所有文档改动必须走 PR |
+| 创建发布分支 | `git checkout -b docs/changelog-vX.Y.Z` | 所有改动必须走 PR |
 | 列出自上一个 tag 以来的提交 | `git log --oneline --no-merges $(git describe --tags --abbrev=0)..HEAD` | 排除 merge commit |
 | 标准分类 | `Added` → `Changed` → `Deprecated` → `Removed` → `Fixed` → `Security` | 严格顺序，不新增分类 |
 | 去除前缀 | 移除 `feat:`、`fix:`、`refactor:`、`chore:` | 仅当存在时才移除；已干净的中文描述保持原样 |
-| 升级指南 | `docs/v{major}/upgrade/v{version}.md` 或实际等价路径 | 先探测真实 docs 路径；无独立文档站直接跳过，说明写进 CHANGELOG |
-| 更新导航 | 侧边栏 / 菜单配置文件 | 无文档站/导航配置时跳过；若 `.gitignore` 忽略 docs 目录，使用 `git add -f` |
 | 合并 PR | 由人工在平台审核后执行 | Agent 严禁自动合并（`gh pr merge` 等一律禁止） |
 | 创建 annotated tag | `git tag -a vX.Y.Z -m "release: vX.Y.Z"` | 必须在 PR 由人工合并后执行 |
 | 创建 GitHub Release | `gh release create vX.Y.Z --notes-file release-notes.md --prerelease` | beta/rc/alpha 需标记为 pre-release |
@@ -109,7 +97,7 @@ git branch --show-current
 git checkout -b docs/changelog-vX.Y.Z
 ```
 
-**禁止**在 `master`/`main` 上直接提交 CHANGELOG 或升级指南改动。
+**禁止**在 `master`/`main` 上直接提交 CHANGELOG 改动。
 
 ### 1. 分析提交
 
@@ -120,7 +108,7 @@ git log --oneline --no-merges ${latest}..HEAD
 
 重点关注：PR 编号、破坏性变更、新功能、已弃用 / 已移除项。
 
-**仅文档发布判断：** 如果自上一个 tag 以来的代码变更已经在目标分支上，而你只是整理文档，则按「仅文档发布」处理。流程相同，但提交范围只包含 CHANGELOG / 升级指南 / 导航。
+**仅文档发布判断：** 如果自上一个 tag 以来的代码变更已经在目标分支上，而你只是整理 CHANGELOG，则按「仅文档发布」处理。流程相同，但提交范围只包含 CHANGELOG。
 
 **关键验证步骤：**
 分析完提交后，务必验证实际代码状态，避免把「新增后又移除」的功能写进发布说明：
@@ -163,60 +151,24 @@ git diff ${latest}..HEAD -- path/to/file
 **规则：**
 - 仅当存在 `feat:` / `fix:` / `refactor:` / `chore:` 等前缀时才移除
 - 不要重写已经是干净中文描述的条目
-- 将 `BREAKING CHANGES` 内容移入 `Changed` 或 `Removed`
+- 将 `BREAKING CHANGES` 内容移入 `Changed` 或 `Removed`，破坏性变更须给出「旧写法 → 新写法」
 - 合并重复条目（如同一文件被删除两次）
 - 保留 PR 引用 `(#1234)` 以便追溯
 - 子列表缩进 2 个空格
+- 使用者可见的行为 / 签名变化、迁移示例、运行环境要求变化（如 PHP 最低版本）全部写在本版本小节内
 
 **版本标题格式：**
 ```markdown
 ## [v1.2.0] - 2024-01-01
 ```
 
-### 3. 编写升级指南（仅「有独立文档站」的仓库）
-
-**若仓库无独立文档站（无 `docs/v*/upgrade/`、`web/docs/`、`src/docs/`、`.vitepress/`、`mkdocs.yml`），跳过本步骤与步骤 4、5**，改为把以下内容直接写入 `CHANGELOG.md` 的对应版本小节：
-- 使用者可见的行为/签名变化（附迁移示例代码块）
-- 破坏性变更（给出「旧写法 → 新写法」，不得只罗列标题）
-- 运行环境要求变化（如 PHP 最低版本）
-
-**先探测真实 docs 路径。** 常见位置：
-- `docs/v{major}/upgrade/v{version}.md`
-- `web/docs/v{major}/upgrade/v{version}.md`
-- `src/docs/v{major}/upgrade/v{version}.md`
-
-如果目标升级指南已存在（例如后续 beta 版本），则在原有基础上追加新内容，不要整篇替换。
-
-**章节结构：**
-1. `## 重点检查`
-   - `### 运行环境` — PHP 版本、扩展、其他运行时要求
-   - `### 简单使用者` — **仅 end-user 可见变更**（命名空间变化、移除的方法、配置调整）。不要罗列内部重构（内部辅助函数重组、不影响公共 API 的基类变化、代码组织调整）。
-   - `### 自有插件开发者` — 影响自定义插件或扩展的内部架构变更（新基类、方法签名变化、移除的内部工具）。
-2. `## 更改版本号` — `composer require vendor/package:~{version}`
-3. `### BREAKING CHANGES`（如有）— 完整破坏性变更列表
-
-### 4. 清理过期示例（仅「有独立文档站」的仓库）
-
-搜索文档中已移除或已弃用功能的使用：
-```bash
-grep -rn "deprecatedMethod\|removedClass\|oldNamespace" docs/
-```
-
-**规则：** 删除已移除功能的示例。不要保留「兼容两种写法」的双示例。文档只反映当前版本。
-
-### 5. 更新导航（仅「有独立文档站」的仓库）
-
-将新升级指南链接加入文档导航配置（如侧边栏、菜单、索引文件）。无导航配置文件时本步骤不适用。
-
-**注意：** 如果 `.gitignore` 包含 docs 目录匹配规则，新文件需用 `git add -f` 强制添加。
-
-### 6. PR → Tag → Release
+### 3. PR → Tag → Release
 
 **创建 PR：**
 ```bash
-git add -f CHANGELOG.md docs/  # 或 web/docs/，按实际路径调整；无独立文档站时只提交 CHANGELOG.md
+git add CHANGELOG.md
 
-git commit -m "docs: update CHANGELOG and upgrade guide for vX.Y.Z"
+git commit -m "docs: update CHANGELOG for vX.Y.Z"
 
 git push -u origin docs/changelog-vX.Y.Z
 
@@ -244,8 +196,8 @@ git push origin vX.Y.Z
 
 **创建 Release（以 GitHub 为例）：**
 ```bash
-# 从 CHANGELOG 提取当前版本段落
-sed -n '/^## \[vX.Y.Z\]/,/^## \[v/p' CHANGELOG.md | sed '$d' > release-notes.md  # 正则按仓库实际标题格式调整（本仓库为 `## [vX.Y.Z]`）
+# 从 CHANGELOG 提取当前版本段落（正则按仓库实际标题格式调整，本仓库为 `## [vX.Y.Z]`）
+sed -n '/^## \[vX.Y.Z\]/,/^## \[v/p' CHANGELOG.md | sed '$d' > release-notes.md
 
 # beta/rc/alpha 版本需添加 --prerelease
 gh release create vX.Y.Z --title "vX.Y.Z" --notes-file release-notes.md --prerelease
@@ -257,15 +209,10 @@ gh release create vX.Y.Z --title "vX.Y.Z" --notes-file release-notes.md --prerel
 |---|---|---|
 | 直接在 master 提交 CHANGELOG | 跳过分支隔离 | 必须先创建 `docs/changelog-vX.Y.Z` 分支 |
 | CHANGELOG 保留 `feat:`/`fix:` 前缀 | 从 commit 消息复制粘贴 | 仅在有前缀时剥离；保持已有干净描述 |
-| 内部重构写入「简单使用者」 | 未区分用户可见变更与内部变更 | 移到「自有插件开发者」或直接删除 |
-| 文档保留新旧双示例 | 试图在文档中保持向后兼容 | 删除旧示例；文档只反映当前版本 |
-| 忘记更新导航 | 创建升级指南后未注册 | 立即加入侧边栏 / 菜单 |
 | PR 未合并就创建 tag | 急于完成发布 | 先确认 `origin/master` 包含合并提交 |
 | 使用 lightweight tag | `git tag` 缺少 `-a` | 始终使用 `git tag -a` 并附带 message |
 | Release notes 与 CHANGELOG 不一致 | 单独编写 release notes | 从 CHANGELOG 提取或复制 |
 | 预发布版本未标记 pre-release | 忘记 beta/rc/alpha 后缀 | 按版本后缀在发布平台勾选 pre-release |
 | 写入「新增后又移除」的功能 | 仅依赖 commit 消息未验证代码 | 用 `git diff` 确认功能在 HEAD 中真实存在 |
-| 在无独立文档站的项目强行新建升级指南 | 机械套用 Minor/Major 规则 | 先探测文档站结构；不存在则写进 CHANGELOG，跳过步骤 3–5 |
 | 擅自「纠正」维护者指定的版本号 | 按语义化版本自行判断 | 版本号以维护者指定为准，分类表仅作默认建议 |
 | Agent 自行合并 PR | 误将「发布流程授权」当作「合并授权」 | 如需撤销：`git revert <merge-commit>`；此后一律仅创建 PR 并等待人工合并 |
-
