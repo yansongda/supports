@@ -2,6 +2,7 @@
 
 namespace Yansongda\Supports\Tests;
 
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 use TypeError;
 use Yansongda\Supports\Collection;
@@ -44,6 +45,8 @@ class CollectionTest extends TestCase
         self::assertEquals('', (new Collection())->toQueryString());
     }
 
+    // 有意调用已弃用的 toString() 验证其委托行为，故忽略由此产生的 E_USER_DEPRECATED（PHP 8.4+）
+    #[IgnoreDeprecations]
     public function testToStringDeprecatedDelegate()
     {
         $collection = new Collection(['a' => 1, 'b' => 2]);
