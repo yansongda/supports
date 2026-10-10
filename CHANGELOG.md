@@ -1,5 +1,23 @@
 # Changelog
 
+## [v4.1.3] - 2026-10-10
+
+### Added
+
+- 新增 `Yansongda\Supports\Json` 工具类：`Json::encode()`/`Json::decode()` 薄封装原生 `json_encode()`/`json_decode()`，失败即抛 `\JsonException`（`code` 为 `JSON_ERROR_*`），不再需要靠 `false` 返回值或 `json_last_error()` 判断失败 (#42)
+  - `Json::encode(mixed $value, int $flags = JSON_UNESCAPED_UNICODE, int $depth = 512): string`
+  - `Json::decode(string $json, bool $assoc = true, int $depth = 512, int $flags = 0): mixed`（默认返回关联数组）
+  - `encode()` 默认 flags 为 `JSON_UNESCAPED_UNICODE`（原生为 `0`，中文会被转义为 `\uXXXX`），传 `0` 可还原原生转义行为；`$flags`/`$depth` 参数名对齐原生函数，其余行为与原生一致
+  - 使用示例（运行环境要求不变，仍为 PHP >= 8.2）：
+
+    ```php
+    use Yansongda\Supports\Json;
+
+    Json::encode(['name' => '中文']);  // {"name":"中文"}
+    Json::decode('{"name":"中文"}');   // ['name' => '中文']
+    Json::decode('{bad');             // 抛 \JsonException，原生此处返回 null
+    ```
+
 ## [v4.1.2] - 2026-09-09
 
 ### Added

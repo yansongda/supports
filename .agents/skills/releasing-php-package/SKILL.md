@@ -12,6 +12,8 @@ description: Use when preparing to publish a new version of a PHP Composer packa
 **硬性约束（违反即流程无效）：**
 - Agent 只负责创建 PR，**严禁自行合并 PR**（包括 `gh pr merge`、平台合并 API 等任何形式的自动合并）
 - PR 必须由人工审核后合并；在获得人工「PR 已合并」确认前，Agent 不得打 tag、不得创建 Release
+- **升级指南只在「有独立文档站」的仓库编写**；无独立文档站的仓库把全部变更说明写进 `CHANGELOG.md`，跳过步骤 3、4、5
+- **版本号以仓库维护者指定为准**：本 skill 的 Patch/Minor/Major 分类仅作默认建议，维护者指定后不得「纠正」
 
 ## 使用场景
 
@@ -24,15 +26,22 @@ description: Use when preparing to publish a new version of a PHP Composer packa
 **不要使用：**
 - 项目已有自动化发布工具（semantic-release、release-please）
 - 仅单文件改动且对用户无可见影响
+- 为「没有独立文档站」的仓库新建升级指南文件（这类仓库只维护 `CHANGELOG.md`）
+
+**本仓库（`yansongda/supports`）适配：** 无独立文档站——只有 `README.md` + `CHANGELOG.md`，无 `docs/v*/upgrade/`、无 `.vitepress/`、无 `mkdocs.yml`。因此发布流程为：分支隔离 → 规范化 `CHANGELOG.md` → PR（人工合并）→ annotated tag → GitHub Release。**步骤 3（升级指南）、步骤 4（清理文档示例）、步骤 5（更新导航）一律跳过**，变更说明与迁移示例直接写在 CHANGELOG 的对应版本小节内。
 
 ## 版本分类
 
 | 变更类型 | 版本号变化 | 是否需要升级指南 |
 |---|---|---|
 | 仅 Bug 修复 | Patch（1.0.X） | 否 |
-| 新功能，向后兼容 | Minor（1.X.0） | 是 |
-| 破坏性变更 | Major（X.0.0） | 是 |
-| 预发布（beta/rc/alpha） | 预发布版本（1.0.0-beta.1） | 是 |
+| 新功能，向后兼容 | Minor（1.X.0） | 是（仅限有独立文档站） |
+| 破坏性变更 | Major（X.0.0） | 是（仅限有独立文档站） |
+| 预发布（beta/rc/alpha） | 预发布版本（1.0.0-beta.1） | 是（仅限有独立文档站） |
+
+> **「有独立文档站」的判断：** 仓库存在 `docs/v{major}/upgrade/`、`web/docs/`、`src/docs/`、`.vitepress/`、`mkdocs.yml` 之一。
+> 不满足时（如本项目）不建升级指南：把使用者可见的行为/签名变化、迁移示例、破坏性变更（必须给「旧写法 → 新写法」）、运行环境要求变化全部写入 `CHANGELOG.md` 对应版本小节。
+> 即使是新功能，只要维护者指定 patch 版本，就按指定版本发布。
 
 ## 核心模式
 
@@ -80,8 +89,8 @@ description: Use when preparing to publish a new version of a PHP Composer packa
 | 列出自上一个 tag 以来的提交 | `git log --oneline --no-merges $(git describe --tags --abbrev=0)..HEAD` | 排除 merge commit |
 | 标准分类 | `Added` → `Changed` → `Deprecated` → `Removed` → `Fixed` → `Security` | 严格顺序，不新增分类 |
 | 去除前缀 | 移除 `feat:`、`fix:`、`refactor:`、`chore:` | 仅当存在时才移除；已干净的中文描述保持原样 |
-| 升级指南 | `docs/v{major}/upgrade/v{version}.md` 或实际等价路径 | 先探测真实 docs 路径 |
-| 更新导航 | 侧边栏 / 菜单配置文件 | 若 `.gitignore` 忽略 docs 目录，使用 `git add -f` |
+| 升级指南 | `docs/v{major}/upgrade/v{version}.md` 或实际等价路径 | 先探测真实 docs 路径；无独立文档站直接跳过，说明写进 CHANGELOG |
+| 更新导航 | 侧边栏 / 菜单配置文件 | 无文档站/导航配置时跳过；若 `.gitignore` 忽略 docs 目录，使用 `git add -f` |
 | 合并 PR | 由人工在平台审核后执行 | Agent 严禁自动合并（`gh pr merge` 等一律禁止） |
 | 创建 annotated tag | `git tag -a vX.Y.Z -m "release: vX.Y.Z"` | 必须在 PR 由人工合并后执行 |
 | 创建 GitHub Release | `gh release create vX.Y.Z --notes-file release-notes.md --prerelease` | beta/rc/alpha 需标记为 pre-release |
@@ -164,7 +173,12 @@ git diff ${latest}..HEAD -- path/to/file
 ## [v1.2.0] - 2024-01-01
 ```
 
-### 3. 编写升级指南
+### 3. 编写升级指南（仅「有独立文档站」的仓库）
+
+**若仓库无独立文档站（无 `docs/v*/upgrade/`、`web/docs/`、`src/docs/`、`.vitepress/`、`mkdocs.yml`），跳过本步骤与步骤 4、5**，改为把以下内容直接写入 `CHANGELOG.md` 的对应版本小节：
+- 使用者可见的行为/签名变化（附迁移示例代码块）
+- 破坏性变更（给出「旧写法 → 新写法」，不得只罗列标题）
+- 运行环境要求变化（如 PHP 最低版本）
 
 **先探测真实 docs 路径。** 常见位置：
 - `docs/v{major}/upgrade/v{version}.md`
@@ -181,7 +195,7 @@ git diff ${latest}..HEAD -- path/to/file
 2. `## 更改版本号` — `composer require vendor/package:~{version}`
 3. `### BREAKING CHANGES`（如有）— 完整破坏性变更列表
 
-### 4. 清理过期示例
+### 4. 清理过期示例（仅「有独立文档站」的仓库）
 
 搜索文档中已移除或已弃用功能的使用：
 ```bash
@@ -190,9 +204,9 @@ grep -rn "deprecatedMethod\|removedClass\|oldNamespace" docs/
 
 **规则：** 删除已移除功能的示例。不要保留「兼容两种写法」的双示例。文档只反映当前版本。
 
-### 5. 更新导航
+### 5. 更新导航（仅「有独立文档站」的仓库）
 
-将新升级指南链接加入文档导航配置（如侧边栏、菜单、索引文件）。
+将新升级指南链接加入文档导航配置（如侧边栏、菜单、索引文件）。无导航配置文件时本步骤不适用。
 
 **注意：** 如果 `.gitignore` 包含 docs 目录匹配规则，新文件需用 `git add -f` 强制添加。
 
@@ -200,7 +214,7 @@ grep -rn "deprecatedMethod\|removedClass\|oldNamespace" docs/
 
 **创建 PR：**
 ```bash
-git add -f CHANGELOG.md docs/  # 或 web/docs/，按实际路径调整
+git add -f CHANGELOG.md docs/  # 或 web/docs/，按实际路径调整；无独立文档站时只提交 CHANGELOG.md
 
 git commit -m "docs: update CHANGELOG and upgrade guide for vX.Y.Z"
 
@@ -231,7 +245,7 @@ git push origin vX.Y.Z
 **创建 Release（以 GitHub 为例）：**
 ```bash
 # 从 CHANGELOG 提取当前版本段落
-sed -n '/^## vX.Y.Z/,/^## v/p' CHANGELOG.md | sed '$d' > release-notes.md
+sed -n '/^## \[vX.Y.Z\]/,/^## \[v/p' CHANGELOG.md | sed '$d' > release-notes.md  # 正则按仓库实际标题格式调整（本仓库为 `## [vX.Y.Z]`）
 
 # beta/rc/alpha 版本需添加 --prerelease
 gh release create vX.Y.Z --title "vX.Y.Z" --notes-file release-notes.md --prerelease
@@ -251,5 +265,7 @@ gh release create vX.Y.Z --title "vX.Y.Z" --notes-file release-notes.md --prerel
 | Release notes 与 CHANGELOG 不一致 | 单独编写 release notes | 从 CHANGELOG 提取或复制 |
 | 预发布版本未标记 pre-release | 忘记 beta/rc/alpha 后缀 | 按版本后缀在发布平台勾选 pre-release |
 | 写入「新增后又移除」的功能 | 仅依赖 commit 消息未验证代码 | 用 `git diff` 确认功能在 HEAD 中真实存在 |
+| 在无独立文档站的项目强行新建升级指南 | 机械套用 Minor/Major 规则 | 先探测文档站结构；不存在则写进 CHANGELOG，跳过步骤 3–5 |
+| 擅自「纠正」维护者指定的版本号 | 按语义化版本自行判断 | 版本号以维护者指定为准，分类表仅作默认建议 |
 | Agent 自行合并 PR | 误将「发布流程授权」当作「合并授权」 | 如需撤销：`git revert <merge-commit>`；此后一律仅创建 PR 并等待人工合并 |
 
