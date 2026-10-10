@@ -3,3 +3,8 @@ vendor/
 composer.lock
 .DS_Store
 .phpunit.cache/
+.worktrees/
+.pi/subagents/
+docs/implementation/
+docs/evidence/
+docs/learning/
